@@ -1,0 +1,4 @@
+<template>
+  <SignInGithub/>
+  <GoogleSignUp/>
+</template>
