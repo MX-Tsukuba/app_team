@@ -30,7 +30,15 @@ const useAuthTest = (): AuthState => {
 
   const signInWithGoogle = async (): Promise<void> => {
     try {
-      const { error: authError } = await supabase.auth.signInWithOAuth({ provider: 'google' })
+      const { error: authError } = await supabase.auth.signInWithOAuth({ 
+        provider: 'google',
+        options: {
+        queryParams: {
+          access_type: 'offline',
+          prompt: 'consent',
+          },
+        }, 
+      })
       console.log(session)
       if (authError) {
         error.value = authError.message

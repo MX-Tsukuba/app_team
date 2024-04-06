@@ -1,4 +1,5 @@
 <template>
-  <!-- <SignInGithub/> -->
-  <SignInGoogle/>
+  <!-- <NuxtLayout> -->
+    <NuxtPage/>
+  <!-- </NuxtLayout> -->
 </template>

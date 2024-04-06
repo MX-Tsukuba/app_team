@@ -1,11 +1,12 @@
 <template>
-    <div>
+    <!-- <div>
       <button @click="signInWithGoogle">Googleでサインインする</button>
       <p v-if="error">{{ error }}</p>
-    </div>
+    </div> -->
+    <SignInGoogle/>
 </template>
   
-<script setup>
+<!-- <script setup>
   import useAuthTest from '@/hooks/useAuthTest'
   
   const nuxtApp = useNuxtApp();
@@ -35,4 +36,4 @@
     return () => authData.subscription.unsubscribe();
   }, [session]);
 </script>
-  
+   -->
