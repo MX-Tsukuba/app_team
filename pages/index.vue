@@ -1,12 +1,12 @@
 <template>
     <div>
-      <button @click="signInWithGithub">Githubでサインインする</button>
+      <button @click="signInWithGoogle">Googleでサインインする</button>
       <p v-if="error">{{ error }}</p>
     </div>
 </template>
   
 <script setup>
-  import useAuth from '@/hooks/useAuth'
+  import useAuthTest from '@/hooks/useAuthTest'
   
   const nuxtApp = useNuxtApp();
 
@@ -22,7 +22,7 @@
   // TODO: データベースに初期値入れる
   };
 
-  const {signInWithGithub,error , session}=useAuth();
+  const {signInWithGoogle,error , session}=useAuthTest();
   console.log("~~~~~~~~~~~~~~~~~~~~")
   console.log(session)
   console.log("~~~~~~~~~~~~~~~~~~~~")

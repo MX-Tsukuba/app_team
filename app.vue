@@ -1,4 +1,4 @@
 <template>
-  <SignInGithub/>
-  <GoogleSignUp/>
+  <!-- <SignInGithub/> -->
+  <SignInGoogle/>
 </template>
