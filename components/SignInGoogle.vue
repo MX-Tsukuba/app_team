@@ -1,13 +1,14 @@
 <template>
     <div>
-      <button @click="signInWithGoogle">Googleでサインインする</button>
+      <button @click="signInWithProvider">{{providerName}}でサインインする</button>
       <p v-if="error">{{ error }}</p>
     </div>
-  </template>
-  
-  <script setup>
-  import useAuthGoogle from '@/hooks/useAuthGoogle'
-  
-  const {signInWithGoogle,error,session}=useAuthGoogle();
-  </script>
-  ~/hooks/useAuthGoogle
+</template>
+
+<script setup>
+import useAuth from '@/hooks/useAuth'
+
+const providerName = 'google';
+
+const {signInWithProvider,error,session}=useAuth(providerName);
+</script>

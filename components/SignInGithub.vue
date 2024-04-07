@@ -1,13 +1,15 @@
 <template>
     <div>
-      <button @click="signInWithGithub">Githubでサインインする</button>
+      <button @click="signInWithProvider">{{providerName}}でサインインする</button>
       <p v-if="error">{{ error }}</p>
     </div>
   </template>
   
   <script setup>
-  import useAuthGithub from '@/hooks/useAuthGithub'
+  import useAuth from '@/hooks/useAuth'
+
+  const providerName = 'github'
   
-  const {signInWithGithub,error,session}=useAuthGithub();
+  const {signInWithProvider,error,session}=useAuth(providerName);
   </script>
-  ~/hooks/useAuthGithub
+  

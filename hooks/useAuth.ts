@@ -3,8 +3,9 @@ import supabase from '~/plugins/supabase';
 import { ref, onMounted,} from "vue";
 import type { Session, SupabaseClient } from "@supabase/supabase-js";
 
+type Provider = 'google' | 'facebook' | 'twitter' | 'github';
 
-interface ProfileFromGoogle {
+interface ProfileFromProvider {
   nickName: string;
   avatarUrl: string;
 }
@@ -12,26 +13,26 @@ interface ProfileFromGoogle {
 interface AuthState {
   session: Ref<Session | null>;
   error: Ref<string>;
-  profileFromGoogle: Ref<ProfileFromGoogle>;
-  signInWithGoogle: () => Promise<void>;
+  profileFromProvider: Ref<ProfileFromProvider>;
+  signInWithProvider: () => Promise<void>;
   signOut: () => Promise<void>;
 }
 
 
-const useAuthGoogle = (): AuthState => {
+const useAuth = (providerName: Provider): AuthState => {
   const session = ref<Session | null>(null)
   const error = ref<string>('')
-  const profileFromGoogle = ref<ProfileFromGoogle>({ nickName: '', avatarUrl: '' })
+  const profileFromProvider = ref<ProfileFromProvider>({ nickName: '', avatarUrl: '' })
   const nuxtApp = useNuxtApp();
   const supabase = nuxtApp.$supabase as SupabaseClient;
   console.log("--------------------")
   console.log(nuxtApp)
   console.log("--------------------")
 
-  const signInWithGoogle = async (): Promise<void> => {
+  const signInWithProvider = async (): Promise<void> => {
     try {
       const { error: authError } = await supabase.auth.signInWithOAuth({ 
-        provider: 'google',
+        provider: providerName,
         options: {
         queryParams: {
           access_type: 'offline',
@@ -44,7 +45,7 @@ const useAuthGoogle = (): AuthState => {
         error.value = authError.message
       }
     } catch (e: any) {
-      error.value = e instanceof Error ? e.message : typeof e === 'string' ? e : 'Googleとの連携に失敗しました。'
+      error.value = e instanceof Error ? e.message : typeof e === 'string' ? e : '{providerName}との連携に失敗しました。'
     }
   }
 
@@ -56,13 +57,13 @@ const useAuthGoogle = (): AuthState => {
     const { data: authData } = supabase.auth.onAuthStateChange((_, session) => {
       if (session) {
         session.user.user_metadata = session.user.user_metadata || {}
-        profileFromGoogle.value.nickName = session.user.user_metadata.user_name
-        profileFromGoogle.value.avatarUrl = session.user.user_metadata.avatar_url
+        profileFromProvider.value.nickName = session.user.user_metadata.user_name
+        profileFromProvider.value.avatarUrl = session.user.user_metadata.avatar_url
         error.value = ''
       } else {
         error.value = 'ユーザーがサインアウトしました'
-        profileFromGoogle.value.nickName = ''
-        profileFromGoogle.value.avatarUrl = ''
+        profileFromProvider.value.nickName = ''
+        profileFromProvider.value.avatarUrl = ''
       }
       session ? (session = session) : (session = null)
     })
@@ -73,10 +74,10 @@ const useAuthGoogle = (): AuthState => {
   return {
     session,
     error,
-    profileFromGoogle,
-    signInWithGoogle,
+    profileFromProvider,
+    signInWithProvider,
     signOut
   }
 }
 
-export default useAuthGoogle
+export default useAuth

@@ -5,8 +5,8 @@
 </template>
 
 <script setup>
-import useAuthTest from "@/hooks/useAuthTest";
+import useAuth from "@/hooks/useAuth";
 
-const { signOut } = useAuthTest();
+const { signOut } = useAuth();
 </script>
-~/hooks/useAuthGoogle
+~/hooks/useAuth

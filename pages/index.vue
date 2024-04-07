@@ -6,6 +6,8 @@
     <!-- <SignInGithub/> -->
     <SignInGoogle/>
     <SignInGithub/>
+    <SignInTwitter/>
+    <LogoutButton/>
 </template>
   
 <!-- <script setup>
