@@ -5,6 +5,7 @@
     </div> -->
     <!-- <SignInGithub/> -->
     <SignInGoogle/>
+    <SignInGithub/>
 </template>
   
 <!-- <script setup>
