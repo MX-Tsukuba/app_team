@@ -6,8 +6,8 @@
   </template>
   
   <script setup>
-  import useAuthTest from '@/hooks/useAuthTest'
+  import useAuthGoogle from '@/hooks/useAuthGoogle'
   
-  const {signInWithGoogle,error,session}=useAuthTest();
+  const {signInWithGoogle,error,session}=useAuthGoogle();
   </script>
-  
+  ~/hooks/useAuthGoogle

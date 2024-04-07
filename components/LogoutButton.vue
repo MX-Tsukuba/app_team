@@ -9,3 +9,4 @@ import useAuthTest from "@/hooks/useAuthTest";
 
 const { signOut } = useAuthTest();
 </script>
+~/hooks/useAuthGoogle

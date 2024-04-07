@@ -3,6 +3,7 @@
       <button @click="signInWithGoogle">Googleでサインインする</button>
       <p v-if="error">{{ error }}</p>
     </div> -->
+    <!-- <SignInGithub/> -->
     <SignInGoogle/>
 </template>
   

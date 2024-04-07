@@ -18,7 +18,7 @@ interface AuthState {
 }
 
 
-const useAuth = (): AuthState => {
+const useAuthGithub = (): AuthState => {
   const session = ref<Session | null>(null)
   const error = ref<string>('')
   const profileFromGithub = ref<ProfileFromGithub>({ nickName: '', avatarUrl: '' })
@@ -71,4 +71,4 @@ const useAuth = (): AuthState => {
   }
 }
 
-export default useAuth
+export default useAuthGithub
