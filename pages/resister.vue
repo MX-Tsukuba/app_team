@@ -2,5 +2,7 @@
     <SignInGoogle/>
     <SignInGithub/>
     <SignInTwitter/>
-    <LogoutButton/>
 </template>
+<script>
+
+</script>

@@ -1,10 +1,8 @@
 <template>
-    <!-- <div>
-      <button @click="signInWithGoogle">Googleでサインインする</button>
-      <p v-if="error">{{ error }}</p>
-    </div> -->
-    <!-- <SignInGithub/> --> 
-    ここにrouterlinkを書きたい
+    <NuxtLink to="/resister">
+      新規会員登録はこちら
+    </NuxtLink>
+
 </template>
   
 <!-- <script setup>
