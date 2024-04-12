@@ -1,7 +1,10 @@
 <template>
-    <NuxtLink to="/resister">
-      新規会員登録はこちら
-    </NuxtLink>
+  <title>
+    ようこそ
+  </title>
+  <NuxtLink to="/resister">
+    新規会員登録はこちら
+  </NuxtLink>
 
 </template>
   

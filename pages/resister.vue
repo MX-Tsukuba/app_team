@@ -1,7 +1,8 @@
 <template>
-    <SignInGoogle/>
-    <SignInGithub/>
-    <SignInTwitter/>
+    <Login-SignInGoogle/>
+    <Login-SignInGithub/>
+    <Login-SignInTwitter/>
+    <Login-LogoutTest/>
 </template>
 <script>
 

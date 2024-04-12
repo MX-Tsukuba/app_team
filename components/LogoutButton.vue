@@ -5,16 +5,10 @@
 </template>
 
 <script setup>
-//import {useRouter} from 'vue-router';
-import useAuth from "@/hooks/useAuth";
+import useAuth from "~/composable/useAuth";
 
-// const router = useRouter();
+
+
 const { signOut } = useAuth();
-
-// const handleSignOut = async () => {
-//   await signOut();
-//   router.push("index");
-// };
-
 </script>
 ~/hooks/useAuth

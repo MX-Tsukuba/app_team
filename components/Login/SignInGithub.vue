@@ -6,10 +6,9 @@
 </template>
 
 <script setup>
-import useAuth from '@/hooks/useAuth'
+import useAuth from '~/composable/useAuth'
 
 const providerName = 'github';
 
 const {signInWithProvider,error,session}=useAuth(providerName);
 </script>
-  

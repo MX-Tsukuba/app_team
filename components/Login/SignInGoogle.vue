@@ -4,11 +4,12 @@
       <p v-if="error">{{ error }}</p>
     </div>
 </template>
-
+  
 <script setup>
-import useAuth from '@/hooks/useAuth'
+import useAuth from '~/composable/useAuth'
 
-const providerName = 'twitter';
+const providerName = 'google';
 
 const {signInWithProvider,error,session}=useAuth(providerName);
 </script>
+  

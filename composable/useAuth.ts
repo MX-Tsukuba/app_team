@@ -40,10 +40,19 @@ const useAuth = (providerName: Provider): AuthState => {
           },
         }, 
       })
+
+      if(session.value){
+        // router.push('@/pages/logout');
+        navigateTo('@/pages/logout')
+    }else{
+        navigateTo('@/pages/resister')
+    }
       console.log(session)
       if (authError) {
         error.value = authError.message
       }
+      
+
       //await router.push('/logout'); not work
     } catch (e: any) {
       error.value = e instanceof Error ? e.message : typeof e === 'string' ? e : '{{providerName}}との連携に失敗しました。'
