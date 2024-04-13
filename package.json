@@ -15,5 +15,8 @@
     "vue": "^3.4.21",
     "vue-google-oauth2": "^1.5.10",
     "vue-router": "^4.3.0"
+  },
+  "devDependencies": {
+    "@nuxtjs/supabase": "^1.2.0"
   }
 }

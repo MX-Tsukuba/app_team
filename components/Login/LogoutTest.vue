@@ -1,6 +1,6 @@
 <template>
     <div>
-      <button @click="signInWithProviderAndRedirect">logouttestでサインインする</button>
+      <button @click.prevent="signInWithProviderAndRedirect">logouttestでサインインする</button>
       <p v-if="error">{{ error }}</p>
     </div>
 </template>
@@ -22,6 +22,5 @@ const signInWithProviderAndRedirect = async () => {
     }else{
         navigateTo('~/pages/resister');
     }
-
 }
 </script>

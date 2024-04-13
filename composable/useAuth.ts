@@ -41,12 +41,12 @@ const useAuth = (providerName: Provider): AuthState => {
         }, 
       })
 
-      if(session.value){
-        // router.push('@/pages/logout');
-        navigateTo('@/pages/logout')
-    }else{
-        navigateTo('@/pages/resister')
-    }
+      // if(session.value){
+      //   // router.push('@/pages/logout');
+      //   navigateTo('@/pages/logout')}
+    // }else{
+    //     navigateTo('@/pages/resister')
+    // }
       console.log(session)
       if (authError) {
         error.value = authError.message
@@ -57,6 +57,7 @@ const useAuth = (providerName: Provider): AuthState => {
     } catch (e: any) {
       error.value = e instanceof Error ? e.message : typeof e === 'string' ? e : '{{providerName}}との連携に失敗しました。'
     }
+    
   }
 
   const signOut = async (): Promise<void> => {
@@ -80,6 +81,60 @@ const useAuth = (providerName: Provider): AuthState => {
 
     return () => authData && authData.subscription.unsubscribe()
   })
+
+  // const supabase = useSupabaseClient()
+  
+  const loading = ref(true)
+  const username = ref('')
+  const website = ref('')
+  const avatar_path = ref('')
+
+  async function updateProfile(){
+    try {
+        loading.value = true
+        const user = useSupabaseUser()
+
+        const updates = {
+            id: user.value.id,
+            username: username.value,
+            website: website.value,
+            avatar_url: avatar_path.value,
+            updated_at:new Date(),
+        }
+        const { error } = await supabase.from('profiles').upsert(updates, {
+            returning: 'minimal', // Don't return the value after inserting
+            })
+        if (error) throw error
+    } catch (error) {
+        alert(error.message)
+    } finally {
+        loading.value = false
+    }
+}
+
+async function createProfile(){
+    try {
+        loading.value = true
+        const user = useSupabaseUser()
+
+        const updates = {
+            id: user.value.id,
+            username: username.value,
+            website: website.value,
+            avatar_url: avatar_path.value,
+            created_at:new Date(),
+        }
+        const { error } = await supabase.from('profiles').insert(updates, {
+            returning: 'minimal', // Don't return the value after inserting
+            })
+        if (error) throw error
+    } catch (error) {
+        alert(error.message)
+    } finally {
+        loading.value = false
+    }
+}
+
 
   return {
     session,

@@ -1,13 +1,13 @@
-<template>
+<!-- <template>
   <title>
     ようこそ
   </title>
   <NuxtLink to="/resister">
     新規会員登録はこちら
   </NuxtLink>
-
-</template>
   
+</template>
+   -->
 <!-- <script setup>
   import useAuthTest from '@/hooks/useAuthTest'
   
@@ -39,3 +39,25 @@
   }, [session]);
 </script>
    -->
+
+
+   <script setup>
+   import { createClient } from '@supabase/supabase-js'
+   const supabase = createClient('https://fuuchzmnathzrsqqsuhg.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1dWNoem1uYXRoenJzcXFzdWhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTAwNjYwNDksImV4cCI6MjAyNTY0MjA0OX0.V9yZTvTcP-1u8zD1PLSKkGhY_fVWLqMDCGBV0hNFBLU')
+   const profiles = ref([])
+   
+   async function getProfiles() {
+     const { data } = await supabase.from('profiles').select()
+     profiles.value = data
+   }
+   
+   onMounted(() => {
+     getProfiles()
+   })
+   </script>
+   
+   <template>
+     <ul>
+       <li v-for="profile in profiles" :key="profile.id">{{ profile.username }}</li>
+     </ul>
+   </template>
