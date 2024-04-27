@@ -1,4 +1,4 @@
-<!-- <template>
+<template>
   <title>
     ようこそ
   </title>
@@ -7,8 +7,8 @@
   </NuxtLink>
   
 </template>
-   -->
-<!-- <script setup>
+   
+ <script setup>
   import useAuthTest from '@/hooks/useAuthTest'
   
   const nuxtApp = useNuxtApp();
@@ -38,10 +38,10 @@
     return () => authData.subscription.unsubscribe();
   }, [session]);
 </script>
-   -->
+  
 
 
-   <script setup>
+   <!-- <script setup>
    import { createClient } from '@supabase/supabase-js'
    const supabase = createClient('https://fuuchzmnathzrsqqsuhg.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1dWNoem1uYXRoenJzcXFzdWhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTAwNjYwNDksImV4cCI6MjAyNTY0MjA0OX0.V9yZTvTcP-1u8zD1PLSKkGhY_fVWLqMDCGBV0hNFBLU')
    const profiles = ref([])
@@ -60,4 +60,4 @@
      <ul>
        <li v-for="profile in profiles" :key="profile.id">{{ profile.username }}</li>
      </ul>
-   </template>
+   </template> -->
