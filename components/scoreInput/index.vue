@@ -46,7 +46,10 @@
 <script setup lang="ts">
 import { ref, reactive, watch } from 'vue';
 import type { Database } from '~/types/database.types';
+import { useHeadVarStore } from '~/src/store/headVar.js'
 
+const headVarStore = useHeadVarStore()
+headVarStore.title = 'スコア入力'
 const supabase = useSupabaseClient<Database>();
 const golfPlaceName = 'つくばゴルフ場';
 

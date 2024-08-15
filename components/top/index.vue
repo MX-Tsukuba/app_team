@@ -18,7 +18,10 @@
 </template>
 
 <script setup lang="ts">
+import { useHeadVarStore } from '~/src/store/headVar.js';
 
+const headVarStore = useHeadVarStore();
+headVarStore.title = 'ホーム';
 const isActive = ref(false);
 const toggleDetail = () => {
   isActive.value = !isActive.value;   
