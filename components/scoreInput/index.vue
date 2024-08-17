@@ -250,8 +250,4 @@ gap: 64px;
 .addBtn{
   justify-content: center;
 }
-.circleBtnContent{
-  font-size: 16px;
-  line-height: 64px;
-}
 </style>
