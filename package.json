@@ -11,8 +11,10 @@
     "start": "eval $(grep '^NUXT_HOST' .env) $(grep '^NUXT_PORT' .env) node .output/server/index.mjs"
   },
   "dependencies": {
+    "@pinia/nuxt": "^0.5.3",
     "@supabase/supabase-js": "^2.42.5",
     "nuxt": "^3.11.2",
+    "pinia": "^2.2.1",
     "supabase": "^1.163.2",
     "vue": "^3.4.21",
     "vue-router": "^4.3.0"

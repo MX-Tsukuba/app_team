@@ -1,6 +1,15 @@
 <template>
-    <h1 class = "header">MX-Tsukuba</h1>
+    <div class = "header">
+        <img src="~/assets/img/back.png" alt="Left" class="backButton" @click="$router.go(-1)">
+        <h1>{{ headVarStore.title }}</h1>
+        <img src="~/assets/img/menu.png" alt="menu" class="menuButton">
+    </div>
 </template>
+
+<script setup lang="ts">
+import { useHeadVarStore } from '~/src/store/headVar.js';
+const headVarStore = useHeadVarStore();
+</script>
 
 <style scoped>
 .header{
@@ -13,5 +22,23 @@
     position: fixed;
     top: 0;
     left: 0;
+}
+.backButton{
+    margin: 0;
+    height: 30px;
+    position: fixed;
+    top: 15px;
+    left: 10px;
+}
+h1{
+    margin: 0;
+    padding-top: 10px;
+}
+.menuButton{
+    margin: 0;
+    height: 20px;
+    position: fixed;
+    top: 20px;
+    right: 10px;
 }
 </style>

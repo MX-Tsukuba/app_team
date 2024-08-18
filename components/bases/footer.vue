@@ -1,8 +1,9 @@
 <template>
   <div class="footer">
-    muscleLink
-    <NuxtLink to="/scoreDisplay">Score</NuxtLink>
-    <NuxtLink to="/top">Top</NuxtLink>
+    <NuxtLink to="/top"><img src="~assets/img/home.png"></NuxtLink>
+    <img src="~assets/img/food.png">
+    <img src="~assets/img/body.png">
+    <NuxtLink to="/scoreDisplay"><img src="~assets/img/golf.png"></NuxtLink>
   </div>
 </template>
 
@@ -13,7 +14,7 @@ width: 100%;
 height: 90px;
 justify-content: center;
 align-items: center;
-gap: 96px;
+gap: 72px;
 flex-shrink: 0;
 background: #FFF;
 box-shadow: 0px 0px 16px 0px rgba(0, 0, 0, 0.25);
