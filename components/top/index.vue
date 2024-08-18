@@ -3,7 +3,6 @@
     <enterGolfCourseName v-if="isShowModal"/>
     <div class="recentRecord">
       <p>直近の記録エリア</p>
-      <p>一目で結果を確認できるグラフ</p>
     </div>
     <div class="inputTags">
       <div class="inputTag">
@@ -57,7 +56,7 @@ const toggleModal = () => modalStore.toggleModal();
 
 .recentRecord {
   width: 360px;
-  height: 200px;
+  height: min(200px, max-height);
   padding-top: 24px;
   display: flex;
   flex-direction: column;
@@ -66,6 +65,7 @@ const toggleModal = () => modalStore.toggleModal();
   border-radius: 16px;
   background: #FFF;
   box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, .25);
+  padding: 10px
 }
 .inputTags{
   margin-top: 32px;

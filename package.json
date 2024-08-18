@@ -13,11 +13,13 @@
   "dependencies": {
     "@pinia/nuxt": "^0.5.3",
     "@supabase/supabase-js": "^2.42.5",
+    "charts.css": "^1.1.0",
     "nuxt": "^3.11.2",
     "pinia": "^2.2.1",
     "supabase": "^1.163.2",
     "vue": "^3.4.21",
-    "vue-router": "^4.3.0"
+    "vue-router": "^4.3.0",
+    "vue.charts.css": "^2.0.1"
   },
   "devDependencies": {
     "@nuxtjs/supabase": "^1.2.1"
