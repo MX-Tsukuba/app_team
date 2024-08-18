@@ -23,23 +23,32 @@ button{
 .whole{
   margin: -8px;
   padding: 80px 0;
+  height: 100vh;
+  background: #F0F0F0;
 }
+/* 共通CSS */
 .circleBtn {
   width: 64px;
   height: 64px;
-  text-align: center;
   border-radius: 32px;
   background: #FFF;
-  box-shadow: 0px 0px 16px 0px rgba(0, 0, 0, 0.10);
+  box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, .25);
   position: fixed;
   right: 8px;
   bottom: 104px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-
-.circleBtnContent {
-  text-decoration: none;
-  color: #DF0000;
-  font-size: 64px;
-  line-height: 100%;
+.bButton {
+  width: 200px;
+  height: 40px;
+  border-radius: 20px;
+  color: #FFF;
+  background: #007be5;
+  box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, .5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 </style>

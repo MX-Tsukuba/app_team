@@ -1,41 +1,62 @@
 <template>
   <section class="wholeHome">
-    <div class="homeRecentRecord">
+    <enterGolfCourseName v-if="isShowModal"/>
+    <div class="recentRecord">
       <p>直近の記録エリア</p>
       <p>一目で結果を確認できるグラフ</p>
     </div>
-    <div class="homeRelationDisplay"  :class="{'isActive': isActive, 'isInactive': !isActive}" >
-      <p class="toggleDetail" :class="{'isActive': !isActive, 'isInactive': isActive}" @click="toggleDetail">詳細を見る</p>
-      <p class="toggleDetail" :class="{'isActive': isActive, 'isInactive': !isActive}" @click="toggleDetail">閉じる</p>
-      <p>マッスルデータとスコアデータとの関連分析結果表示エリア
-      </p>
-    </div>
-    <div class="circleBtn">
-      <NuxtLink to="../scoreInput" class="circleBtnContent">+</NuxtLink>
-    </div>
+    <div class="inputTags">
+      <div class="inputTag">
+        <img src="~assets/img/foodInput.png" width="40">
+        <div class="innerInputTag">
+          <p class="tagTitle">食事を記録</p>
+          <p class="tagDescription">毎日の食事とカロリーを記録します</p>
+        </div>
+        <img src="~assets/img/right.png">
+      </div> 
+      <div class="inputTag">
+        <img src="~assets/img/bodyInput.png" width="40">
+        <div class="innerInputTag">
+          <p class="tagTitle">身体情報</p>
+          <p class="tagDescription">体重や身長などの変化を記録します</p>
+        </div>
+        <img src="~assets/img/right.png">
+      </div> 
+      <div class="inputTag">
+        <img src="~assets/img/golfInput.png" width="40">
+        <div class="innerInputTag">
+          <p class="tagTitle">スコアを記録</p>
+          <p class="tagDescription">ゴルフのスコアなどを記録します</p>
+        </div>
+        <img src="~assets/img/right.png" @click="toggleModal">
+      </div>
+    </div>    
+    <NuxtLink to="../camera/video"  class="circleBtn"><img src="~assets/img/camera.png" width="48"></NuxtLink>
   </section>
-
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
+import { useHeadVarStore } from '~/src/store/headVar.js';
+import { useModalStore } from '~/src/store/modal';
+import enterGolfCourseName from './enterGolfCourseName.vue';
 
-const isActive = ref(false);
-const toggleDetail = () => {
-  isActive.value = !isActive.value;   
-};
+const headVarStore = useHeadVarStore();
+headVarStore.title = 'Home';
+const modalStore = useModalStore();
+const isShowModal = computed(() => modalStore.isShowModal);
+const toggleModal = () => modalStore.toggleModal();
 </script>
 
 <style scoped>
-
 .wholeHome {
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: #FAFAFA;
 }
 
-.homeRecentRecord {
-  width: 350px;
+.recentRecord {
+  width: 360px;
   height: 200px;
   padding-top: 24px;
   display: flex;
@@ -44,48 +65,33 @@ const toggleDetail = () => {
   gap: 80px;
   border-radius: 16px;
   background: #FFF;
-  box-shadow: 0px 0px 16px 0px rgba(0, 0, 0, 0.10);
+  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, .25);
 }
-
-.homeRelationDisplay.isInactive {
-  width: 100%;
-  height: 390px;
+.inputTags{
   margin-top: 32px;
-  padding-top: 24px;
+}
+.inputTag{
+  width: 350px;
+  height: 64px;
+  margin-top: 16px;
   display: flex;
-  flex-direction: column;
-  justify-content: center;
+  justify-content: space-around;
   align-items: center;
-  position: relative;
   border-radius: 16px;
   background: #FFF;
-  box-shadow: 0px 0px 16px 0px rgba(0, 0, 0, 0.10);
+  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, .25);
 }
-
-.homeRelationDisplay.isActive {
-  width: 100%;
-  height: 800px;
-  margin-top: 32px;
-  padding-top: 24px;
+.innerInputTag{
+  width: 65%;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-  border-radius: 16px;
-  background: #FFF;
-  box-shadow: 0px 0px 16px 0px rgba(0, 0, 0, 0.10);
 }
-
-.toggleDetail.isActive{
-  color: #DF0000;
+.tagTitle{
+  font-size: 24px;
+  font-weight: bold;
+}
+.tagDescription{
   font-size: 14px;
-  position: absolute;
-  top: 32px;
-  right: 16px;
-}
-
-.toggleDetail.isInactive{
-  display: none;
+  color: #777;
 }
 </style>
