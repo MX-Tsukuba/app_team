@@ -4,6 +4,20 @@
     <div class="recentRecord">
       <p>直近の記録エリア</p>
       <p>一目で結果を確認できるグラフ</p>
+      <table class="charts-css column multiple show-heading show-labels data-spacing-10 show-primary-axis show-6-secondary-axes">
+        <tr>
+          <th>2015</th>
+          <td style="--size: calc(1244 / 1300)">1,244名</td>
+          </tr>
+          <tr>
+          <th>2016</th>
+          <td style="--size: calc(1139 / 1300)">1,139名</td>
+          </tr>
+          <tr>
+          <th>2017</th>
+          <td style="--size: calc(1290 / 1300)">1,290名</td>
+          </tr>
+      </table>
     </div>
     <div class="inputTags">
       <div class="inputTag">
@@ -36,6 +50,7 @@
 </template>
 
 <script setup lang="ts">
+import 'charts.css';
 import { computed } from 'vue';
 import { useHeadVarStore } from '~/src/store/headVar.js';
 import { useModalStore } from '~/src/store/modal';
@@ -57,7 +72,6 @@ const toggleModal = () => modalStore.toggleModal();
 
 .recentRecord {
   width: 360px;
-  height: 200px;
   padding-top: 24px;
   display: flex;
   flex-direction: column;

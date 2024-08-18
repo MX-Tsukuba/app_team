@@ -1,5 +1,5 @@
 <template>
-  <div class="modal">
+  <div class="modal" @click.self="toggleModal">
     <div class="card">
     <span class="closeModal" @click="toggleModal">×</span>
       <p class="title">ゴルフ場登録</p>

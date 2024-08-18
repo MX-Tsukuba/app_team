@@ -1,7 +1,6 @@
 <template>
   <section class="scoreInputWhole">
-    <div class="SIshowHole">      
-      <p>{{ golfPlaceName }}</p>
+    <div class="SIshowHole">
       <div class="SISHtop">
         <p class="SIhole">{{ currentHole }}H</p>
         <p class="SIpar">par{{ par }}</p>
@@ -12,33 +11,30 @@
     <ul class="SIBoxes">
       <li  v-for="(item, index) in items" :key="index" class="SIbox" v-show="isItemVisible(index)" @click="updateCurrentHole(item)">{{ item }}H</li>
     </ul>
-      <p class="SIleftButton" @click="moveLeft"> < </p>
-      <p class="SIrightButton" @click="moveRight"> > </p>
+      <!-- <p class="SIleftButton" @click="moveLeft"> < </p>
+      <p class="SIrightButton" @click="moveRight"> > </p> -->
     </div>
 
     <div class="SIchooseNum">
+      <img src="~assets/img/information.png" alt="information" class="information" @click="toggleModal">
+      <information v-if="isShowModal"/>
       <div class="SIdata">
         <div>
-        <p class="scoreScore">スコア</p>
+          <p class="scoreScore">スコア</p>
+          <div>
+            <input type="number" pattern="\d*" class="SInum" v-model="playData.scoreNumber">
+          </div>
+        </div>
         <div>
-          <input type="number" pattern="\d*" class="SInum" v-model="playData.scoreNumber">
-          <img>
+          <p class="scoreScore">パット数</p>
+          <div>
+            <input type="number" pattern="\d*" class="SInum" v-model="playData.puttsNumber">
+          </div>
         </div>
       </div>
-      <div>
-        <p class="scoreScore">パット数</p>
-        <div>
-          <input type="number" pattern="\d*" class="SInum" v-model="playData.puttsNumber">
-          <img>
-        </div>
-      </div>
-      </div>
-    <div>
-      <p class="SInum addBtn" @click="addPlayData">addData</p>
-    </div>
-    <div class="circleBtn">
-      <NuxtLink to="../camera/video" class="circleBtnContent">Camera</NuxtLink>
-    </div>
+      <video></video>
+      <NuxtLink to="../scoreDisplay"  class="bButton" @click="addPlayData">完了</NuxtLink>
+    <NuxtLink to="../camera/video"  class="circleBtn"><img src="~assets/img/camera.png" width="48"></NuxtLink>
     </div>
   </section>
 </template>
@@ -47,12 +43,16 @@
 import { ref, reactive, watch } from 'vue';
 import type { Database } from '~/types/database.types';
 import { useHeadVarStore } from '~/src/store/headVar.js'
+import { useModalStore } from '~/src/store/modal';
+import information from './information.vue';
 
-const headVarStore = useHeadVarStore()
-headVarStore.title = 'スコア入力'
 const supabase = useSupabaseClient<Database>();
 const golfPlaceName = 'つくばゴルフ場';
-
+const headVarStore = useHeadVarStore()
+headVarStore.title = `${golfPlaceName}`;
+const modalStore = useModalStore();
+const isShowModal = computed(() => modalStore.isShowModal);
+const toggleModal = () => modalStore.toggleModal();
 const playData = reactive({
   scoreNumber: 0,
   puttsNumber: 0,
@@ -101,19 +101,18 @@ const addPlayData = async () => {
 const items:number[] = Array.from({ length: 18 }, (_, i) => i + 1);
 const currentCardIndex = ref<number>(5);
 
-const moveLeft = () =>{
-  currentCardIndex.value -= 5;
-  if (currentCardIndex.value <= 3) {
-    currentCardIndex.value = 5; // 最終的な表示範囲をリセット
-  }
-}
-
-const moveRight = () =>{
-  currentCardIndex.value += 5;
-  if (currentCardIndex.value > 15) {
-    currentCardIndex.value = 18; // 最終的な表示範囲をリセット
-  }
-}
+// const moveLeft = () =>{
+//   currentCardIndex.value -= 5;
+//   if (currentCardIndex.value <= 3) {
+//     currentCardIndex.value = 5; // 最終的な表示範囲をリセット
+//   }
+// }
+// const moveRight = () =>{
+//   currentCardIndex.value += 5;
+//   if (currentCardIndex.value > 15) {
+//     currentCardIndex.value = 18; // 最終的な表示範囲をリセット
+//   }
+// }
 
 const isItemVisible = (index:number)=> {
   const start = Math.max(0, currentCardIndex.value - 5);
@@ -124,11 +123,10 @@ const isItemVisible = (index:number)=> {
 
 <style scoped>
 .scoreInputWhole{
-  display: inline-flex;
+  display: flex;
   flex-direction: column;
   align-items: center;
   gap: 40px;
-  background: #FAFAFA;
 }
 .SIshowHole{
   display: flex;
@@ -146,18 +144,19 @@ gap: 70px;
 align-self: stretch;
 }
 .SIhole{
-  font-size: 32px;
+  font-size: 36px;
+  color: #007BE5;
 }
 .SIpar{
-  font-size: 24px;
+  font-size: 20px;
+  color: #777;
 }
 .SISHborder{
   width: 300px;
-height: 8px;
+height: 2px;
 border-radius: 8px;
-border: 2px solid #777;
-background: #FFF;
-box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.25);
+background: #007BE5;
+box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, .5);
 }
 .SIsearchHole{
   display: flex;
@@ -180,12 +179,13 @@ gap: 10px;
   display: flex;
 justify-content: center;
 align-items: center;
-border: 1px solid #000;
+border-radius: 5px;
+border: 1px solid #007BE5;
 background: #FFF;
 box-shadow: 2px 2px 16px 0px rgba(0, 0, 0, 0.25);
 cursor: pointer;
 }
-.SIleftButton{
+/* .SIleftButton{
   width: 48px;
 height: 48px;
 font-size: 32px;
@@ -193,6 +193,7 @@ text-align: center;
 vertical-align: middle;
 border: 1px solid black;
 border-radius: 24px;
+background: #FFF;
 position: absolute;
 left: 16px;
 bottom: 0px;
@@ -207,24 +208,32 @@ text-align: center;
 vertical-align: middle;
 border: 1px solid black;
 border-radius: 24px;
+background: #FFF;
 position: absolute;
 right: 16px;
 bottom: 0px;
 box-shadow: 2px 2px 16px 0px rgba(0, 0, 0, 0.25);
 cursor: pointer;
-}
+} */
 .SIchooseNum{
   display: flex;
-width: 389px;
-padding: 36px 0px;
-flex-direction: column;
-justify-content: center;
-align-items: center;
-gap: 64px;
-flex-wrap: wrap;
-border-radius: 16px;
-background: #FFF;
-box-shadow: 0px 0px 16px 0px rgba(0, 0, 0, 0.10);
+  width: 390px;
+  padding: 40px 0px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+  flex-wrap: wrap;
+  position: relative;
+  border-radius: 16px;
+  background: #FFF;
+  box-shadow: 0px 0px 16px 0px rgba(0, 0, 0, 0.10);
+}
+.information{
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
 }
 .SInum{
   display: flex;
