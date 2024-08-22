@@ -4,20 +4,6 @@
     <div class="recentRecord">
       <p>直近の記録エリア</p>
       <p>一目で結果を確認できるグラフ</p>
-      <table class="charts-css column multiple show-heading show-labels data-spacing-10 show-primary-axis show-6-secondary-axes">
-        <tr>
-          <th>2015</th>
-          <td style="--size: calc(1244 / 1300)">1,244名</td>
-          </tr>
-          <tr>
-          <th>2016</th>
-          <td style="--size: calc(1139 / 1300)">1,139名</td>
-          </tr>
-          <tr>
-          <th>2017</th>
-          <td style="--size: calc(1290 / 1300)">1,290名</td>
-          </tr>
-      </table>
     </div>
     <div class="inputTags">
       <div class="inputTag">
@@ -26,7 +12,7 @@
           <p class="tagTitle">食事を記録</p>
           <p class="tagDescription">毎日の食事とカロリーを記録します</p>
         </div>
-        <img src="~assets/img/right.png">
+        <img src="~assets/img/right.png" class="goButton">
       </div> 
       <div class="inputTag">
         <img src="~assets/img/bodyInput.png" width="40">
@@ -34,7 +20,7 @@
           <p class="tagTitle">身体情報</p>
           <p class="tagDescription">体重や身長などの変化を記録します</p>
         </div>
-        <img src="~assets/img/right.png">
+        <img src="~assets/img/right.png" class="goButton">
       </div> 
       <div class="inputTag">
         <img src="~assets/img/golfInput.png" width="40">
@@ -42,7 +28,7 @@
           <p class="tagTitle">スコアを記録</p>
           <p class="tagDescription">ゴルフのスコアなどを記録します</p>
         </div>
-        <img src="~assets/img/right.png" @click="toggleModal">
+        <img src="~assets/img/right.png"  class="goButton" @click="toggleModal">
       </div>
     </div>    
     <NuxtLink to="../camera/video"  class="circleBtn"><img src="~assets/img/camera.png" width="48"></NuxtLink>
@@ -50,7 +36,6 @@
 </template>
 
 <script setup lang="ts">
-import 'charts.css';
 import { computed } from 'vue';
 import { useHeadVarStore } from '~/src/store/headVar.js';
 import { useModalStore } from '~/src/store/modal';
@@ -107,5 +92,8 @@ const toggleModal = () => modalStore.toggleModal();
 .tagDescription{
   font-size: 14px;
   color: #777;
+}
+.goButton{
+  cursor: pointer;
 }
 </style>

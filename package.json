@@ -4,10 +4,11 @@
   "type": "module",
   "scripts": {
     "build": "nuxt build",
-    "dev": "nuxt dev",
+    "dev": "nuxt dev --https --ssl-cert ./localhttps_cert.pem --ssl-key ./localhttps_key.pem",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "start": "eval $(grep '^NUXT_HOST' .env) $(grep '^NUXT_PORT' .env) node .output/server/index.mjs"
   },
   "dependencies": {
     "@pinia/nuxt": "^0.5.3",
@@ -17,7 +18,8 @@
     "pinia": "^2.2.1",
     "supabase": "^1.163.2",
     "vue": "^3.4.21",
-    "vue-router": "^4.3.0"
+    "vue-router": "^4.3.0",
+    "vue.charts.css": "^2.0.1"
   },
   "devDependencies": {
     "@nuxtjs/supabase": "^1.2.1"

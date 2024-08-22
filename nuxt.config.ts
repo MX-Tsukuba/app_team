@@ -7,6 +7,7 @@ export default defineNuxtConfig({
   supabase:{
     redirect:false
   },
+
   hooks:{
     'pages:extend'(pages){
       pages.push({
@@ -15,5 +16,5 @@ export default defineNuxtConfig({
         file: '~/pages/top/index.vue',
       })
     }
-  }
+  },
 })

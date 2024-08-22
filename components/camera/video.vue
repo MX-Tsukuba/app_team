@@ -6,15 +6,20 @@
       <button @click="captureImage">写真を撮影</button>
       <button @click="startRecording" :disabled="isRecording">動画を開始</button>
       <button @click="stopRecording" :disabled="!isRecording">動画を停止</button>
+      <button @click="downloadVideo" :disabled="!videoSrc">動画を保存</button>
+      <button @click="downloadImage" :disabled="!videoSrc">写真を保存</button>
+    <!--------->
+      <input type = "file" accept = "video/*" @change="onFileChange"/>
+      <input type = "file" accept = "video/*" @change="upLoadSupabaseStorage">
     </div>
-    
+
     <div v-if="imageSrc">
-      <h2>撮影した画像</h2>
+      <h2>撮影した画像orアプロードした画像</h2>
       <img :src="imageSrc" alt="Captured Image" />
     </div>
 
     <div v-if="videoSrc">
-      <h2>撮影した動画</h2>
+      <h2>撮影した動画orアップロードした動画</h2>
       <video :src="videoSrc" controls></video>
     </div>
   </div>
@@ -22,6 +27,7 @@
 
 <script lang="ts" setup>
 import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { useSupabaseClient } from '#imports';
 
 const video = ref<HTMLVideoElement | null>(null)
 const imageSrc = ref<string | null>(null)
@@ -66,7 +72,7 @@ const startRecording = () => {
       }
     }
     mediaRecorder.value.onstop = () => {
-      const blob = new Blob(recordedChunks, { type: 'video/webm' })
+      const blob = new Blob(recordedChunks, { type: 'video/mp4' })
       videoSrc.value = URL.createObjectURL(blob)
       recordedChunks.length = 0
     }
@@ -79,6 +85,47 @@ const stopRecording = () => {
   if (mediaRecorder.value && isRecording.value) {
     mediaRecorder.value.stop()
     isRecording.value = false
+  }
+}
+
+const downloadVideo = () => {
+  if (videoSrc.value) {
+    const a = document.createElement('a')
+    a.href = videoSrc.value
+    a.download = 'recorded_video.mp4'
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+  }
+}
+
+const downloadImage = () =>{
+  if(imageSrc.value){
+    const a = document.createElement('a')
+    a.href = imageSrc.value
+    a.download = 'recoad_image.png'
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+  }
+}
+
+const onFileChange = (event: Event) =>{
+  const input = event.target as HTMLInputElement;
+  if(input.files && input.files[0]){
+    const file = input.files[0];
+    videoSrc.value = URL.createObjectURL(file);
+  }
+} 
+
+const upLoadSupabaseStorage= async(event: Event)=>{
+  const input = event.target as HTMLInputElement;
+  if(input.files && input.files[0]){
+    const file = input.files[0];
+    const{data, error} = await useSupabaseClient().storage.from('Movie').upload('test/test.mp4', file);
+    if(error){
+      console.log(error);
+    }
   }
 }
 
