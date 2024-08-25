@@ -1,3 +1,10 @@
+# app_authentication
+認証チーム
+
+もとは
+https://zenn.dev/chot/articles/ddd2844ad3ae61
+を参考に進めていたが、完全に詰まってしまったため、公式ドキュメントをベースに作り直すことにした。
+
 # Nuxt 3 Minimal Starter
 
 Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.

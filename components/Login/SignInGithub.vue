@@ -11,4 +11,8 @@ import useAuth from '~/composable/useAuth'
 const providerName = 'github';
 
 const {signInWithProvider,error,session}=useAuth(providerName);
+
+const props= defineProps({
+  
+})
 </script>

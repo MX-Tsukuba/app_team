@@ -4,19 +4,17 @@
   "type": "module",
   "scripts": {
     "build": "nuxt build",
-    "dev": "nuxt dev",
+    "dev": "nuxt dev --host",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.41.1",
-    "nuxt": "^3.11.1",
+    "@nuxtjs/supabase": "^1.2.1",
+    "charts.css": "^1.1.0",
+    "nuxt": "^3.11.2",
     "vue": "^3.4.21",
-    "vue-google-oauth2": "^1.5.10",
-    "vue-router": "^4.3.0"
-  },
-  "devDependencies": {
-    "@nuxtjs/supabase": "^1.2.0"
+    "vue-router": "^4.3.0",
+    "vue.charts.css": "^2.0.1"
   }
 }

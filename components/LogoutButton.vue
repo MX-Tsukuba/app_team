@@ -11,4 +11,3 @@ import useAuth from "~/composable/useAuth";
 
 const { signOut } = useAuth();
 </script>
-~/hooks/useAuth

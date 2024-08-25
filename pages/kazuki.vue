@@ -1,6 +1,12 @@
-<script setup="ts">
-import type {Database} from '~/types/database.types';
-const supabase = useSupabaseClient<Database>();
+<!-- <script setup="ts">
+// import type { Database } from '~/types/database.types';
+import { createClient } from '@supabase/supabase-js'
+import type  { Database } from '~/types/database.types'
+
+const supabase = useSupabaseClient<Database>(
+    process.env.SUPABASE_URL,
+    process.env.SUPABASE_KEY
+);
 
 const {data: profiles} = await useAsyncData(async () => {
     const {data} = await supabase.from('profiles').select('*');
@@ -44,4 +50,5 @@ const addProduct = async() => {
             </button>
         </form>
     </div>
-</template>
+</template> -->
+<template></template>
