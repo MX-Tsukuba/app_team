@@ -17,6 +17,7 @@
     "nuxt": "^3.11.2",
     "pinia": "^2.2.1",
     "supabase": "^1.163.2",
+    "swiper": "^11.1.10",
     "vue": "^3.4.21",
     "vue-router": "^4.3.0",
     "vue.charts.css": "^2.0.1"

@@ -8,10 +8,10 @@
       <hr class="displayLine"/>
     </div>
     <ul class="selectHole">
-      <li  v-for="(item, index) in items" :key="index" class="eachHole" v-show="isItemVisible(index)" @click="updateCurrentHole(item.id)" :class="{'holeCardLarge': item.card.isLarge, 'holeCardMedium': item.card.isMedium, 'holeCardSmall': item.card.isSmall}">{{ item.id }}H</li>
+      <li  v-for="(item, index) in items" :key="index" class="eachHole" v-show="index >= isItemVisible.start && index < isItemVisible.end" @click="updateCurrentHole(item.id)" :class="{'holeCardLarge': item.card.isLarge, 'holeCardMedium': item.card.isMedium, 'holeCardSmall': item.card.isSmall}">{{ item.id }}H</li>
+    <button @click="moveLeft()" class="leftButton">left</button>
+    <button @click="moveRight()" class="rightButton">right</button>
     </ul>
-    <button @click="moveLeft()">left</button>
-    <button @click="moveRight()">right</button>
 
     <div class="inputData">
       <img src="~assets/img/information.png" alt="information" class="information" @click="toggleModal">
@@ -59,7 +59,7 @@ const playData = reactive({
 
 //ホール選択（クリック）とパー表示
 const offset: number = 3;
-const currentHole = ref<number>(1);
+const currentHole = ref<number>(3);
 const par = ref<number|null>(0);
 const fetchPar = async (hole: number) => {
   const { data, error } = await supabase
@@ -83,8 +83,8 @@ watch(currentHole, async (newHole) => {
   par.value= await Number(fetchPar(newHole));
   refresh();
 });
-const updateCurrentHole = (hole:number) =>{
-  currentHole.value = hole;
+const updateCurrentHole = (holeId:number) =>{
+  currentHole.value = holeId;
 };
 
 //データ挿入
@@ -127,44 +127,40 @@ for (let i = 1; i <= 18; i++) {
   items.push(singleObject)
 };
 
-const displayCardIndex = ref<number>(5);
-
 const moveLeft = () =>{
-  displayCardIndex.value -= 5;
-  if (displayCardIndex.value < 5) {
-    displayCardIndex.value = 5; // 最終的な表示範囲をリセット
+  currentHole.value -= 5;
+  if (currentHole.value < 5) {
+    currentHole.value = 5; // 最終的な表示範囲をリセット
   }
-  defineCardSize();
 }
 const moveRight = () =>{
-  displayCardIndex.value += 5;
-  if (displayCardIndex.value > 15) {
-    displayCardIndex.value = 18; // 最終的な表示範囲をリセット
+  currentHole.value += 5;
+  if (currentHole.value > 15) {
+    currentHole.value = 18; // 最終的な表示範囲をリセット
   }
-  defineCardSize();
 }
 
-const isItemVisible = (index:number)=> {
-  const start = Math.max(0, displayCardIndex.value - 5);
-  const end = Math.min(items.length, displayCardIndex.value);
-  return index >= start && index < end;
-}
+const isItemVisible = computed(() => {
+  const start = Math.max(0, currentHole.value - 3);
+  const end = Math.min(items.length, currentHole.value + 2);
+  return { start, end };
+})
 
-const defineCardSize = () => items.forEach(item => {
-  if (item.id === displayCardIndex.value -2) {
+watch(currentHole, () => items.forEach(item => {
+  if (item.id === currentHole.value) {
     item.card.isLarge = true;
     item.card.isMedium = false;
     item.card.isSmall = false;
-  } else if (item.id === displayCardIndex.value - 1 || item.id === displayCardIndex.value - 3) {
+  } else if (item.id === currentHole.value - 1 || item.id === currentHole.value + 1) {
     item.card.isLarge = false;
     item.card.isMedium = true;
     item.card.isSmall = false;
-  } else if (item.id === displayCardIndex.value || item.id === displayCardIndex.value - 4) {
+  } else if (item.id === currentHole.value - 2 || item.id === currentHole.value + 2) {
     item.card.isLarge = false;
     item.card.isMedium = false;
     item.card.isSmall = true;
-  }
-})
+  } 
+}))
 </script>
 
 <style scoped>
@@ -209,6 +205,7 @@ box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, .5);
   display: flex;
   align-items: end;
   gap: 10px;
+  position: relative;
 }
 
 .eachHole{
@@ -241,36 +238,36 @@ box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, .5);
   height: 40px;
   /* overflow: hidden; */
 }
-/* .SIleftButton{
+.leftButton{
   width: 48px;
 height: 48px;
-font-size: 32px;
+font-size: 16px;
 text-align: center;
 vertical-align: middle;
 border: 1px solid black;
 border-radius: 24px;
 background: #FFF;
 position: absolute;
-left: 16px;
+left: 24px;
 bottom: 0px;
 box-shadow: 2px 2px 16px 0px rgba(0, 0, 0, 0.25);
 cursor: pointer;
 }
-.SIrightButton{
+.rightButton{
   width: 48px;
 height: 48px;
-font-size: 32px;
+font-size: 16px;
 text-align: center;
 vertical-align: middle;
 border: 1px solid black;
 border-radius: 24px;
 background: #FFF;
 position: absolute;
-right: 16px;
+right: 24px;
 bottom: 0px;
 box-shadow: 2px 2px 16px 0px rgba(0, 0, 0, 0.25);
 cursor: pointer;
-} */
+}
 .inputData{
   display: flex;
   width: 390px;

@@ -25,6 +25,7 @@ button{
   padding: 80px 0;
   height: 100vh;
   background: #F0F0F0;
+  overflow: hidden;
 }
 /* 共通CSS */
 .circleBtn {

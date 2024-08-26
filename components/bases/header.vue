@@ -21,7 +21,8 @@ const headVarStore = useHeadVarStore();
     text-align: center;
     position: fixed;
     top: 0;
-    left: 0;
+    left: 0;    
+    z-index: 99;
 }
 .backButton{
     margin: 0;
