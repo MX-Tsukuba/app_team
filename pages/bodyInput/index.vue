@@ -1,16 +1,17 @@
 <template>
-  <ScoreDisplay/>
+  <BodyInput/>
 </template>
 
 <script setup lang="ts">
-import ScoreDisplay from '~/components/scoreDisplay/index.vue';
+import { onMounted } from 'vue'
+import BodyInput from '~/components/bodyInput/index.vue';
 import { useHeadVarStore } from '~/src/store/headVar.js'
 import { usePageStore } from '~/src/store/currentPage';
 
 const headVarStore = useHeadVarStore()
-headVarStore.title = 'スコア記録'
+headVarStore.title = '身体情報入力'
 const pageStore = usePageStore();
 onMounted(() => {
-  pageStore.setCurrentPage('score');
+  pageStore.setCurrentPage('body');
 });
 </script>
