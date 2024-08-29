@@ -31,7 +31,7 @@
         </div>
       </div>
       <video></video>
-      <NuxtLink @click="addPlayData" to="../scoreDisplay"  class="bButton">完了</NuxtLink>
+      <button @click="addPlayData" class="bButton">完了</button>
     <NuxtLink to="../camera/video"  class="circleBtn"><img src="~assets/img/camera.png" width="48"></NuxtLink>
     </div>
   </section>
@@ -56,7 +56,6 @@ const playData = reactive({
   scoreNumber: 0,
   puttsNumber: 0,
 });
-
 //ホール選択（クリック）とパー表示
 const offset: number = 3;
 const currentHole = ref<number>(3);
@@ -96,6 +95,9 @@ const addPlayData = async () => {
   } else {
     return true;
   }
+  if(currentHole.value === 18){
+    await navigateTo('/scoreDisplay')
+  }
 };
 
 //ホール選択（スライド）
@@ -128,24 +130,38 @@ for (let i = 1; i <= 18; i++) {
 };
 
 const moveLeft = () =>{
-  currentHole.value -= 5;
-  if (currentHole.value < 5) {
-    currentHole.value = 5; // 最終的な表示範囲をリセット
+  currentHole.value -= 1;
+  if (currentHole.value < 1) {
+    currentHole.value = 1; 
   }
 }
 const moveRight = () =>{
-  currentHole.value += 5;
-  if (currentHole.value > 15) {
-    currentHole.value = 18; // 最終的な表示範囲をリセット
+  currentHole.value += 1;
+  if (currentHole.value > 18) {
+    currentHole.value = 18; 
   }
 }
 
+// const isItemVisible = computed(() => {
+//   const start = Math.max(0, currentHole.value - 3);
+//   const end = Math.min(items.length, currentHole.value + 2);
+//   return { start, end };
+// })
 const isItemVisible = computed(() => {
-  const start = Math.max(0, currentHole.value - 3);
-  const end = Math.min(items.length, currentHole.value + 2);
+  let start;
+  let end;
+  if(currentHole.value > 16){
+    start = 13;
+  }else{
+    start = Math.max(0, currentHole.value - 3)
+  };
+  if(currentHole.value < 3){
+    end = 5;
+  }else{
+    end = Math.min(items.length, currentHole.value + 2);
+  };
   return { start, end };
 })
-
 watch(currentHole, () => items.forEach(item => {
   if (item.id === currentHole.value) {
     item.card.isLarge = true;
@@ -202,7 +218,9 @@ background: #007BE5;
 box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, .5);
 }
 .selectHole{
+  width: 100vw;
   display: flex;
+  justify-content: center;
   align-items: end;
   gap: 10px;
   position: relative;
