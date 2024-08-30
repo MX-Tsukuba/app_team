@@ -14,7 +14,12 @@ import logcard from './logcard.vue';
       <div class = "sub_container">
         <div class = "month">2024年5月</div>
         <div class = "subsub_container">
-
+          <Logcard/>
+          <Logcard/>
+          <Logcard/>
+          <Logcard/>
+          <Logcard/>
+          <Logcard/>
         </div>
       </div>
     </div>
@@ -24,9 +29,10 @@ import logcard from './logcard.vue';
 <style scoped>
   .back{
     display: flex;
+    background-attachment: fixed;
+    height: 100%;
     width: 100%;
-    min-height: 100vh;
-    padding: 70px 10px;
+    padding: 70px 10px 100px 10px;
     flex-direction: column;
     align-items: center;
     border-radius: 32px;
@@ -70,5 +76,5 @@ import logcard from './logcard.vue';
 </style>
 
 <script setup lang = "ts">
-  import Logcard from "./logcard.vue";
+import Logcard from "./logcard.vue";
 </script>
