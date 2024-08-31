@@ -93,10 +93,10 @@ const addPlayData = async () => {
   if (error) {
     alert(error.message);
   } else {
-    return true;
-  }
   if(currentHole.value === 18){
-    await navigateTo('/scoreDisplay')
+    await navigateTo('./scoreDisplay')
+  }
+    return true;
   }
 };
 
