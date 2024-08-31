@@ -1,16 +1,17 @@
 <template>
-  <ScoreDisplay/>
+  <FoodInput/>
 </template>
 
 <script setup lang="ts">
-import ScoreDisplay from '~/components/scoreDisplay/index.vue';
+import { onMounted } from 'vue'
+import FoodInput from '~/components/foodInput/index.vue';
 import { useHeadVarStore } from '~/src/store/headVar.js'
 import { usePageStore } from '~/src/store/currentPage';
 
 const headVarStore = useHeadVarStore()
-headVarStore.title = 'スコア記録'
+headVarStore.title = '食事入力'
 const pageStore = usePageStore();
 onMounted(() => {
-  pageStore.setCurrentPage('score');
+  pageStore.setCurrentPage('food');
 });
 </script>
