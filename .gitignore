@@ -23,5 +23,7 @@ logs
 .env.*
 !.env.example
 
+assets
+
 localhttps_cert.pem
 localhttps_key.pem

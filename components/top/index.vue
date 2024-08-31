@@ -12,7 +12,7 @@
           <p class="tagTitle">食事を記録</p>
           <p class="tagDescription">毎日の食事とカロリーを記録します</p>
         </div>
-        <img src="~assets/img/right.png" class="goButton">
+        <NuxtLink to="../foodInput"><img src="~assets/img/right.png" class="goButton"></NuxtLink>
       </div> 
       <div class="inputTag">
         <img src="~assets/img/bodyInput.png" width="40">
@@ -20,7 +20,7 @@
           <p class="tagTitle">身体情報</p>
           <p class="tagDescription">体重や身長などの変化を記録します</p>
         </div>
-        <img src="~assets/img/right.png" class="goButton">
+        <NuxtLink to="../bodyInput"><img src="~assets/img/right.png" class="goButton"></NuxtLink>
       </div> 
       <div class="inputTag">
         <img src="~assets/img/golfInput.png" width="40">
