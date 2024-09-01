@@ -1,4 +1,6 @@
-<script setup lang="ts" src="">
+<script setup lang="ts">
+import {signInWithOAuth} from '~/composables/useSupabaseClient';
+
 const supabase = useSupabaseClient()
 
 const signInWithGoogle = async () => {
@@ -15,7 +17,7 @@ const signInWithGoogle = async () => {
   <Header/>
   <div class="loginContainer">
     <h1>login.vue</h1>
-    <button class="loginButton" @click="signInWithGoogle">
+    <button class="loginButton" @click="signInWithOAuth">
       Sign In with Google
     </button>
     <NuxtLink class="returnIndex" to="/">

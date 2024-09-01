@@ -4,6 +4,7 @@ import { pushScopeId } from "vue";
 export default defineNuxtConfig({
   devtools: { enabled: true },
   modules: ["@nuxtjs/supabase"],
+
   supabase: {
     url:process.env.SUPABASE_URL,
     key:process.env.SUPABASE_KEY,
@@ -29,14 +30,18 @@ export default defineNuxtConfig({
       },
     },
   },
+
   plugins:[
     '~/plugins/supabase.client.js'
     
   ],
+
   runtimeConfig:{
     public:{
       supabaseUrl:process.env.SUPABASE_URL || "https://fuuchzmnathzrsqqsuhg.supabase.co",
       supabaseKey:process.env.SUPABASE_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1dWNoem1uYXRoenJzcXFzdWhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTAwNjYwNDksImV4cCI6MjAyNTY0MjA0OX0.V9yZTvTcP-1u8zD1PLSKkGhY_fVWLqMDCGBV0hNFBLU"
     }
   },
+
+  compatibilityDate: '2024-08-27',
 })
