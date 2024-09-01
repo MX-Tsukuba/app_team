@@ -12,7 +12,7 @@
           <p class="tagTitle">食事を記録</p>
           <p class="tagDescription">毎日の食事とカロリーを記録します</p>
         </div>
-        <NuxtLink to="/mealInput"><img src="~assets/img/right.png"></NuxtLink>
+        <NuxtLink to="../foodInput"><img src="~assets/img/right.png" class="goButton"></NuxtLink>
       </div> 
       <div class="inputTag">
         <img src="~assets/img/bodyInput.png" width="40">
@@ -20,7 +20,7 @@
           <p class="tagTitle">身体情報</p>
           <p class="tagDescription">体重や身長などの変化を記録します</p>
         </div>
-        <img src="~assets/img/right.png">
+        <NuxtLink to="../bodyInput"><img src="~assets/img/right.png" class="goButton"></NuxtLink>
       </div> 
       <div class="inputTag">
         <img src="~assets/img/golfInput.png" width="40">
@@ -28,7 +28,7 @@
           <p class="tagTitle">スコアを記録</p>
           <p class="tagDescription">ゴルフのスコアなどを記録します</p>
         </div>
-        <img src="~assets/img/right.png" @click="toggleModal">
+        <img src="~assets/img/right.png"  class="goButton" @click="toggleModal">
       </div>
     </div>    
     <NuxtLink to="../camera/video"  class="circleBtn"><img src="~assets/img/camera.png" width="48"></NuxtLink>
@@ -57,7 +57,6 @@ const toggleModal = () => modalStore.toggleModal();
 
 .recentRecord {
   width: 360px;
-  height: 200px;
   padding-top: 24px;
   display: flex;
   flex-direction: column;
@@ -93,5 +92,8 @@ const toggleModal = () => modalStore.toggleModal();
 .tagDescription{
   font-size: 14px;
   color: #777;
+}
+.goButton{
+  cursor: pointer;
 }
 </style>
