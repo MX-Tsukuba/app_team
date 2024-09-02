@@ -2,11 +2,8 @@
   <div class="modal" @click.self="toggleModal">
     <div class="card">
     <span class="closeModal" @click="toggleModal">×</span>
-      <p class="title">ゴルフ場登録</p>
-      <p>ゴルフ場を選択してください</p>
-      <!-- ここにゴルフ場検索機能を実装する -->
-      <input type="text" placeholder="course">
-      <Nuxt-link @click="toggleModal" to="/scoreInput" class="bButton">登録</Nuxt-link>  
+      <p class="title">スワイプ操作</p>
+      <p>スワイプして画面を切り替えられます</p> 
     </div>
   </div>
 </template>

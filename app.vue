@@ -25,6 +25,7 @@ button{
   padding: 80px 0;
   height: 100vh;
   background: #F0F0F0;
+  overflow: hidden;
 }
 /* 共通CSS */
 .circleBtn {
@@ -46,9 +47,12 @@ button{
   border-radius: 20px;
   color: #FFF;
   background: #007be5;
-  box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, .5);
+  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, .25);
   display: flex;
   align-items: center;
   justify-content: center;
+}
+.bButton:active {
+  background: #0058a3;
 }
 </style>

@@ -1,16 +1,17 @@
 <template>
-  <ScoreDisplay/>
+  <BodyDisplay/>
 </template>
 
 <script setup lang="ts">
-import ScoreDisplay from '~/components/scoreDisplay/index.vue';
+import { onMounted } from 'vue'
+import BodyDisplay from '~/components/bodyDisplay/index.vue';
 import { useHeadVarStore } from '~/src/store/headVar.js'
 import { usePageStore } from '~/src/store/currentPage';
 
 const headVarStore = useHeadVarStore()
-headVarStore.title = 'スコア記録'
+headVarStore.title = '身体情報記録'
 const pageStore = usePageStore();
 onMounted(() => {
-  pageStore.setCurrentPage('score');
+  pageStore.setCurrentPage('body');
 });
 </script>
