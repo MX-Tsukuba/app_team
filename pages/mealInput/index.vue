@@ -8,18 +8,26 @@ const currentIcon = ref<IconKind>('朝')
 
 const supabase = useSupabaseClient<Database>();
 
-const {data:days}=await useAsyncData(async ()=>{
-  const { data,error } = await supabase
-    .from('days')
-    .select('*');//daysテーブルのデータの取得
-    return data;
-});
 const {data:view_tables}=await useAsyncData(async ()=>{
   const { data,error } = await supabase
     .from('view_tables')
     .select('*'); //eatテーブルのデータの取得
     return data;
 });
+
+const insertData = async()=>{
+    const {data,error} =await supabase
+    .from('view_tables')
+    .insert([
+        {title:'$myArr[counter].title',calorie:'$myArr[$counter].calorie',kind:'$currentIcon',date:'$formattedDate'},
+    ])
+
+    if(error){
+        console.error('Error inserting data:',error)
+    }else{
+        console.log('Data inserted:',data)
+    }
+}
 
 // 現在の日付を保持するref
 const selectedDate = ref<Date>(new Date());
@@ -51,38 +59,44 @@ const moveToNextDay = (): void => moveDate(1)
 class myClass {
   title: string;
   calorie: number;
+  kind:IconKind;
+  date:string;
 
   constructor() {
     this.title ="";
     this.calorie =0;
+    this.kind=currentIcon;
+    this.date=formattedDate;
+
   }
   call(){
     return{
       title:this.title,
       calorie:this.calorie,
+      kind:this.kind,
+      date:this.date,
     };
   }
 }
 
 
-const myObject=new myClass();
-const myArr:Ref<myClass[]> = ref([]);
-myArr.value.push(myObject);
+const myArr = ref([]);
+const firstObject= new myClass();
+myArr.value.push(firstObject.call());
 let counter=ref<number>(0);
-// let counter:number=0;
 let sumCalorie =ref<number>(0);
 
-// if (myArr[counter].title==="" || myArr[counter].calorie===0){
-//     console.warn("食事とカロリーを入力してください");
-//   }
-function addObject(){
+
+function addObject(counter:string){
   if(myArr.value.length >=10){
     console.warn("最大入力数に達しました")
     return null;
+  }else if (myArr[counter].title==="" || myArr[counter].calorie===0){
+    console.warn("食事とカロリーを入力してください");
   }
   sumCalorie += myArr[counter].calorie;
   const newObject = new myClass();
-  myArr.value.push(newObject);
+  myArr.value.push(newObject.call());
   counter++;
   return newObject;
 }
@@ -90,21 +104,6 @@ function addObject(){
 
 
 
-// async function insertToDetabase(){
-//   for(const obj of myArr.value){
-//     const {data,error}= await
-//     supabase
-//     .from("view_tables")
-//     .insert("title":obj.title,"calorie":obj.calorie, "kind":obj.kind,"date":obj.date);
-
-//     if(error){
-//       console.error('Insert error:',data);
-//     }
-//     else if(data){
-//       console.log('Inserted successfully:', data);
-//     }
-//   }
-// }
 
 </script>
 
@@ -134,7 +133,7 @@ function addObject(){
                     <input class="input" type="number" v-model="myArr[counter].calorie" placeholder="カロリーを入力">
                 </div>
             </div>
-            <div class="addBtn" @click="addObject()"><p class="addName">追加</p></div>
+            <div class="addBtn" @click="addObject(counter)"><p class="addName">追加</p></div>
         </div>
     </div>
     <div class="resultTable">
