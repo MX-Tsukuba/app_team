@@ -1,17 +1,17 @@
 <script setup lang="ts">
-import {signInWithOAuth} from '~/composables/useSupabaseClient';
+// import {signInWithOAuth} from '~/composables/useSupabaseClient';
 
-const supabase = useSupabaseClient()
+// const supabase = useSupabaseClient()
 
-const signInWithGoogle = async () => {
-  const { error } = await supabase.auth.signInWithOAuth({
-    provider: 'google',
-    options: {
-      redirectTo: 'http://localhost:3000/confirm', // ここを絶対パスにしたら成功する
-    }
-  })
-  if (error) console.log(error)
-}
+// const signInWithGoogle = async () => {
+//   const { error } = await supabase.auth.signInWithOAuth({
+//     provider: 'google',
+//     options: {
+//       redirectTo: 'http://localhost:3000/confirm', // ここを絶対パスにしたら成功する
+//     }
+//   })
+//   if (error) console.log(error)
+// }
 </script>
 <template>
   <Header/>

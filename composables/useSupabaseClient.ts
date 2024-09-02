@@ -4,20 +4,27 @@ import { createClient } from '@supabase/supabase-js'
 import type { Database } from '~/types/database.types'
 
 // const supabase = useSupabaseClient<Database>(process.env.SUPABASE_URL,process.env.SUPABASE_KEY);
-const supabase = useSupabaseClient();
+const supabaseUrl = process.env.SUPABASE_URL || 'https://fuuchzmnathzrsqqsuhg.supabase.co'
+    const supabaseKey = process.env.SUPABASE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1dWNoem1uYXRoenJzcXFzdWhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTAwNjYwNDksImV4cCI6MjAyNTY0MjA0OX0.V9yZTvTcP-1u8zD1PLSKkGhY_fVWLqMDCGBV0hNFBLU'
+    const supabase = createClient(supabaseUrl, supabaseKey)
+// const supabase = useSupabaseClient();
+
 
 export const signInWithOAuth = async () => {
   if (!supabase) {
     console.error('Supabase client is not initialized');
     return;
   }
-    const { error } = await supabase.auth.signInWithOAuth({
+    const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
         redirectTo: 'http://localhost:3000/confirm',
       },
     })
     if (error) console.log(error)
+    // if (data.url){
+    //   redirect(data.url)
+    // }
 }
 
 export const signOut = async () => {
