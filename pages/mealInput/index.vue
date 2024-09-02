@@ -3,8 +3,6 @@ import type { Database } from '~/types/database.types.ts';
 import resultData from '~/components/meal/resultData.vue';
 import kindBtn from '~/components/meal/kindBtn.vue';
 
-type IconKind ='朝' | '昼' | '夜' | '間食'
-const currentIcon = ref<IconKind>('朝')
 
 const supabase = useSupabaseClient<Database>();
 
@@ -59,13 +57,13 @@ const moveToNextDay = (): void => moveDate(1)
 class myClass {
   title: string;
   calorie: number;
-  kind:IconKind;
+  kind:string;
   date:string;
 
   constructor() {
     this.title ="";
     this.calorie =0;
-    this.kind=currentIcon;
+    this.kind="朝食";
     this.date=formattedDate;
 
   }
@@ -74,7 +72,7 @@ class myClass {
       title:this.title,
       calorie:this.calorie,
       kind:this.kind,
-      date:this.date,
+      date:formattedDate,
     };
   }
 }
@@ -82,27 +80,31 @@ class myClass {
 
 const myArr = ref([]);
 const firstObject= new myClass();
-myArr.value.push(firstObject.call());
+myArr.value.push(firstObject);
 let counter=ref<number>(0);
-let sumCalorie =ref<number>(0);
+let sumCalorie:number =0;
 
 
-function addObject(counter:string){
+function addObject(){
   if(myArr.value.length >=10){
     console.warn("最大入力数に達しました")
     return null;
-  }else if (myArr[counter].title==="" || myArr[counter].calorie===0){
+  }else if (myArr.value[counter.value].title==="" || myArr.value[counter.value].calorie===0){
     console.warn("食事とカロリーを入力してください");
+    return null;
   }
-  sumCalorie += myArr[counter].calorie;
+  sumCalorie += myArr.value[counter.value].calorie;//動いてる
   const newObject = new myClass();
-  myArr.value.push(newObject.call());
-  counter++;
+  myArr.value.push(newObject);
+  counter.value++;
+  console.log(counter.value);
+  console.log(counter);
+  console.log(sumCalorie);
   return newObject;
 }
 
 
-
+let kind=ref("朝食");
 
 
 </script>
@@ -111,7 +113,8 @@ function addObject(counter:string){
 <template>
 <div class="mealInput">
     <div class="kindBtn">
-        <kindBtn />
+        <!-- <kindBtn /> -->
+         <input style="width: 40px;" v-model="kind"></input>
     </div>
     <div class="dateAll">
         <p class="kind">昼</p>
@@ -133,7 +136,7 @@ function addObject(counter:string){
                     <input class="input" type="number" v-model="myArr[counter].calorie" placeholder="カロリーを入力">
                 </div>
             </div>
-            <div class="addBtn" @click="addObject(counter)"><p class="addName">追加</p></div>
+            <div class="addBtn" @click="addObject()"><p class="addName">追加</p></div>
         </div>
     </div>
     <div class="resultTable">
@@ -154,7 +157,8 @@ function addObject(counter:string){
                 </div>
             </div>
         </div>
-        <resultData v-for="(v,i) in myArr" :key="i" :title="myArr[i].title" :calorie="myArr[i].calorie" />
+        <resultData  v-for="(v,i) in myArr" :key="i" :title="myArr[i].title" :calorie="myArr[i].calorie"  />
+        
     </div>
 </div>
 
@@ -173,6 +177,8 @@ function addObject(counter:string){
     border-radius: 60px;
     border: 1px solid #F28822;
     background: #FFF;
+    width: 60px;/*仮で*/
+
 }
 .dateAll{
     display: flex;
