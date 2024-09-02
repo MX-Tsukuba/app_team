@@ -1,6 +1,11 @@
 <script setup lang="ts" >
-import type { Database } from '.../types/database.types.ts';
-import resultData from '../components/meal/resultData.vue';
+import type { Database } from '~/types/database.types.ts';
+import resultData from '~/components/meal/resultData.vue';
+import kindBtn from '~/components/meal/kindBtn.vue';
+
+type IconKind ='朝' | '昼' | '夜' | '間食'
+const currentIcon = ref<IconKind>('朝')
+
 const supabase = useSupabaseClient<Database>();
 
 const {data:days}=await useAsyncData(async ()=>{
@@ -17,7 +22,7 @@ const {data:view_tables}=await useAsyncData(async ()=>{
 });
 
 // 現在の日付を保持するref
-const selectedDate = ref<Date>(new Date())
+const selectedDate = ref<Date>(new Date());
 
 // 日付を指定のフォーマットに変換する関数
 const formatDateToString = (date: Date): string => {
@@ -45,22 +50,16 @@ const moveToNextDay = (): void => moveDate(1)
 
 class myClass {
   title: string;
-  date: string;
-  kind: string;
   calorie: number;
 
   constructor() {
     this.title ="";
     this.calorie =0;
-    this.kind ="朝食";
-    this.date ="";
   }
   call(){
     return{
       title:this.title,
       calorie:this.calorie,
-      kind:this.kind,
-      date:this.date,
     };
   }
 }
@@ -69,20 +68,28 @@ class myClass {
 const myObject=new myClass();
 const myArr:Ref<myClass[]> = ref([]);
 myArr.value.push(myObject);
-let counter:number=0;
+let counter=ref<number>(0);
+// let counter:number=0;
+let sumCalorie =ref<number>(0);
 
+// if (myArr[counter].title==="" || myArr[counter].calorie===0){
+//     console.warn("食事とカロリーを入力してください");
+//   }
 function addObject(){
   if(myArr.value.length >=10){
     console.warn("最大入力数に達しました")
     return null;
-  }else if (myArr[counter].title==="" || myArr[counter].calorie===0){
-    console.warn("食事とカロリーを入力してください");
   }
-  const newObject = new myClass()
+  sumCalorie += myArr[counter].calorie;
+  const newObject = new myClass();
   myArr.value.push(newObject);
   counter++;
   return newObject;
 }
+
+
+
+
 // async function insertToDetabase(){
 //   for(const obj of myArr.value){
 //     const {data,error}= await
@@ -99,15 +106,14 @@ function addObject(){
 //   }
 // }
 
-
-
-
 </script>
 
 
 <template>
 <div class="mealInput">
-    <div class="kindBtn"></div>
+    <div class="kindBtn">
+        <kindBtn />
+    </div>
     <div class="dateAll">
         <p class="kind">昼</p>
         <div class="changeDate">
@@ -134,7 +140,7 @@ function addObject(){
     <div class="resultTable">
         <div class="tableHeader">
             <div class="sumCalorie">
-                <p class="sum">700kcal</p>
+                <p class="sum">{{sumCalorie}}kcal</p>
             </div>
             <div class="btnAll">
                 <div class="menuBtn">
@@ -143,8 +149,9 @@ function addObject(){
                     </svg>
                 </div>
                 <div class="insertBtn">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 50 50" fill="none">
-                    <path d="M28.6687 25.0212L6.25208 22.7629L6.25 8.48785C6.25027 8.10665 6.34793 7.73184 6.53372 7.39898C6.7195 7.06611 6.98724 6.78623 7.31155 6.58589C7.63586 6.38554 8.00598 6.27138 8.38679 6.25422C8.76761 6.23706 9.14649 6.31748 9.4875 6.48785L42.5125 23.0004C42.8835 23.1864 43.1954 23.472 43.4134 23.8252C43.6314 24.1784 43.7468 24.5853 43.7468 25.0004C43.7468 25.4154 43.6314 25.8223 43.4134 26.1755C43.1954 26.5287 42.8835 26.8143 42.5125 27.0004L9.49167 43.5128C9.15066 43.6832 8.77177 43.7636 8.39096 43.7465C8.01014 43.7293 7.64003 43.6152 7.31572 43.4148C6.99141 43.2145 6.72367 42.9346 6.53788 42.6017C6.3521 42.2689 6.25444 41.8941 6.25417 41.5129V27.2379L28.6687 25.0212Z" fill="#F28822"/></svg>
+                    <NuxtLink to="./mealDisplay" ><svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 50 50" fill="none">
+                        <path d="M28.6687 25.0212L6.25208 22.7629L6.25 8.48785C6.25027 8.10665 6.34793 7.73184 6.53372 7.39898C6.7195 7.06611 6.98724 6.78623 7.31155 6.58589C7.63586 6.38554 8.00598 6.27138 8.38679 6.25422C8.76761 6.23706 9.14649 6.31748 9.4875 6.48785L42.5125 23.0004C42.8835 23.1864 43.1954 23.472 43.4134 23.8252C43.6314 24.1784 43.7468 24.5853 43.7468 25.0004C43.7468 25.4154 43.6314 25.8223 43.4134 26.1755C43.1954 26.5287 42.8835 26.8143 42.5125 27.0004L9.49167 43.5128C9.15066 43.6832 8.77177 43.7636 8.39096 43.7465C8.01014 43.7293 7.64003 43.6152 7.31572 43.4148C6.99141 43.2145 6.72367 42.9346 6.53788 42.6017C6.3521 42.2689 6.25444 41.8941 6.25417 41.5129V27.2379L28.6687 25.0212Z" fill="#F28822"/></svg></NuxtLink>
+                    
                 </div>
             </div>
         </div>
@@ -162,6 +169,8 @@ function addObject(){
 }
 .kindBtn{
     position: absolute;
+    top: 70px;
+    left: 0;
     border-radius: 60px;
     border: 1px solid #F28822;
     background: #FFF;
@@ -196,7 +205,7 @@ function addObject(){
     line-height: normal;
 }
 .dateBtn{
-    width: 11px; height: 15px; 
+    width: 11px; height: 15px;
 }
 .reverse{
     transform: rotate(180deg);
