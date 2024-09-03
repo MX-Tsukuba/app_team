@@ -1,7 +1,20 @@
 <script setup lang="ts" >
+import { onMounted } from 'vue'
+import { useHeadVarStore } from '~/src/store/headVar.js'
+import { usePageStore } from '~/src/store/currentPage';
+
+const headVarStore = useHeadVarStore()
+headVarStore.title = '食事入力'
+const pageStore = usePageStore();
+onMounted(() => {
+  pageStore.setCurrentPage('food');
+});
+
 import type { Database } from '~/types/database.types.ts';
 import resultData from '~/components/meal/resultData.vue';
 import kindBtn from '~/components/meal/kindBtn.vue';
+import { useRouter } from 'vue-router';
+import { toRaw } from 'vue';
 
 
 const supabase = useSupabaseClient<Database>();
@@ -13,19 +26,19 @@ const {data:view_tables}=await useAsyncData(async ()=>{
     return data;
 });
 
-const insertData = async()=>{
+const insertToDatabase = async()=>{
+    const rawData = toRaw(myArr); 
     const {data,error} =await supabase
     .from('view_tables')
-    .insert([
-        {title:'$myArr[counter].title',calorie:'$myArr[$counter].calorie',kind:'$currentIcon',date:'$formattedDate'},
-    ])
+    .insert(rawData);
 
     if(error){
-        console.error('Error inserting data:',error)
+        console.error('Error inserting data:',error);
     }else{
-        console.log('Data inserted:',data)
+        console.log('Data inserted:',data);
+        router.push('./mealDisplay');
     }
-}
+};
 
 // 現在の日付を保持するref
 const selectedDate = ref<Date>(new Date());
@@ -77,6 +90,8 @@ class myClass {
   }
 }
 
+const router= useRouter();
+let kind=ref("朝食");
 
 const myArr = ref([]);
 const firstObject= new myClass();
@@ -97,14 +112,12 @@ function addObject(){
   const newObject = new myClass();
   myArr.value.push(newObject);
   counter.value++;
-  console.log(counter.value);
-  console.log(counter);
-  console.log(sumCalorie);
+  myArr.value.forEach(obj =>{(obj as any).kind=kind;})
+  myArr.value.forEach(obj =>{(obj as any).date=formattedDate;})
   return newObject;
 }
 
 
-let kind=ref("朝食");
 
 
 </script>
@@ -150,15 +163,17 @@ let kind=ref("朝食");
                         <path d="M0 24V20H36V24H0ZM0 14V10H36V14H0ZM0 4V0H36V4H0Z" fill="#777777" fill-opacity="0.5"/>
                     </svg>
                 </div>
-                <div class="insertBtn">
-                    <NuxtLink to="./mealDisplay" ><svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 50 50" fill="none">
-                        <path d="M28.6687 25.0212L6.25208 22.7629L6.25 8.48785C6.25027 8.10665 6.34793 7.73184 6.53372 7.39898C6.7195 7.06611 6.98724 6.78623 7.31155 6.58589C7.63586 6.38554 8.00598 6.27138 8.38679 6.25422C8.76761 6.23706 9.14649 6.31748 9.4875 6.48785L42.5125 23.0004C42.8835 23.1864 43.1954 23.472 43.4134 23.8252C43.6314 24.1784 43.7468 24.5853 43.7468 25.0004C43.7468 25.4154 43.6314 25.8223 43.4134 26.1755C43.1954 26.5287 42.8835 26.8143 42.5125 27.0004L9.49167 43.5128C9.15066 43.6832 8.77177 43.7636 8.39096 43.7465C8.01014 43.7293 7.64003 43.6152 7.31572 43.4148C6.99141 43.2145 6.72367 42.9346 6.53788 42.6017C6.3521 42.2689 6.25444 41.8941 6.25417 41.5129V27.2379L28.6687 25.0212Z" fill="#F28822"/></svg></NuxtLink>
-                    
+                <div class="insertBtn" >
+                    <!-- <NuxtLink to="./mealDisplay" > -->
+                        <button @click="insertToDatabase">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 50 50" fill="none">
+                        <path d="M28.6687 25.0212L6.25208 22.7629L6.25 8.48785C6.25027 8.10665 6.34793 7.73184 6.53372 7.39898C6.7195 7.06611 6.98724 6.78623 7.31155 6.58589C7.63586 6.38554 8.00598 6.27138 8.38679 6.25422C8.76761 6.23706 9.14649 6.31748 9.4875 6.48785L42.5125 23.0004C42.8835 23.1864 43.1954 23.472 43.4134 23.8252C43.6314 24.1784 43.7468 24.5853 43.7468 25.0004C43.7468 25.4154 43.6314 25.8223 43.4134 26.1755C43.1954 26.5287 42.8835 26.8143 42.5125 27.0004L9.49167 43.5128C9.15066 43.6832 8.77177 43.7636 8.39096 43.7465C8.01014 43.7293 7.64003 43.6152 7.31572 43.4148C6.99141 43.2145 6.72367 42.9346 6.53788 42.6017C6.3521 42.2689 6.25444 41.8941 6.25417 41.5129V27.2379L28.6687 25.0212Z" fill="#F28822"/></svg>
+                    </button>
+                    <!-- </NuxtLink> -->
                 </div>
             </div>
         </div>
         <resultData  v-for="(v,i) in myArr" :key="i" :title="myArr[i].title" :calorie="myArr[i].calorie"  />
-        
     </div>
 </div>
 

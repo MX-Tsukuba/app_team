@@ -8,8 +8,14 @@
             </div>
         </div>
         <div class="resultCard">
-            <div class="day"></div>
-            <div class="dayKcal"></div>
+            <div class="day">
+                2024/07/20
+            </div>
+            <div class="dayKcal">
+                <div class="kcalNumber"></div>
+                <div class="kcal"></div>
+                <div class="rectangle"></div>
+            </div>
             <div class="eachOfResult">
                 <div class="kindBtn"></div>
                 <div class="table">
@@ -22,8 +28,66 @@
     </div>
 </template>
 
-<script>
+<script setup>
 import resultData from '~/components/meal/resultData.vue';
+import { onMounted } from 'vue'
+import { useHeadVarStore } from '~/src/store/headVar.js'
+import { usePageStore } from '~/src/store/currentPage';
+// import type { Database } from '~/types/database.types.ts';
+
+const headVarStore = useHeadVarStore()
+headVarStore.title = '食事記録'
+const pageStore = usePageStore();
+onMounted(() => {
+  pageStore.setCurrentPage('food');
+});
+
+// const supabase = useSupabaseClient<Database>();
+
+const {data:days}=await useAsyncData(async ()=>{
+  const { data,error } = await supabase
+    .from('days')
+    .select('date');
+    return data;
+});
+
+const {data:view_tables}=await useAsyncData(async ()=>{
+  const { data,error } = await supabase
+    .from('view_tables')
+    .select('*');
+    return data;
+});
+
+const arrayOriginal=ref([]);
+
+function getMostRecentDate(dates){
+    if (dates.length === 0) {
+        return null;
+    }
+
+    const dateObjects = dates.map(date => new Date(date));
+
+    const mostRecentDate = new Date(Math.max(...dateObjects.map(date => date.getTime())));
+
+    // const mostRecentDateString = mostRecentDate.toISOString().split('T')[0];
+
+    return mostRecentDate;
+}
+
+const mostRecent =getMostRecentDate(date);
+
+for(let i=0;i<7;i++){
+    const displayDate=new Date(mostRecent)
+    displayDate.setDate(displayDate.getDate-6+i)
+    arrayOriginal.value[i]=view_tables.filter((obj) =>obj.date==displayDate)
+}
+
+
+
+
+
+
+
 </script>
 
 <style lang="css">
@@ -88,6 +152,31 @@ import resultData from '~/components/meal/resultData.vue';
     width: 179px;
     height: 77px;
     flex-shrink: 0;
+}
+.kcalNumber{
+    color: #F28822;
+font-family: Inter;
+font-size: 64px;
+font-style: normal;
+font-weight: 400;
+line-height: normal;
+}
+.kcal{
+    color: #F28822;
+font-family: Inter;
+font-size: 24px;
+font-style: normal;
+font-weight: 400;
+line-height: normal;
+}
+.rectangle{
+    width: 200px;
+    height: 2px;
+    flex-shrink: 0;
+
+    border-radius: 8px;
+    border: 1px solid rgba(0, 0, 0, 0.50);
+    background: #FFF;
 }
 .eachOfResult{
     display: flex;
