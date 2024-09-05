@@ -1,44 +1,38 @@
 <template>
   <section class="scoreInputWhole">
-    <div class="SIshowHole">      
-      <p>{{ golfPlaceName }}</p>
-      <div class="SISHtop">
-        <p class="SIhole">{{ currentHole }}H</p>
-        <p class="SIpar">par{{ par }}</p>
+    <div class="displayBox">
+      <div class="displayHolePar">
+        {{ currentHole }}H
+        <p class="displayPar">par{{ par }}</p>
       </div>
-      <hr class="SISHborder"/>
+      <hr class="displayLine"/>
     </div>
-    <div class="SIsearchHole" >
-    <ul class="SIBoxes">
-      <li  v-for="(item, index) in items" :key="index" class="SIbox" v-show="isItemVisible(index)" @click="updateCurrentHole(item)">{{ item }}H</li>
+    <ul class="selectHole">
+      <li  v-for="(item, index) in items" :key="index" class="eachHole" v-show="index >= isItemVisible.start && index < isItemVisible.end" @click="updateCurrentHole(item.id)" :class="{'holeCardLarge': item.card.isLarge, 'holeCardMedium': item.card.isMedium, 'holeCardSmall': item.card.isSmall}">{{ item.id }}H</li>
+    <button @click="moveLeft()" class="leftButton">left</button>
+    <button @click="moveRight()" class="rightButton">right</button>
     </ul>
-      <p class="SIleftButton" @click="moveLeft"> < </p>
-      <p class="SIrightButton" @click="moveRight"> > </p>
-    </div>
 
-    <div class="SIchooseNum">
-      <div class="SIdata">
+    <div class="inputData">
+      <img src="~assets/img/information.png" alt="information" class="information" @click="toggleModal">
+      <information v-if="isShowModal"/>
+      <div class="scorePuttsBox">
         <div>
-        <p class="scoreScore">スコア</p>
+          <p class="scorePuttsTitle">スコア</p>
+          <div>
+            <input type="number" pattern="\d*" class="scorePuttsData" v-model="playData.scoreNumber">
+          </div>
+        </div>
         <div>
-          <input type="number" pattern="\d*" class="SInum" v-model="playData.scoreNumber">
-          <img>
+          <p class="scorePuttsTitle">パット数</p>
+          <div>
+            <input type="number" pattern="\d*" class="scorePuttsData" v-model="playData.puttsNumber">
+          </div>
         </div>
       </div>
-      <div>
-        <p class="scoreScore">パット数</p>
-        <div>
-          <input type="number" pattern="\d*" class="SInum" v-model="playData.puttsNumber">
-          <img>
-        </div>
-      </div>
-      </div>
-    <div>
-      <p class="SInum addBtn" @click="addPlayData">addData</p>
-    </div>
-    <div class="circleBtn">
-      <NuxtLink to="../camera/video" class="circleBtnContent">Camera</NuxtLink>
-    </div>
+      <video></video>
+      <button @click="addPlayData" class="bButton">完了</button>
+    <NuxtLink to="../camera/video"  class="circleBtn"><img src="~assets/img/camera.png" width="48"></NuxtLink>
     </div>
   </section>
 </template>
@@ -46,18 +40,25 @@
 <script setup lang="ts">
 import { ref, reactive, watch } from 'vue';
 import type { Database } from '~/types/database.types';
+import { useHeadVarStore } from '~/src/store/headVar.js'
+import { useModalStore } from '~/src/store/modal';
+import information from './information.vue';
 
 const supabase = useSupabaseClient<Database>();
 const golfPlaceName = 'つくばゴルフ場';
+const headVarStore = useHeadVarStore()
+headVarStore.title = `${golfPlaceName}`;
+const modalStore = useModalStore();
+const isShowModal = computed(() => modalStore.isShowModal);
+const toggleModal = () => modalStore.toggleModal();
 const playData = reactive({
   holeNumber: 0,
   scoreNumber: 0,
   puttsNumber: 0,
 });
-
 //ホール選択（クリック）とパー表示
 const offset: number = 3;
-const currentHole = ref<number>(1);
+const currentHole = ref<number>(3);
 const par = ref<number|null>(0);
 const fetchPar = async (hole: number) => {
   const { data, error } = await supabase
@@ -81,8 +82,8 @@ watch(currentHole, async (newHole) => {
   par.value= await Number(fetchPar(newHole));
   refresh();
 });
-const updateCurrentHole = (hole:number) =>{
-  currentHole.value = hole;
+const updateCurrentHole = (holeId:number) =>{
+  currentHole.value = holeId;
 };
 
 //データ挿入
@@ -92,140 +93,229 @@ const addPlayData = async () => {
   if (error) {
     alert(error.message);
   } else {
+  if(currentHole.value === 18){
+    await navigateTo('./scoreDisplay')
+  }
     return true;
   }
 };
 
 //ホール選択（スライド）
-const items:number[] = Array.from({ length: 18 }, (_, i) => i + 1);
-const currentCardIndex = ref<number>(5);
+interface holeObj {
+  id: number,
+  card: {
+    isLarge:boolean,
+    isMedium:boolean,
+    isSmall:boolean,
+  }
+};
+const items:holeObj[] = reactive([]);
+for (let i = 1; i <= 18; i++) {
+  const singleObject = {
+    id: i,
+    card: {
+      isLarge: false,
+      isMedium: false,
+      isSmall: false,
+    }
+  };
+  if (i === 3) {
+    singleObject.card.isLarge = true;
+  } else if (i === 2 || i === 4) {
+    singleObject.card.isMedium = true;
+  } else if (i === 1 || i === 5) {
+    singleObject.card.isSmall = true;
+  }
+  items.push(singleObject)
+};
 
 const moveLeft = () =>{
-  currentCardIndex.value -= 5;
-  if (currentCardIndex.value <= 3) {
-    currentCardIndex.value = 5; // 最終的な表示範囲をリセット
+  currentHole.value -= 1;
+  if (currentHole.value < 1) {
+    currentHole.value = 1; 
   }
 }
-
 const moveRight = () =>{
-  currentCardIndex.value += 5;
-  if (currentCardIndex.value > 15) {
-    currentCardIndex.value = 18; // 最終的な表示範囲をリセット
+  currentHole.value += 1;
+  if (currentHole.value > 18) {
+    currentHole.value = 18; 
   }
 }
 
-const isItemVisible = (index:number)=> {
-  const start = Math.max(0, currentCardIndex.value - 5);
-  const end = Math.min(items.length, currentCardIndex.value);
-  return index >= start && index < end;
-}
+// const isItemVisible = computed(() => {
+//   const start = Math.max(0, currentHole.value - 3);
+//   const end = Math.min(items.length, currentHole.value + 2);
+//   return { start, end };
+// })
+const isItemVisible = computed(() => {
+  let start;
+  let end;
+  if(currentHole.value > 16){
+    start = 13;
+  }else{
+    start = Math.max(0, currentHole.value - 3)
+  };
+  if(currentHole.value < 3){
+    end = 5;
+  }else{
+    end = Math.min(items.length, currentHole.value + 2);
+  };
+  return { start, end };
+})
+watch(currentHole, () => items.forEach(item => {
+  if (item.id === currentHole.value) {
+    item.card.isLarge = true;
+    item.card.isMedium = false;
+    item.card.isSmall = false;
+  } else if (item.id === currentHole.value - 1 || item.id === currentHole.value + 1) {
+    item.card.isLarge = false;
+    item.card.isMedium = true;
+    item.card.isSmall = false;
+  } else if (item.id === currentHole.value - 2 || item.id === currentHole.value + 2) {
+    item.card.isLarge = false;
+    item.card.isMedium = false;
+    item.card.isSmall = true;
+  } 
+}))
 </script>
 
 <style scoped>
 .scoreInputWhole{
-  display: inline-flex;
+  display: flex;
   flex-direction: column;
   align-items: center;
   gap: 40px;
-  background: #FAFAFA;
 }
-.SIshowHole{
+.displayBox{
   display: flex;
 flex-direction: column;
 justify-content: center;
 align-items: flex-end;
 gap: 2px;
 }
-.SISHtop{
-  display: flex;
-padding-left: 114px;
-justify-content: flex-end;
-align-items: flex-end;
-gap: 70px;
+.displayHolePar{
+  font-size: 36px;
+  color: #007BE5;
 align-self: stretch;
+position: relative;
+top: 0;
+left: 0;
+text-align: center;
 }
-.SIhole{
-  font-size: 32px;
+.displayPar{
+  font-size: 20px;
+  color: #777;
+  position: absolute;
+  bottom: 0;
+  right: 0;
 }
-.SIpar{
-  font-size: 24px;
-}
-.SISHborder{
+.displayLine{
   width: 300px;
-height: 8px;
+height: 2px;
+margin: 0;
 border-radius: 8px;
-border: 2px solid #777;
-background: #FFF;
-box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.25);
+background: #007BE5;
+box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, .5);
 }
-.SIsearchHole{
+.selectHole{
+  width: 100vw;
   display: flex;
+  justify-content: center;
+  align-items: end;
+  gap: 10px;
   position: relative;
-width: 390px;
-justify-content: center;
-align-items: flex-end;
-gap: 10px;
-  overflow: hidden;
 }
 
-.SIBoxes{
+.eachHole{
   display: flex;
-  gap: 8px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 5px;
+  border: 1px solid #007BE5;
+  box-sizing: border-box;
+  background: #FFF;
+  box-shadow: 0 0 8px 1px rgba(0, 0, 0, .25);
+  color: #007BE5;
+  cursor: pointer;
 }
 
-.SIbox{
-  width: 72px;
+.holeCardLarge{
+  width: 88px;
   height: 56px;
-  display: flex;
-justify-content: center;
-align-items: center;
-border: 1px solid #000;
+  background: #007BE5;
+  color: #FFF;
+}
+
+.holeCardMedium{
+  width: 80px;
+  height: 48px;
+}
+
+.holeCardSmall{
+  width: 72px;
+  height: 40px;
+  /* overflow: hidden; */
+}
+.leftButton{
+  width: 48px;
+height: 48px;
+font-size: 16px;
+text-align: center;
+vertical-align: middle;
+border: 1px solid black;
+border-radius: 24px;
 background: #FFF;
-box-shadow: 2px 2px 16px 0px rgba(0, 0, 0, 0.25);
-cursor: pointer;
-}
-.SIleftButton{
-  width: 48px;
-height: 48px;
-font-size: 32px;
-text-align: center;
-vertical-align: middle;
-border: 1px solid black;
-border-radius: 24px;
 position: absolute;
-left: 16px;
+left: 24px;
 bottom: 0px;
 box-shadow: 2px 2px 16px 0px rgba(0, 0, 0, 0.25);
 cursor: pointer;
 }
-.SIrightButton{
+.rightButton{
   width: 48px;
 height: 48px;
-font-size: 32px;
+font-size: 16px;
 text-align: center;
 vertical-align: middle;
 border: 1px solid black;
 border-radius: 24px;
+background: #FFF;
 position: absolute;
-right: 16px;
+right: 24px;
 bottom: 0px;
 box-shadow: 2px 2px 16px 0px rgba(0, 0, 0, 0.25);
 cursor: pointer;
 }
-.SIchooseNum{
+.inputData{
   display: flex;
-width: 389px;
-padding: 36px 0px;
-flex-direction: column;
+  width: 390px;
+  padding: 40px 0px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+  flex-wrap: wrap;
+  position: relative;
+  border-radius: 16px;
+  background: #FFF;
+  box-shadow: 0px 0px 16px 0px rgba(0, 0, 0, 0.10);
+}
+.information{
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
+}
+.scorePuttsBox{
+  display: flex;
 justify-content: center;
 align-items: center;
 gap: 64px;
-flex-wrap: wrap;
-border-radius: 16px;
-background: #FFF;
-box-shadow: 0px 0px 16px 0px rgba(0, 0, 0, 0.10);
 }
-.SInum{
+.scorePuttsTitle{
+  text-align: center; 
+}
+.scorePuttsData{
   display: flex;
 width: 100px;
 height: 40px;
@@ -236,15 +326,6 @@ gap: 23px;
 border-radius: 8px;
 border: 1px solid #000;
 background: rgba(51, 51, 51, 0.03);
-}
-.SIdata{
-  display: flex;
-justify-content: center;
-align-items: center;
-gap: 64px;
-}
-.scoreScore{
-  text-align: center; 
 }
 .addBtn{
   justify-content: center;
