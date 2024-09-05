@@ -1,17 +1,12 @@
 
-import logcard from './logcard.vue';
 <template>
-  <div class = 'back'>
-    <div class = 'main_container'>
-      <div class = "sub_container">
-        <div class = "month">2024年6月</div>
-        <div class = "subsub_container">
-          <Logcard/>
-          <Logcard/>
-          <Logcard/>
-        </div> 
-      </div>
-    </div>
+  <div class = "sub_container">
+    <div class = "month">2024年6月</div>
+    <div class = "subsub_container">
+      <Logcard/>
+      <Logcard/>
+      <Logcard/>
+    </div> 
   </div>
 </template>
 
@@ -22,32 +17,15 @@ import Logcard from "./logListChild.vue";
 </script>
 
 <style scoped>
-  .back{
-    display: flex;
-    background-attachment: fixed;
-    height: 100vh;
-    width: 100%;
-    padding: 70px 10px 100px 10px;
-    flex-direction: column;
-    align-items: center;
-    border-radius: 32px;
-    background: #F0F0F0;
-  }
-
-  .main_container{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-    align-self: stretch;
-  }
-
   .sub_container{
     display: flex;
-    width: 100%;
+    width: 100WW;
+    align-self: stretch;
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
+    margin-left: 10px;
+    margin-right: 10px;
   }
 
   .subsub_container{
