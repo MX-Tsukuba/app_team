@@ -1,7 +1,7 @@
 <template>
   <div class="footer">
     <NuxtLink to="/top"><img :src="pageStore.currentPage === 'home' ? homeActiveImg : homeImg"></NuxtLink>
-    <NuxtLink to="/foodDisplay"><img :src="pageStore.currentPage === 'food' ? foodActiveImg : foodImg"></NuxtLink>
+    <NuxtLink to="./mealDisplay"><img :src="pageStore.currentPage === 'food' ? foodActiveImg : foodImg"></NuxtLink>
     <NuxtLink to="/bodyDisplay"><img :src="pageStore.currentPage === 'body' ? bodyActiveImg : bodyImg"></NuxtLink>
     <NuxtLink to="/scoreDisplay"><img :src="pageStore.currentPage === 'score' ? scoreActiveImg : scoreImg"></NuxtLink>
   </div>
