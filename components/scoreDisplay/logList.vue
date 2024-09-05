@@ -12,8 +12,9 @@
 
 <script setup lang = "ts">
 import Logcard from "./logListChild.vue";
+import type { Database } from "~/types/database.types";
 
-
+const supabase = useSupabaseClient<Database>();
 </script>
 
 <style scoped>
