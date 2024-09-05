@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-import ScoreDisplay from '~/components/scoreDisplay/index.vue';
+import ScoreDisplay from '~/components/scoreDisplay/logList.vue';
 import { useHeadVarStore } from '~/src/store/headVar.js'
 import { usePageStore } from '~/src/store/currentPage';
 
