@@ -1,6 +1,6 @@
 <template>
     <Header/>
-    <div>
+    <div class="backGround">
         <slot/>
     </div>
     <Footer/>
@@ -10,3 +10,11 @@
 import Header from '~/components/bases/header.vue';
 import Footer from '~/components/bases/footer.vue';
 </script>
+<style>
+
+.backGround{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #F0F0F0;
+}</style>

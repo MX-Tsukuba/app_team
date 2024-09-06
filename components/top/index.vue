@@ -11,7 +11,7 @@
           <p class="tagTitle">食事を記録</p>
           <p class="tagDescription">毎日の食事とカロリーを記録します</p>
         </div>
-        <NuxtLink to="../foodInput"><img src="~assets/img/right.png" class="goButton"></NuxtLink>
+        <NuxtLink to="../mealInput"><img src="~assets/img/right.png" class="goButton"></NuxtLink>
       </div> 
       <div class="inputTag">
         <img src="~assets/img/bodyInput.png" width="40">
