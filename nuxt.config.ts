@@ -31,11 +31,6 @@ export default defineNuxtConfig({
     },
   },
 
-  plugins:[
-    '~/plugins/supabase.client.js'
-    
-  ],
-
   runtimeConfig:{
     public:{
       supabaseUrl:process.env.SUPABASE_URL || "https://fuuchzmnathzrsqqsuhg.supabase.co",

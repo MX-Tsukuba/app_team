@@ -19,3 +19,7 @@ watch(user, () => {
 <template>
   <div>Waiting for login...</div>
 </template>
+
+
+
+<!-- http://localhost:3000/confirm?error=server_error&error_description=ERROR%3A+permission+denied+for+table+t_profiles+%28SQLSTATE+42501%29#error=server_error&error_description=ERROR%253A+permission+denied+for+table+t_profiles+%2528SQLSTATE+42501%2529 -->
