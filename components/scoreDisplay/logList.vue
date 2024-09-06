@@ -2,6 +2,7 @@
 <template>
   <div class = "sub_container">
     <div class = "month">2024年6月</div>
+    <button @click='getScore'>クリック</button>
     <div class = "subsub_container">
       <Logcard/>
       <Logcard/>
@@ -15,6 +16,22 @@ import Logcard from "./logListChild.vue";
 import type { Database } from "~/types/database.types";
 
 const supabase = useSupabaseClient<Database>();
+
+const getScore = async () => {
+  try{
+    console.log("Hello World");
+    const { data, error } = await supabase.from('t_rounds').select('golfPlace_id');
+    if (error){
+      console.error('Error fetching data:', error);
+      return null;
+    }else{
+      console.log(data);
+      return data;
+    }
+  }catch(e){
+    console.error("Unexpected Error", e);
+  }
+}
 </script>
 
 <style scoped>
