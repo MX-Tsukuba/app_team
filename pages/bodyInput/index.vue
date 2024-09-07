@@ -37,6 +37,10 @@ const moveToPreviousDay = (): void => moveDate(-1)
 // 翌日に移動する関数
 const moveToNextDay = (): void => moveDate(1)
 
+let bodyWeight=ref(0);
+let bodyHeight=ref(0);
+let flexibility=ref(0);
+
 
 </script>
 
@@ -54,14 +58,14 @@ const moveToNextDay = (): void => moveDate(1)
         <div class="BinputCard">
           <div class="inputName">体重</div>
           <div class="inputBody">
-            <input class="Binput"placeholder="数値を入力"></input>
+            <input class="Binput"placeholder="数値を入力" v-model="bodyWeight"></input>
             <p>kg</p>
           </div>
         </div>
         <div class="inputCard">
           <div class="inputName">身長</div>
           <div class="inputBody">
-            <input class="Binput"placeholder="数値を入力(任意)"></input>
+            <input class="Binput"placeholder="数値を入力(任意)" v-model="bodyHeight"></input>
             <p>cm</p>
           </div>
         </div>

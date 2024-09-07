@@ -3,9 +3,8 @@
 </template>
 
 <script setup lang="ts">
-export default {
-    props:['selectedDate']
-}
+
+
 
 // 現在の日付を保持するref
 const selectedDate = ref<Date>(new Date());

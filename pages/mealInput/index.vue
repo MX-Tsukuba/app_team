@@ -14,29 +14,26 @@ import type { Database } from '~/types/database.types.ts';
 import resultData from '~/components/meal/resultData.vue';
 import kindBtn from '~/components/meal/kindBtn.vue';
 import { useRouter } from 'vue-router';
-import { toRaw } from 'vue';
 
 
 const supabase = useSupabaseClient<Database>();
 
-const {data:view_tables}=await useAsyncData(async ()=>{
-  const { data,error } = await supabase
-    .from('view_tables')
-    .select('*'); //eatテーブルのデータの取得
-    return data;
-});
 
 const insertToDatabase = async()=>{
-    const rawData = toRaw(myArr); 
+    myArr=myArr.splice(counter-1,1);
+    myArr=myArr.filter((obj)=>!obj.date && !obj.kind );
+    //リアクティブな変数を非リアクティブに変更するメソッド
+    console.log(myArr)
+
     const {data,error} =await supabase
     .from('view_tables')
-    .insert(rawData);
+    .insert(myArr);
 
     if(error){
         console.error('Error inserting data:',error);
     }else{
         console.log('Data inserted:',data);
-        router.push('./mealDisplay');
+        router.push('./mealDisplay');//insert実行後にページ遷移をしたい
     }
 };
 
@@ -52,7 +49,7 @@ const formatDateToString = (date: Date): string => {
 }
 
 // フォーマットされた日付を計算するcomputed
-const formattedDate = computed<string>(() => formatDateToString(selectedDate.value))
+const formattedDate:string = computed(() => formatDateToString(selectedDate.value))
 
 // 日付を指定した日数分移動する関数
 const moveDate = (days: number): void => {
@@ -93,30 +90,62 @@ class myClass {
 const router= useRouter();
 let kind=ref("朝食");
 
-const myArr = ref([]);
+let myArr:myClass[] = reactive([]);//配列の中身を指定するか型指定しないと型がneverになりエラー
 const firstObject= new myClass();
-myArr.value.push(firstObject);
+myArr.push(firstObject);
 let counter=ref<number>(0);
 let sumCalorie:number =0;
 
 
 function addObject(){
-  if(myArr.value.length >=10){
+  if(myArr.length >=10){
     console.warn("最大入力数に達しました")
     return null;
-  }else if (myArr.value[counter.value].title==="" || myArr.value[counter.value].calorie===0){
+  }else if (myArr[counter.value].title==="" || myArr[counter.value].calorie===0){
     console.warn("食事とカロリーを入力してください");
     return null;
   }
-  sumCalorie += myArr.value[counter.value].calorie;//動いてる
+  sumCalorie += myArr[counter.value].calorie;//動いてる
   const newObject = new myClass();
-  myArr.value.push(newObject);
+  myArr.push(newObject);
   counter.value++;
-  myArr.value.forEach(obj =>{(obj as any).kind=kind;})
-  myArr.value.forEach(obj =>{(obj as any).date=formattedDate;})
+  myArr.forEach(obj =>{(obj as any).kind=kind;})
+  myArr.forEach(obj =>{(obj as any).date=formattedDate;})
   return newObject;
 }
 
+let kindCounter:number =0;
+const addKindCounter=()=>{
+    if(kindCounter==3){
+        kindCounter=0;
+        return;
+    }else{
+        kindCounter++;
+        return;
+    }
+}
+const inputKind =ref([
+    {
+        kind:"朝食",
+        kindSrc:"~assets/img/icon_morning.png",
+        changeKind:addKindCounter
+    },
+    {
+        kind:"昼食",
+        kindSrc:"~assets/img/icon_afternoon.png",
+        changeKind:addKindCounter
+    },
+    {
+        kind:"夕食",
+        kindSrc:"~assets/img/icon_night.png",
+        changeKind:addKindCounter
+    },
+    {
+        kind:"間食",
+        kindSrc:"~assets/img/icon_snack.png",
+        changeKind:addKindCounter
+    },
+]);
 
 
 
@@ -126,8 +155,8 @@ function addObject(){
 <template>
 <div class="mealInput">
     <div class="kindBtn">
-        <!-- <kindBtn /> -->
-         <input style="width: 40px;" v-model="kind"></input>
+        <kindBtn :kind="inputKind[kindCounter].kind" :kind-src="inputKind[kindCounter].kindSrc" :change-kind="inputKind[kindCounter].changeKind"  />
+         <!-- <input style="width: 40px;" v-model="kind"></input> -->
     </div>
     <div class="dateAll">
         <p class="kind">昼</p>
@@ -173,7 +202,7 @@ function addObject(){
                 </div>
             </div>
         </div>
-        <resultData  v-for="(v,i) in myArr" :key="i" :title="myArr[i].title" :calorie="myArr[i].calorie"  />
+        <resultData  v-for="(v,i) in myArr" :key="i" :title="myArr[i].title" :calorie=myArr[i].calorie />
     </div>
 </div>
 
@@ -189,11 +218,6 @@ function addObject(){
     position: absolute;
     top: 70px;
     left: 0;
-    border-radius: 60px;
-    border: 1px solid #F28822;
-    background: #FFF;
-    width: 60px;/*仮で*/
-
 }
 .dateAll{
     display: flex;
