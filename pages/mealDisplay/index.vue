@@ -1,10 +1,10 @@
 <template>
-    <div class="homebody">
+    <!-- <div class="homebody">
         <div class="gragh">
-            <div class="graghChart"></div><!--グラフを表示するコンポーネントやtableタグが入る-->
+            <div class="graghChart"></div>
             <div class="changeWeeks">
-                <img class="weekBtn reverse" src="~assets/img/right.png">
-                <img class="weekBtn " src="~assets/img/right.png">
+                <img class="weekBtn reverse" src="~/assets/img/right.png">
+                <img class="weekBtn " src="~/assets/img/right.png">
             </div>
         </div>
         <div class="resultCard">
@@ -21,66 +21,67 @@
                 <div class="table">
                     <p class="kindDisplay"></p>
                     <p class="sum"></p>
-                    <resultData v-for="(v,i) in myArr" :key="i" :title="myArr[i].title" :calorie="myArr[i].calorie" />
+                    <resultData v-for="(v,i) in myArr" :key="i" :title="myArr[i].title" :calorie="myArr[i].calorie" v-if="myArr[i].kind==selectedKind"  />
                 </div>
             </div>
         </div>
-    </div>
+    </div> -->
 </template>
 
 <script setup>
-import resultData from '~/components/meal/resultData.vue';
-import { onMounted } from 'vue'
-import { useHeadVarStore } from '~/src/store/headVar.js'
-import { usePageStore } from '~/src/store/currentPage';
-// import type { Database } from '~/types/database.types.ts';
+// import resultData from '~/components/meal/resultData.vue';
+// import { onMounted } from 'vue'
+// import { useHeadVarStore } from '~/src/store/headVar.js'
+// import { usePageStore } from '~/src/store/currentPage';
+// // import type { Database } from '~/types/database.types.ts';
 
-const headVarStore = useHeadVarStore()
-headVarStore.title = '食事記録'
-const pageStore = usePageStore();
-onMounted(() => {
-  pageStore.setCurrentPage('food');
-});
+// const headVarStore = useHeadVarStore()
+// headVarStore.title = '食事記録'
+// const pageStore = usePageStore();
+// onMounted(() => {
+//   pageStore.setCurrentPage('food');
+// });
 
 // const supabase = useSupabaseClient<Database>();
 
-const {data:days}=await useAsyncData(async ()=>{
-  const { data,error } = await supabase
-    .from('days')
-    .select('date');
-    return data;
-});
+// const {data:days}=await useAsyncData(async ()=>{
+//   const { data,error } = await supabase
+//     .from('days')
+//     .select('date');
+//     return data;
+// });
 
-const {data:view_tables}=await useAsyncData(async ()=>{
-  const { data,error } = await supabase
-    .from('view_tables')
-    .select('*');
-    return data;
-});
+// const {data:view_tables}=await useAsyncData(async ()=>{
+//   const { data,error } = await supabase
+//     .from('view_tables')
+//     .select('*');
+//     return data;
+// });
 
-const arrayOriginal=ref([]);
+// const arrayOriginal=ref([]);
+// let selectedKind=ref("朝食");
 
-function getMostRecentDate(dates){
-    if (dates.length === 0) {
-        return null;
-    }
+// function getMostRecentDate(date){
+//     if (dates.length === 0) {
+//         return null;
+//     }
 
-    const dateObjects = dates.map(date => new Date(date));
+//     const dateObjects = dates.map(date => new Date(date));
 
-    const mostRecentDate = new Date(Math.max(...dateObjects.map(date => date.getTime())));
+//     const mostRecentDate = new Date(Math.max(...dateObjects.map(date => date.getTime())));
 
-    // const mostRecentDateString = mostRecentDate.toISOString().split('T')[0];
+//     // const mostRecentDateString = mostRecentDate.toISOString().split('T')[0];
 
-    return mostRecentDate;
-}
+//     return mostRecentDate;
+// }
 
-const mostRecent =getMostRecentDate(date);
+// const mostRecent =getMostRecentDate(date);
 
-for(let i=0;i<7;i++){
-    const displayDate=new Date(mostRecent)
-    displayDate.setDate(displayDate.getDate-6+i)
-    arrayOriginal.value[i]=view_tables.filter((obj) =>obj.date==displayDate)
-}
+// for(let i=0;i<7;i++){
+//     const displayDate=new Date(mostRecent)
+//     displayDate.setDate(displayDate.getDate-6+i)
+//     arrayOriginal.value[i]=view_tables.filter((obj) =>obj.date==displayDate)
+// }
 
 
 
