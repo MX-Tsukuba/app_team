@@ -11,7 +11,7 @@
     </div>
 </template>
 
-<script>
+<script setup>
 const supabase = useSupabaseClient()
 const signOut = async () =>{
   const { error } = await supabase.auth.signOut()
