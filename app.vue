@@ -5,6 +5,9 @@
 </template>
 
 <style>
+body{
+  margin: 0px;
+}
 p, ul, li, a{
   margin: 0;
   padding: 0;
@@ -21,7 +24,6 @@ button{
   cursor: pointer;
 }
 .whole{
-  margin: -8px;
   padding: 80px 0;
   height: 100vh;
   background: #F0F0F0;
