@@ -10,33 +10,33 @@ export default defineNuxtConfig({
     key:process.env.SUPABASE_KEY,
     redirect: true,
     redirectOptions: {
-      login: '/login',
-      callback: '/confirm',
+      login: '/login/login',
+      callback: '/login/confirm',
       include: undefined,
       exclude: [],
       cookieRedirect: false,
     },
-    cookieOptions: {
-      maxAge: 60 * 60 * 8,
-      sameSite: 'lax',
-      secure: true
-    },
-    clientOptions: {
-      auth: {
-        flowType: 'pkce',
-        detectSessionInUrl: true,
-        persistSession: true,
-        autoRefreshToken: true
-      },
-    },
+    // cookieOptions: {
+    //   maxAge: 60 * 60 * 8,
+    //   sameSite: 'lax',
+    //   secure: true
+    // },
+    // clientOptions: {
+    //   auth: {
+    //     flowType: 'pkce',
+    //     detectSessionInUrl: true,
+    //     persistSession: true,
+    //     autoRefreshToken: true
+    //   },
+    // },
   },
 
-  runtimeConfig:{
-    public:{
-      supabaseUrl:process.env.SUPABASE_URL || "https://fuuchzmnathzrsqqsuhg.supabase.co",
-      supabaseKey:process.env.SUPABASE_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1dWNoem1uYXRoenJzcXFzdWhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTAwNjYwNDksImV4cCI6MjAyNTY0MjA0OX0.V9yZTvTcP-1u8zD1PLSKkGhY_fVWLqMDCGBV0hNFBLU"
-    }
-  },
+  // runtimeConfig:{
+  //   public:{
+  //     supabaseUrl:process.env.SUPABASE_URL || "https://fuuchzmnathzrsqqsuhg.supabase.co",
+  //     supabaseKey:process.env.SUPABASE_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1dWNoem1uYXRoenJzcXFzdWhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTAwNjYwNDksImV4cCI6MjAyNTY0MjA0OX0.V9yZTvTcP-1u8zD1PLSKkGhY_fVWLqMDCGBV0hNFBLU"
+  //   }
+  // },
 
   compatibilityDate: '2024-08-27',
 })

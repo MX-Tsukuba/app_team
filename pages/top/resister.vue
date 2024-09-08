@@ -2,7 +2,7 @@
     <div class="resisterContainer">
         <h1>resister.vue</h1>
         <div class="successMessage">authentication successful</div>
-        <NuxtLink class="returnLink" to="/">
+        <NuxtLink class="returnLink" to="/top">
             return to index.vue
         </NuxtLink>
         <button class="logoutButton" @click="signOut">
@@ -18,3 +18,5 @@ const signOut = async () =>{
   if (error) console.log(error)
 }
 </script>
+
+

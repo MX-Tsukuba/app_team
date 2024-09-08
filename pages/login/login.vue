@@ -7,7 +7,7 @@ const signInWithGoogle = async () => {
   const { error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: 'http://localhost:3000/confirm', // ここを絶対パスにしたら成功する
+      redirectTo: 'http://localhost:3000/login/confirm', // ここを絶対パスにしたら成功する
     }
   })
   if (error) console.log(error)
@@ -20,7 +20,7 @@ const signInWithGoogle = async () => {
     <button class="loginButton" @click="signInWithGoogle">
       Sign In with Google
     </button>
-    <NuxtLink class="returnIndex" to="/">
+    <NuxtLink class="returnIndex" to="/top">
       return to index.vue
     </NuxtLink>
   </div>
