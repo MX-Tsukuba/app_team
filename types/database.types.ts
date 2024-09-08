@@ -7,192 +7,325 @@ export type Json =
   | Json[]
 
 export type Database = {
-  graphql_public: {
-    Tables: {
-      [_ in never]: never
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      graphql: {
-        Args: {
-          operationName?: string
-          query?: string
-          variables?: Json
-          extensions?: Json
-        }
-        Returns: Json
-      }
-    }
-    Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
-  }
   public: {
     Tables: {
-      t_sample_kazuki: {
+      days: {
         Row: {
-          course: string | null
           created_at: string
-          hole: number | null
-          id: number
-          putts: number | null
-          score: number | null
+          date: string
+          days_id: number
+          update_at: string
         }
         Insert: {
-          course?: string | null
           created_at?: string
-          hole?: number | null
-          id?: number
-          putts?: number | null
-          score?: number | null
+          date: string
+          days_id?: never
+          update_at?: string
         }
         Update: {
-          course?: string | null
           created_at?: string
-          hole?: number | null
-          id?: number
-          putts?: number | null
-          score?: number | null
+          date?: string
+          days_id?: never
+          update_at?: string
         }
         Relationships: []
       }
-      t_scores: {
+      eat: {
         Row: {
-          created_at: string | null
-          id: number
-          name: string | null
-          score: string | null
-          updated_at: string | null
+          created_at: string
+          days_id: number
+          deal_id: number
+          eat_id: number
+          kind_option_id: number
+          update_at: string
         }
         Insert: {
-          created_at?: string | null
-          id?: never
-          name?: string | null
-          score?: string | null
-          updated_at?: string | null
+          created_at?: string
+          days_id: number
+          deal_id: number
+          eat_id?: never
+          kind_option_id: number
+          update_at?: string
         }
         Update: {
-          created_at?: string | null
-          id?: never
-          name?: string | null
-          score?: string | null
-          updated_at?: string | null
+          created_at?: string
+          days_id?: number
+          deal_id?: number
+          eat_id?: never
+          kind_option_id?: number
+          update_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "eat_days_id_fkey"
+            columns: ["days_id"]
+            isOneToOne: false
+            referencedRelation: "days"
+            referencedColumns: ["days_id"]
+          },
+          {
+            foreignKeyName: "eat_deal_id_fkey"
+            columns: ["deal_id"]
+            isOneToOne: false
+            referencedRelation: "meal"
+            referencedColumns: ["deal_id"]
+          },
+          {
+            foreignKeyName: "eat_kind_option_id_fkey"
+            columns: ["kind_option_id"]
+            isOneToOne: false
+            referencedRelation: "kind_option"
+            referencedColumns: ["kind_option_id"]
+          },
+        ]
+      }
+      kind_option: {
+        Row: {
+          kind: string
+          kind_option_id: number
+        }
+        Insert: {
+          kind: string
+          kind_option_id?: number
+        }
+        Update: {
+          kind?: string
+          kind_option_id?: number
         }
         Relationships: []
       }
-    t_holes: {
-      Row: {
-        created_at: string | null
-        id: number
-        holeNumber: number | null
-        scoreNumber: number | null
-        puttsNumber: number | null
-        round_id: number | null
-        updated_at: string | null
+      m_golfplaces: {
+        Row: {
+          created_at: string
+          golfplace_name: string
+          golfplaces_id: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          golfplace_name: string
+          golfplaces_id?: never
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          golfplace_name?: string
+          golfplaces_id?: never
+          updated_at?: string
+        }
+        Relationships: []
       }
-      Insert: {
-        created_at?: string | null
-        id?: never
-        holeNumber?: number | null
-        scoreNumber?: number | null
-        puttsNumber?: number | null
-        round_id?: number | null
-        updated_at?: string | null
+      m_pars: {
+        Row: {
+          golfplace_id: number | null
+          hole_number: number
+          par_number: number
+          pars_id: number
+        }
+        Insert: {
+          golfplace_id?: number | null
+          hole_number: number
+          par_number: number
+          pars_id?: never
+        }
+        Update: {
+          golfplace_id?: number | null
+          hole_number?: number
+          par_number?: number
+          pars_id?: never
+        }
+        Relationships: [
+          {
+            foreignKeyName: "m_pars_golfplace_id_fkey"
+            columns: ["golfplace_id"]
+            isOneToOne: false
+            referencedRelation: "m_golfplaces"
+            referencedColumns: ["golfplaces_id"]
+          },
+        ]
       }
-      Update: {
-        created_at?: string | null
-        id?: never
-        holeNumber?: number | null
-        scoreNumber?: number | null
-        puttsNumber?: number | null
-        round_id?: number | null
-        updated_at?: string | null
+      meal: {
+        Row: {
+          calorie: number
+          created_at: string
+          deal_id: number
+          title: string
+          update_at: string
+        }
+        Insert: {
+          calorie: number
+          created_at?: string
+          deal_id?: never
+          title: string
+          update_at?: string
+        }
+        Update: {
+          calorie?: number
+          created_at?: string
+          deal_id?: never
+          title?: string
+          update_at?: string
+        }
+        Relationships: []
       }
-      Relationships: []
+      sum_per_kind: {
+        Row: {
+          created_at: string
+          days_id: number
+          kind_option_id: number
+          sum_per_kind_id: number
+          update_at: string
+        }
+        Insert: {
+          created_at?: string
+          days_id: number
+          kind_option_id: number
+          sum_per_kind_id?: never
+          update_at?: string
+        }
+        Update: {
+          created_at?: string
+          days_id?: number
+          kind_option_id?: number
+          sum_per_kind_id?: never
+          update_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sum_per_kind_days_id_fkey"
+            columns: ["days_id"]
+            isOneToOne: false
+            referencedRelation: "days"
+            referencedColumns: ["days_id"]
+          },
+          {
+            foreignKeyName: "sum_per_kind_kind_option_id_fkey"
+            columns: ["kind_option_id"]
+            isOneToOne: false
+            referencedRelation: "kind_option"
+            referencedColumns: ["kind_option_id"]
+          },
+        ]
+      }
+      t_holes: {
+        Row: {
+          created_at: string
+          hole_number: number
+          holes_id: number
+          pat_number: number
+          round_id: number | null
+          score_number: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          hole_number: number
+          holes_id?: never
+          pat_number: number
+          round_id?: number | null
+          score_number: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          hole_number?: number
+          holes_id?: never
+          pat_number?: number
+          round_id?: number | null
+          score_number?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "t_holes_round_id_fkey"
+            columns: ["round_id"]
+            isOneToOne: false
+            referencedRelation: "t_rounds"
+            referencedColumns: ["rounds_id"]
+          },
+        ]
+      }
+      t_meal: {
+        Row: {
+          calorie: number
+          created_at: string
+          meal_id: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          calorie: number
+          created_at?: string
+          meal_id?: never
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          calorie?: number
+          created_at?: string
+          meal_id?: never
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      t_rounds: {
+        Row: {
+          created_at: string
+          date: string
+          golfplace_id: number | null
+          par_id: number | null
+          rounds_id: number
+          updated_at: string
+          user_id: number
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          golfplace_id?: number | null
+          par_id?: number | null
+          rounds_id?: never
+          updated_at?: string
+          user_id: number
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          golfplace_id?: number | null
+          par_id?: number | null
+          rounds_id?: never
+          updated_at?: string
+          user_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "t_rounds_golfplace_id_fkey"
+            columns: ["golfplace_id"]
+            isOneToOne: false
+            referencedRelation: "m_golfplaces"
+            referencedColumns: ["golfplaces_id"]
+          },
+          {
+            foreignKeyName: "t_rounds_par_id_fkey"
+            columns: ["par_id"]
+            isOneToOne: false
+            referencedRelation: "m_pars"
+            referencedColumns: ["pars_id"]
+          },
+        ]
+      }
     }
-  m_golfPlaces: {
-    Row: {
-      created_at: string | null
-      id: number
-      golfPlaceName: string | null
-      par_1H: string | null
-      par_2H: string | null
-      par_3H: string | null
-      par_4H: string | null
-      par_5H: string | null
-      par_6H: string | null
-      par_7H: string | null
-      par_8H: string | null
-      par_9H: string | null
-      par_10H: string | null
-      par_11H: string | null
-      par_12H: string | null
-      par_13H: string | null
-      par_14H: string | null
-      par_15H: string | null
-      par_16H: string | null
-      par_17H: string | null
-      par_18H: string | null
-      updated_at: string | null
-    }
-    Insert: {
-      created_at?: string | null
-      id?: never
-      golfPlaceName?: string | null
-      par_1H?: number | null
-      par_2H?: number | null
-      par_3H?: number | null
-      par_4H?: number | null
-      par_5H?: number | null
-      par_6H?: number | null
-      par_7H?: number | null
-      par_8H?: number | null
-      par_9H?: number | null
-      par_10H?: number | null
-      par_11H?: number | null
-      par_12H?: number | null
-      par_13H?: number | null
-      par_14H?: number | null
-      par_15H?: number | null
-      par_16H?: number | null
-      par_17H?: number | null
-      par_18H?: number | null
-      updated_at?: string | null
-    }
-    Update: {
-      created_at?: string | null
-      id?: never
-      golfPlaceName?: string | null
-      par_1H?: number | null
-      par_2H?: number | null
-      par_3H?: number | null
-      par_4H?: number | null
-      par_5H?: number | null
-      par_6H?: number | null
-      par_7H?: number | null
-      par_8H?: number | null
-      par_9H?: number | null
-      par_10H?: number | null
-      par_11H?: number | null
-      par_12H?: number | null
-      par_13H?: number | null
-      par_14H?: number | null
-      par_15H?: number | null
-      par_16H?: number | null
-      par_17H?: number | null
-      par_18H?: number | null
-      updated_at?: string | null
-    }
-    Relationships: []
-  }
-}
     Views: {
-      [_ in never]: never
+      view_tables: {
+        Row: {
+          calorie: number | null
+          date: string | null
+          eat_id: number | null
+          kind: string | null
+          title: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       [_ in never]: never
@@ -278,6 +411,7 @@ export type Database = {
           owner_id: string | null
           path_tokens: string[] | null
           updated_at: string | null
+          user_metadata: Json | null
           version: string | null
         }
         Insert: {
@@ -291,6 +425,7 @@ export type Database = {
           owner_id?: string | null
           path_tokens?: string[] | null
           updated_at?: string | null
+          user_metadata?: Json | null
           version?: string | null
         }
         Update: {
@@ -304,6 +439,7 @@ export type Database = {
           owner_id?: string | null
           path_tokens?: string[] | null
           updated_at?: string | null
+          user_metadata?: Json | null
           version?: string | null
         }
         Relationships: [
@@ -325,6 +461,7 @@ export type Database = {
           key: string
           owner_id: string | null
           upload_signature: string
+          user_metadata: Json | null
           version: string
         }
         Insert: {
@@ -335,6 +472,7 @@ export type Database = {
           key: string
           owner_id?: string | null
           upload_signature: string
+          user_metadata?: Json | null
           version: string
         }
         Update: {
@@ -345,6 +483,7 @@ export type Database = {
           key?: string
           owner_id?: string | null
           upload_signature?: string
+          user_metadata?: Json | null
           version?: string
         }
         Relationships: [
@@ -480,6 +619,10 @@ export type Database = {
           metadata: Json
           updated_at: string
         }[]
+      }
+      operation: {
+        Args: Record<PropertyKey, never>
+        Returns: string
       }
       search: {
         Args: {

@@ -76,7 +76,7 @@ const currentHole = ref<number>(3);
 const par = ref<number|null>(0);
 const fetchPar = async (hole: number) => {
   const { data, error } = await supabase
-    .from('m_golfPlaces')
+    .from('m_golfplaces')
     .select(`par_${hole}H`)
     .eq('golfPlaceName', golfPlaceName)
     .single();
