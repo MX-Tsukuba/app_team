@@ -1,6 +1,5 @@
 <template>
   <section class="wholeHome">
-    <enterGolfCourseName v-if="isShowModal"/>
     <div class="recentRecord">
       <p>直近の記録エリア</p>
       <p>一目で結果を確認できるグラフ</p>
@@ -28,10 +27,11 @@
           <p class="tagTitle">スコアを記録</p>
           <p class="tagDescription">ゴルフのスコアなどを記録します</p>
         </div>
-        <img src="~assets/img/right.png"  class="goButton" @click="toggleModal">
+        <img src="~assets/img/right.png"  class="goButton" @click="toggleModal('top')">
+        <enterGolfCourseName v-if="isShowModal && modalName === 'top'"/>
       </div>
     </div>    
-    <NuxtLink to="../camera/video"  class="circleBtn"><img src="~assets/img/camera.png" width="48"></NuxtLink>
+    <NuxtLink to="/camera"  class="circleBtn"><img src="~assets/img/camera.png" width="48"></NuxtLink>
   </section>
 </template>
 
@@ -45,7 +45,8 @@ const headVarStore = useHeadVarStore();
 headVarStore.title = 'Home';
 const modalStore = useModalStore();
 const isShowModal = computed(() => modalStore.isShowModal);
-const toggleModal = () => modalStore.toggleModal();
+const modalName = computed(() => modalStore.modalName);
+const toggleModal = (name:string) => modalStore.toggleModal(name);
 </script>
 
 <style scoped>
