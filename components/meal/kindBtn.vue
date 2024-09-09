@@ -1,21 +1,20 @@
 <template>
-  <div>
-    <img class="kindBtnStyle"  :src="kindSrc" @click="changeKind" />
-    <p class=""></p>
-  </div>
+  <div @click="$emit('click')">
+      <img :src="imageSrc" :alt="mealType" class="kindBtnStyle" />
+      <!-- <p>{{ mealType }}</p> -->
+    </div>
 </template>
 
 <script setup lang="ts">
 
-interface kindBtnStyle{
-  kind:string
-  kindSrc:string
-  changeKind:any
-}
+defineProps<{
+  mealType: string
+  imageSrc: string
+}>()
 
-const props=defineProps<kindBtnStyle>();
-
-
+defineEmits<{
+  (e: 'click'): void
+}>()
 </script>
 
 <style scoped>
