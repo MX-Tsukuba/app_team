@@ -2,13 +2,21 @@
     <div class = "header">
         <img src="~/assets/img/back.png" alt="Left" class="backButton" @click="$router.go(-1)">
         <h1>{{ headVarStore.title }}</h1>
-        <img src="~/assets/img/menu.png" alt="menu" class="menuButton">
+        <img src="~/assets/img/menu.png" alt="menu" class="menuButton" @click="handleMenubar">
+        <Menu v-if="isOpen" :isOpen="isOpen" :onClick="handleMenubar"/>
     </div>
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue';
+import Menu from './Menu.vue';
 import { useHeadVarStore } from '~/src/store/headVar.js';
 const headVarStore = useHeadVarStore();
+const isOpen = ref(false);
+const handleMenubar = () => {
+    isOpen.value = !isOpen.value;
+}
+
 </script>
 
 <style scoped>
@@ -41,5 +49,6 @@ h1{
     position: fixed;
     top: 20px;
     right: 10px;
+    cursor: pointer;
 }
 </style>
