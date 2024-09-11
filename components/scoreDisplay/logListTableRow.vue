@@ -1,10 +1,6 @@
 <template>
-    <div v-if = "props.holeNo % 2 ===0">
-        <tr class="even"><td>{{props.holeNo}}</td><td>{{ props.par }}</td><td>{{ props.result }}</td><td>{{ props.puts }}</td><td>{{ props.form_Score }}</td></tr>
-    </div>
-    <div v-else>
-        <tr class="odd"><td>{{props.holeNo}}</td><td>{{ props.par }}</td><td>{{ props.result }}</td><td>{{ props.puts }}</td><td>{{ props.form_Score }}</td></tr>
-    </div>
+    <tr v-if = "props.holeNo % 2 ===0" class="even"><td>{{props.holeNo}}</td><td>{{ props.par }}</td><td>{{ props.result }}</td><td>{{ props.puts }}</td><td>{{ props.form_Score }}</td></tr>
+    <tr v-else class="odd"><td>{{props.holeNo}}</td><td>{{ props.par }}</td><td>{{ props.result }}</td><td>{{ props.puts }}</td><td>{{ props.form_Score }}</td></tr>
 </template>
 
 <script setup lang = "ts">

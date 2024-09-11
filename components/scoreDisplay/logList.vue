@@ -2,9 +2,8 @@
 <template>
   <div class = "sub_container">
     <div class = "month">2024年6月</div>
-    <!-- <button @click='getScore'>クリック</button> -->
+    <button @click='getScore'>クリック</button>
     <div class = "subsub_container">
-      <Logcard :golfPlace="sampleData.golfPlace" :details="sampleData.details"/>
       <Logcard :golfPlace="sampleData.golfPlace" :details="sampleData.details"/>
       <Logcard :golfPlace="sampleData.golfPlace" :details="sampleData.details"/>
     </div> 
@@ -17,16 +16,53 @@ import type { Database } from "~/types/database.types";
 
 const supabase = useSupabaseClient<Database>();
 
+interface holeDetails{
+    holeNo:number,
+    par:number,
+    result: number,
+    puts:number,
+    form_Score:number
+}
+
+interface roundDeteail{
+  date: any,
+  golfPlaceName: string,
+  holes: holeDetails[],
+}
+
 const getScore = async () => {
   try{
-    console.log("Hello World");
-    const { data, error } = await supabase.from('t_rounds').select('golfPlace_id');
-    if (error){
-      console.error('Error fetching data:', error);
+    let roundDeteails = Array<roundDeteail>();
+    //特定のユーザのデータゴルフデータを全て取得、ユーザの識別についてはローレベルセキュリティで実行する。
+    const { data:roundDetas, error:error1 } = await supabase.from('t_rounds').select("id, golfPlace_id, date").eq('user_id', 1);
+    if (error1){
+      console.error('Error fetching data from t_round table:', error1);
       return null;
     }else{
-      console.log(data);
-      return data;
+      console.log(roundDetas);
+    }
+
+    
+    //要素一つ一つについてゴルフ場、ホールの情報等必要な情報を取得する。
+    for(let roundDeta of roundDetas){  
+      let r:roundDeteail = {date: "", golfPlaceName: "", holes: []};   
+      const {data:golfPlaceinfo, error:error2} = await supabase.from("m_golfplaces").select("*").eq("id", roundDeta[<any>"golfPlace_id"]);
+      if(error2){
+        console.error('Error fetching data from m_golfplaces table:', error2);
+      }else{
+        console.log(golfPlaceinfo);
+        r.date = roundDeta[<any>"date"]
+        r.golfPlaceName = golfPlaceinfo;
+        console.log(r);
+      }
+
+      const {data:scoreDetails, error:error3} = await supabase.from("t_holes").select("*").eq("round_id", roundDeta[<any>"id"])
+      if (error3){
+        console.error('Error fetching data from t_holes table:', error3);
+      }else{
+        console.log(scoreDetails)
+      }
+
     }
   }catch(e){
     console.error("Unexpected Error", e);
