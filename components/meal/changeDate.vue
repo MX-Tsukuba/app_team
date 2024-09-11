@@ -1,36 +1,39 @@
 <template>
-
+  <div class="changeDate">
+      <button @click="$emit('firstclick')"><img class="dateBtn reverse" src="~assets/img/right.png"></button>
+      <p class="date">{{formattedDate}}</p>
+      <button @click="$emit('secondclick')"><img class="dateBtn" src="~assets/img/right.png"></button>
+  </div>
 </template>
 
 <script setup lang="ts">
-export default {
-    props:['selectedDate']
-}
 
-// 現在の日付を保持するref
-const selectedDate = ref<Date>(new Date());
+defineEmits<{
+  (e:'firstclick'):void
+  (e:'secondclick'):void
+}>()
 
-// 日付を指定のフォーマットに変換する関数
-const formatDateToString = (date: Date): string => {
-  const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const day = String(date.getDate()).padStart(2, '0')
-  return `${year}-${month}-${day}`
-}
-
-// フォーマットされた日付を計算するcomputed
-const formattedDate = computed<string>(() => formatDateToString(selectedDate.value))
-
-// 日付を指定した日数分移動する関数
-const moveDate = (days: number): void => {
-  const newDate = new Date(selectedDate.value)
-  newDate.setDate(newDate.getDate() + days)
-  selectedDate.value = newDate
-}
-
-// 前日に移動する関数
-const moveToPreviousDay = (): void => moveDate(-1)
-
-// 翌日に移動する関数
-const moveToNextDay = (): void => moveDate(1)
+defineProps<{
+  formattedDate:string
+}>()
 </script>
+<style scoped>
+.changeDate{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.date{
+    color: #777;
+    font-family: Inter;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+.dateBtn{
+    width: 11px; height: 15px;
+}
+.reverse{
+    transform: rotate(180deg);
+}</style>

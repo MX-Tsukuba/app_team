@@ -5,13 +5,13 @@
     </div>
 </template>
 
-<script>
-export default {
-  props: {
-    title: String,
-    calorie:Number
-  }
-}
+<script setup lang="ts">
+
+const props=defineProps<{
+    title:string
+    calorie:number
+}>()
+
 </script>
 
 <style>

@@ -1,39 +1,41 @@
 <template>
     <div class="homebody">
         <div class="gragh">
-            <div class="graghChart"></div><!--グラフを表示するコンポーネントやtableタグが入る-->
+            <div class="graghChart"></div>
             <div class="changeWeeks">
-                <img class="weekBtn reverse" src="~assets/img/right.png">
-                <img class="weekBtn " src="~assets/img/right.png">
+                <img class="weekBtn reverse" src="~/assets/img/right.png">
+                <img class="weekBtn " src="~/assets/img/right.png">
             </div>
         </div>
         <div class="resultCard">
             <div class="day">
-                2024/07/20
+                <input type="date" v-model="dateNow">
             </div>
             <div class="dayKcal">
-                <div class="kcalNumber"></div>
+                <div class="kcalNumber">{{ daySum[dateNowIndex] }}</div>
                 <div class="kcal"></div>
                 <div class="rectangle"></div>
             </div>
             <div class="eachOfResult">
-                <div class="kindBtn"></div>
+                <div class="kindBtn">{{ kindNow[kindNowIndex] }}</div>
                 <div class="table">
                     <p class="kindDisplay"></p>
-                    <p class="sum"></p>
-                    <resultData v-for="(v,i) in myArr" :key="i" :title="myArr[i].title" :calorie="myArr[i].calorie" />
+                    <p class="sum">{{ kindSum[kindNowIndex][dateNowIndex] }}</p>
+                    <div v-for="(v,i) in week_view_tables" :key="i">
+                    <resultData  v-if="v.kind==kindNow[kindNowIndex] && v.date==dateNow" :title="v.title" :calorie="v.calorie" />
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import resultData from '~/components/meal/resultData.vue';
-import { onMounted } from 'vue'
-import { useHeadVarStore } from '~/src/store/headVar.js'
+import { onMounted } from 'vue';
+import { useHeadVarStore } from '~/src/store/headVar.js';
 import { usePageStore } from '~/src/store/currentPage';
-// import type { Database } from '~/types/database.types.ts';
+import type { Database } from '~/types/database.types.ts';
 
 const headVarStore = useHeadVarStore()
 headVarStore.title = '食事記録'
@@ -42,55 +44,84 @@ onMounted(() => {
   pageStore.setCurrentPage('food');
 });
 
-// const supabase = useSupabaseClient<Database>();
+const supabase = useSupabaseClient<Database>();
 
-const {data:days}=await useAsyncData(async ()=>{
-  const { data,error } = await supabase
-    .from('days')
-    .select('date');
-    return data;
-});
-
-const {data:view_tables}=await useAsyncData(async ()=>{
-  const { data,error } = await supabase
+const daySum:number[]=[];
+const kindSum:number[][]=[[]];
+const today=new Date();
+const kindNowIndex=ref<number>(0);
+const kindNow=["朝食","昼食","夕食","間食"];
+const dateNowIndex =ref<number>(today.getDay())
+let dateNow=ref<string>("");
+async function fetchLatestDate() {
+    const {data:week_view_tables,error} = await supabase
     .from('view_tables')
-    .select('*');
-    return data;
-});
+    .select('*')
+    .in('date', weekDates)
+    .order('date',{ascending:true})
 
-const arrayOriginal=ref([]);
-
-function getMostRecentDate(dates){
-    if (dates.length === 0) {
-        return null;
+    if(error){
+        console.error('最新のデータの取得に失敗しました',error);
+    }else{
+        console.log("データの取得に成功しました",week_view_tables);
+        const morningSum:number[] =[];
+        const afternoonSum:number[] =[];
+        const dinnerSum:number[] =[];
+        const snackSum:number[] =[];
+        for(let i=0;i<7;i++){
+            for(let j=0;j<week_view_tables.length;j++){
+                if(week_view_tables[j].date==weekDates[i]){
+                    if(week_view_tables[j].kind=="朝食"){
+                        morningSum[i] +=week_view_tables[j].calorie;
+                    }else if(week_view_tables[j].kind=="昼食"){
+                        afternoonSum[i] +=week_view_tables[j].calorie;
+                    }else if(week_view_tables[j].kind=="夕食"){
+                        dinnerSum[i] +=week_view_tables[j].calorie;
+                    }else if(week_view_tables[j].kind=="間食"){
+                        snackSum[i] +=week_view_tables[j].calorie;
+                    }
+                    daySum[i]+=week_view_tables[j].calorie;
+                }
+            }
+        }
+        kindSum.push(morningSum,afternoonSum,dinnerSum,snackSum);
+        console.log(kindSum,"kindSumです");
     }
-
-    const dateObjects = dates.map(date => new Date(date));
-
-    const mostRecentDate = new Date(Math.max(...dateObjects.map(date => date.getTime())));
-
-    // const mostRecentDateString = mostRecentDate.toISOString().split('T')[0];
-
-    return mostRecentDate;
+}
+const formatDateToString = (date: Date): string => {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
 }
 
-const mostRecent =getMostRecentDate(date);
+function getCurrentWeekDates(startDay:number=1):string[]{
+    const today=new Date();
+    const dayOfWeek =today.getDay();//日曜日=0,土曜日=6
+    const diff=(dayOfWeek +7-startDay) % 7;
 
-for(let i=0;i<7;i++){
-    const displayDate=new Date(mostRecent)
-    displayDate.setDate(displayDate.getDate-6+i)
-    arrayOriginal.value[i]=view_tables.filter((obj) =>obj.date==displayDate)
+    const startOfWeek = new Date(today);
+    startOfWeek.setDate(today.getDate()-diff);
+
+    const weekDates:string[]=[];
+    for(let i=0;i<7;i++){
+        const date=new Date(startOfWeek);
+        date.setDate(startOfWeek.getDate()+i);
+        weekDates.push(formatDateToString(date));
+    }
+    // dateNow.value=weekDates[dateNowIndex.value];
+    return weekDates;
 }
-
-
-
-
+const weekDates = getCurrentWeekDates();
+console.log(weekDates,"現在の週の配列");
+fetchLatestDate();
+dateNow.value=formatDateToString(today);
 
 
 
 </script>
 
-<style lang="css">
+<style lang="css" scoped>
 .homebody{
     display: flex;
     width: 390px;
