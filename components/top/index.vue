@@ -24,23 +24,33 @@ const modalStore = useModalStore();
 const isShowModal = computed(() => modalStore.isShowModal);
 const toggleModal = () => modalStore.toggleModal();
 
+onMounted(async ()=>{
+  const foodInput=await import('@/assets/img/foodInput.png')
+  const bodyInput=await import('@/assets/img/bodyInput.png')
+  const golfInput=await import('@/assets/img/golfInput.png')
+
+  inputAll.value[0].images=foodInput.default
+  inputAll.value[1].images=bodyInput.default
+  inputAll.value[2].images=golfInput.default
+})
+
 const inputAll =ref([
   {
-    images:"~/assets/img/foodInput.png",
+    images:'',
     tagTitle:'食事を記録',
     tagDescription:'毎日の食事とカロリーを記録します',
     link:'../mealInput',
     onclick:null
   },
   {
-    images:'~assets/img/bodyInput.png',
+    images:'',
     tagTitle:'身体情報',
     tagDescription:'体重や身長などの変化を記録します',
     link:'../bodyInput',
     onclick:null
   },
   {
-    images:'~assets/img/golfInput.png',
+    images:'',
     tagTitle:'スコアを記録',
     tagDescription:'ゴルフのスコアなどを記録します',
     link:'',

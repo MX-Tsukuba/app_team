@@ -10,29 +10,31 @@ onMounted(() => {
   pageStore.setCurrentPage('food');
 });
 
+import { useRouter } from 'vue-router';
 import type { Database } from '~/types/database.types.ts';
 import resultData from '~/components/meal/resultData.vue';
 import kindBtn from '~/components/meal/kindBtn.vue';
-import { useRouter } from 'vue-router';
+import changeDate from '~/components/meal/changeDate.vue';
+
+
 
 
 const supabase = useSupabaseClient<Database>();
 
 
 const insertToDatabase = async()=>{
-    myArr=myArr.splice(counter-1,1);
-    myArr=myArr.filter((obj)=>!obj.date && !obj.kind );
-    //リアクティブな変数を非リアクティブに変更するメソッド
-    console.log(myArr)
+    myArr.forEach(obj =>{(obj as any).kind=mealTypes[currentMealTypeIndex.value];});
+    myArr.forEach(obj =>{(obj as any).date=formattedDate;});
+    myArr=myArr.filter((obj)=>obj.kind && obj.date && obj.title && obj.calorie );
+    console.log(myArr);
 
-    const {data,error} =await supabase
+    const {error} = await supabase
     .from('view_tables')
     .insert(myArr);
 
     if(error){
         console.error('Error inserting data:',error);
     }else{
-        console.log('Data inserted:',data);
         router.push('./mealDisplay');//insert実行後にページ遷移をしたい
     }
 };
@@ -50,6 +52,7 @@ const formatDateToString = (date: Date): string => {
 
 // フォーマットされた日付を計算するcomputed
 const formattedDate:string = computed(() => formatDateToString(selectedDate.value))
+//型定義の警告を直すため.valueを追加すると動かない
 
 // 日付を指定した日数分移動する関数
 const moveDate = (days: number): void => {
@@ -88,12 +91,12 @@ class myClass {
 }
 
 const router= useRouter();
-let kind=ref("朝食");
+// let kind=ref("朝食");
 
 let myArr:myClass[] = reactive([]);//配列の中身を指定するか型指定しないと型がneverになりエラー
 const firstObject= new myClass();
 myArr.push(firstObject);
-let counter=ref<number>(0);
+let counter:number=0;
 let sumCalorie:number =0;
 
 
@@ -101,53 +104,46 @@ function addObject(){
   if(myArr.length >=10){
     console.warn("最大入力数に達しました")
     return null;
-  }else if (myArr[counter.value].title==="" || myArr[counter.value].calorie===0){
+  }else if (myArr[counter].title==="" || myArr[counter].calorie===0){
     console.warn("食事とカロリーを入力してください");
     return null;
   }
-  sumCalorie += myArr[counter.value].calorie;//動いてる
+  sumCalorie += myArr[counter].calorie;//動いてる
   const newObject = new myClass();
   myArr.push(newObject);
-  counter.value++;
-  myArr.forEach(obj =>{(obj as any).kind=kind;})
+  counter++;
+  myArr.forEach(obj =>{(obj as any).kind=mealTypes[currentMealTypeIndex.value];})
   myArr.forEach(obj =>{(obj as any).date=formattedDate;})
+  console.log(myArr);
   return newObject;
 }
 
-let kindCounter:number =0;
-const addKindCounter=()=>{
-    if(kindCounter==3){
-        kindCounter=0;
-        return;
-    }else{
-        kindCounter++;
-        return;
-    }
+const mealTypes = ['朝食', '昼食', '夕食', '間食'] as const
+type MealType = typeof mealTypes[number]
+
+const mealImages: Record<MealType, () => Promise<any>> = {
+  '朝食': () => import('@/assets/img/icon_morning.png'),
+  '昼食': () => import('@/assets/img/icon_afternoon.png'),
+  '夕食': () => import('@/assets/img/icon_night.png'),
+  '間食': () => import('@/assets/img/icon_snack.png')
 }
-const inputKind =ref([
-    {
-        kind:"朝食",
-        kindSrc:"~assets/img/icon_morning.png",
-        changeKind:addKindCounter
-    },
-    {
-        kind:"昼食",
-        kindSrc:"~assets/img/icon_afternoon.png",
-        changeKind:addKindCounter
-    },
-    {
-        kind:"夕食",
-        kindSrc:"~assets/img/icon_night.png",
-        changeKind:addKindCounter
-    },
-    {
-        kind:"間食",
-        kindSrc:"~assets/img/icon_snack.png",
-        changeKind:addKindCounter
-    },
-]);
 
+const currentMealTypeIndex = ref(0)
+const currentImageSrc = ref('')
 
+const currentMealType = computed(() => mealTypes[currentMealTypeIndex.value])
+
+const changeMealType = () => {
+  currentMealTypeIndex.value = (currentMealTypeIndex.value + 1) % mealTypes.length
+  loadImage()
+}
+
+const loadImage = async () => {
+  const imageModule = await mealImages[currentMealType.value]()
+  currentImageSrc.value = imageModule.default
+}
+
+onMounted(loadImage)
 
 </script>
 
@@ -155,16 +151,11 @@ const inputKind =ref([
 <template>
 <div class="mealInput">
     <div class="kindBtn">
-        <kindBtn :kind="inputKind[kindCounter].kind" :kind-src="inputKind[kindCounter].kindSrc" :change-kind="inputKind[kindCounter].changeKind"  />
-         <!-- <input style="width: 40px;" v-model="kind"></input> -->
+        <kindBtn :mealType="currentMealType" :imageSrc="currentImageSrc" @click="changeMealType"  />
     </div>
     <div class="dateAll">
-        <p class="kind">昼</p>
-        <div class="changeDate">
-            <button @click="moveToPreviousDay"><img class="dateBtn reverse" src="~assets/img/right.png"></button>
-            <p class="date">{{formattedDate}}</p>
-            <button @click="moveToNextDay"><img class="dateBtn" src="~assets/img/right.png"></button>
-        </div>
+        <p class="kind">{{mealTypes[currentMealTypeIndex]}}</p>
+        <changeDate :formatted-date="formattedDate" @firstclick="moveDate(-1)" @secondclick="moveDate(1)" ></changeDate>
     </div>
     <div class="mainInputCard">
         <div class="inputLayout">
@@ -207,7 +198,7 @@ const inputKind =ref([
 </div>
 
 </template>
-<style lang="css">
+<style lang="css" scoped>
 .mealInput{
     display: flex;
     flex-direction: column;
@@ -233,27 +224,9 @@ const inputKind =ref([
     font-style: normal;
     font-weight: 400;
     line-height: normal;
-    margin-left: 50px;
+    margin-left: 80px;
 }
-.changeDate{
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-.date{
-    color: #777;
-    font-family: Inter;
-    font-size: 16px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
-}
-.dateBtn{
-    width: 11px; height: 15px;
-}
-.reverse{
-    transform: rotate(180deg);
-}
+
 .mainInputCard{
     display: flex;
     width: 274px;
