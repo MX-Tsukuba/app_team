@@ -76,7 +76,7 @@ async function fetchLatestDate() {
                     }else if(week_view_tables[j].kind=="昼食"){
                         afternoonSum[i] +=week_view_tables[j].calorie;
                     }else if(week_view_tables[j].kind=="夕食"){
-                        [idinnerSum] +=week_view_tables[j].calorie;
+                        dinnerSum[i] +=week_view_tables[j].calorie;
                     }else if(week_view_tables[j].kind=="間食"){
                         snackSum[i] +=week_view_tables[j].calorie;
                     }
