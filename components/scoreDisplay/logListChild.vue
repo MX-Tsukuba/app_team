@@ -12,10 +12,10 @@
         <div class = "tags">
             <div class = "score_tag">
                 <div class = "score_text">合計スコア</div>
-                <div class = "score_value">91</div>
+                <div class = "score_value">{{ sampleData.calculate() }}</div>
             </div>
             <div class = "place_tag">
-                <div class = "place_text">📍牛久ゴルフ場</div>
+                <div class = "place_text">📍{{ sampleData.golfPlace }}</div>
             </div>
         </div>
         <div class = "score_table" v-show = "isScoreTableVisible">
@@ -24,7 +24,7 @@
                     <tr><th>ホール</th><th>パー</th><th>ホール</th><th>パッド</th><th>フォーム</th></tr>
                 </thead>
                 <tbody class = "t_body">
-                    <LogListTableRow v-for="item in [{value: 1}, {value: 2}, {value: 3}, {value: 4}, {value: 5}, {value: 6}]" :holeNo="item.value"/>
+                    <LogListTableRow v-for="item in sampleData.details" :holeNo="item.holeNo" :par="item.par" :result="item.result" :puts="item.puts" :form_Score="item.form_Score"/>
                 </tbody>
             </table>
         </div>
@@ -54,13 +54,88 @@ interface holeDetails{
     form_Score:number
 }
 
-interface scoreDetails{
+class scoreDetails{
+    // ?totalScore:number;
     golfPlace:string;
-    details: holeDetails[]
+    details: holeDetails[];
+
+    constructor(golfPlace: string, details: holeDetails[]){
+        // this.totalScore = 0;
+        this.golfPlace = golfPlace;
+        this.details = details;
+    }
+    
+    calculate(){
+        let tmp = 0;
+        for (let detail of this.details){
+            tmp += detail.result;
+        }
+        // this.totalScore = tmp;
+        return tmp
+    }
 }
 
 // const pops = defineProps<scoreDetails>();
 
+const sampleData = new scoreDetails(
+    '筑波大学',
+    [
+        {
+            holeNo:1,
+            par:5,
+            result:6,
+            puts:3,
+            form_Score:80
+        },{
+            holeNo:2,
+            par:4,
+            result:4,
+            puts:2,
+            form_Score:81
+        },{
+            holeNo:3,
+            par:5,
+            result:1,
+            puts:0,
+            form_Score:82
+        },{
+            holeNo:4,
+            par:6,
+            result:6,
+            puts:2,
+            form_Score:83
+        },{
+            holeNo:5,
+            par:5,
+            result:4,
+            puts:2,
+            form_Score:84
+        },{
+            holeNo:6,
+            par:5,
+            result:5,
+            puts:2,
+            form_Score:85
+        },{
+            holeNo:7,
+            par:5,
+            result:6,
+            puts:3,
+            form_Score:86
+        },{
+            holeNo:8,
+            par:3,
+            result:4,
+            puts:2,
+            form_Score:87
+        },{
+            holeNo:9,
+            par:5,
+            result:7,
+            puts:4,
+            form_Score:88
+        }]   
+)
 </script>
 
 <style scoped>

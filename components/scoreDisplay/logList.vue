@@ -2,7 +2,7 @@
 <template>
   <div class = "sub_container">
     <div class = "month">2024年6月</div>
-    <button @click='getScore'>クリック</button>
+    <!-- <button @click='getScore'>クリック</button> -->
     <div class = "subsub_container">
       <Logcard/>
       <Logcard/>
