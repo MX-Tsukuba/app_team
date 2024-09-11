@@ -3,7 +3,6 @@
     <enterGolfCourseName v-if="isShowModal"/>
     <div class="recentRecord">
       <p>直近の記録エリア</p>
-      <p>一目で結果を確認できるグラフ</p>
     </div>
     <div class="inputTags">
       <inputTag  v-for="(v,i) in inputAll" :key="i" :images="inputAll[i].images" :tag-title="inputAll[i].tagTitle" :tag-description="inputAll[i].tagDescription" :link="inputAll[i].link" :onclick="inputAll[i].onclick" ></inputTag>
@@ -77,6 +76,7 @@ const inputAll =ref([
   border-radius: 16px;
   background: #FFF;
   box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, .25);
+  padding: 10px
 }
 .inputTags{
   margin-top: 32px;
