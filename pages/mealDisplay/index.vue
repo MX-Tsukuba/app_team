@@ -3,8 +3,14 @@
         <div class="gragh">
             <div class="graghChart"></div>
             <div class="changeWeeks">
-                <img class="weekBtn reverse" src="~/assets/img/right.png">
-                <img class="weekBtn " src="~/assets/img/right.png">
+                <div>
+                    <img class="weekBtn reverse" src="~/assets/img/right.png">
+                    <p>前の週</p>
+                </div>
+                <div>
+                    <p>次の週</p>
+                    <img class="weekBtn " src="~/assets/img/right.png">
+                </div>
             </div>
         </div>
         <div class="resultCard">
@@ -12,17 +18,24 @@
                 <input type="date" v-model="dateNow">
             </div>
             <div class="dayKcal">
-                <div class="kcalNumber">{{ daySum[dateNowIndex] }}</div>
-                <div class="kcal"></div>
+                <div class="dayKcalAll">
+                    <div class="kcalNumber">{{ daySum[dateNowIndex] }}</div>
+                    <p class="kcal">kcal</p>
+                </div>
                 <div class="rectangle"></div>
             </div>
             <div class="eachOfResult">
-                <div class="kindBtn">{{ kindNow[kindNowIndex] }}</div>
+                <div class="kindBtn">
+                    <img src="@/assets/img/icon_morning.png" width="60px" height="60px"></img>
+                    <img src="@/assets/img/icon_afternoon.png"width="60px" height="60px" ></img>
+                    <img src="@/assets/img/icon_night.png"width="60px" height="60px" ></img>
+                    <img src="@/assets/img/icon_snack.png" width="60px" height="60px"></img>
+                </div>
                 <div class="table">
-                    <p class="kindDisplay"></p>
-                    <p class="sum">{{ kindSum[kindNowIndex][dateNowIndex] }}</p>
-                    <div v-for="(v,i) in week_view_tables" :key="i">
-                    <resultData  v-if="v.kind==kindNow[kindNowIndex] && v.date==dateNow" :title="v.title" :calorie="v.calorie" />
+                    <p class="kindDisplay">{{ kindNow[kindNowIndex] }} 合計</p>
+                    <p class="sum">{{ kindSum[kindNowIndex][dateNowIndex] }}kcal</p>
+                    <div class="resultData" v-for="(v,i) in week_view_tables" :key="i">
+                        <resultData :title="v.title" :calorie="v.calorie" v-if="v.kind==kindNow[kindNowIndex] && v.date==dateNow" />
                     </div>
                 </div>
             </div>
@@ -46,55 +59,20 @@ onMounted(() => {
 
 const supabase = useSupabaseClient<Database>();
 
-const daySum:number[]=[];
-const kindSum:number[][]=[[]];
+const daySum=ref<number[]>([0,0,0,0,0,0,0]);
+const kindSum=ref<number[][]>([[],[],[],[]]);
 const today=new Date();
 const kindNowIndex=ref<number>(0);
 const kindNow=["朝食","昼食","夕食","間食"];
 const dateNowIndex =ref<number>(today.getDay())
-let dateNow=ref<string>("");
-async function fetchLatestDate() {
-    const {data:week_view_tables,error} = await supabase
-    .from('view_tables')
-    .select('*')
-    .in('date', weekDates)
-    .order('date',{ascending:true})
+const dateNow=ref<string>("");
 
-    if(error){
-        console.error('最新のデータの取得に失敗しました',error);
-    }else{
-        console.log("データの取得に成功しました",week_view_tables);
-        const morningSum:number[] =[];
-        const afternoonSum:number[] =[];
-        const dinnerSum:number[] =[];
-        const snackSum:number[] =[];
-        for(let i=0;i<7;i++){
-            for(let j=0;j<week_view_tables.length;j++){
-                if(week_view_tables[j].date==weekDates[i]){
-                    if(week_view_tables[j].kind=="朝食"){
-                        morningSum[i] +=week_view_tables[j].calorie;
-                    }else if(week_view_tables[j].kind=="昼食"){
-                        afternoonSum[i] +=week_view_tables[j].calorie;
-                    }else if(week_view_tables[j].kind=="夕食"){
-                        dinnerSum[i] +=week_view_tables[j].calorie;
-                    }else if(week_view_tables[j].kind=="間食"){
-                        snackSum[i] +=week_view_tables[j].calorie;
-                    }
-                    daySum[i]+=week_view_tables[j].calorie;
-                }
-            }
-        }
-        kindSum.push(morningSum,afternoonSum,dinnerSum,snackSum);
-        console.log(kindSum,"kindSumです");
-    }
-}
 const formatDateToString = (date: Date): string => {
   const year = date.getFullYear()
   const month = String(date.getMonth() + 1).padStart(2, '0')
   const day = String(date.getDate()).padStart(2, '0')
   return `${year}-${month}-${day}`
 }
-
 function getCurrentWeekDates(startDay:number=1):string[]{
     const today=new Date();
     const dayOfWeek =today.getDay();//日曜日=0,土曜日=6
@@ -114,9 +92,45 @@ function getCurrentWeekDates(startDay:number=1):string[]{
 }
 const weekDates = getCurrentWeekDates();
 console.log(weekDates,"現在の週の配列");
-fetchLatestDate();
-dateNow.value=formatDateToString(today);
 
+
+const {data:week_view_tables,error} = await supabase
+.from('view_tables')
+.select('*')
+.in('date', weekDates)
+.order('date',{ascending:true})
+
+if(error){
+    console.error('最新のデータの取得に失敗しました',error);
+}else{
+    console.log("データの取得に成功しました",week_view_tables);
+
+    daySum.value = [0, 0, 0, 0, 0, 0, 0]
+    kindSum.value = [
+    [0, 0, 0, 0, 0, 0, 0], // 朝食
+    [0, 0, 0, 0, 0, 0, 0], // 昼食
+    [0, 0, 0, 0, 0, 0, 0], // 夕食
+    [0, 0, 0, 0, 0, 0, 0]  // 間食
+    ]
+
+    week_view_tables.forEach(record => {
+        const dayIndex = weekDates.indexOf(record.date)
+        if (dayIndex !== -1) {
+            const kindIndex = kindNow.indexOf(record.kind)
+            if (kindIndex !== -1) {
+                kindSum.value[kindIndex][dayIndex] += record.calorie
+                daySum.value[dayIndex] += record.calorie
+            }
+        }
+    })
+    console.log("朝食:", kindSum.value[0])
+    console.log("昼食:", kindSum.value[1])
+    console.log("夕食:", kindSum.value[2])
+    console.log("間食:", kindSum.value[3])
+    console.log("日別合計:", daySum.value)
+}
+
+dateNow.value=formatDateToString(today);
 
 
 </script>
@@ -124,11 +138,9 @@ dateNow.value=formatDateToString(today);
 <style lang="css" scoped>
 .homebody{
     display: flex;
-    width: 390px;
-    padding: 52px 15px;
+    padding: 52px 0;
     flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
+    align-items: center;
 }
 .gragh{
     display: flex;
@@ -165,40 +177,48 @@ dateNow.value=formatDateToString(today);
 }
 .resultCard{
     width: 390px;
-    height: 413px;
+    height: 1000px;
 
-    position: absolute;
-    bottom: -400.538px;
+    /* position: absolute;
+    bottom: -400.538px; */
 
     background: #FFF;
     box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.25);
 }
 .day{
-    display: inline-flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
+    position: relative;
+    top: 12px;
+    left: 25px;
+    color: #777;
+    font-family: Inter;
+    font-size: 15px;
+    border: white;
+    /* font-style: normal;デフォルト値だからいらない
+    font-weight: 400;
+    line-height: normal; */
 }
 .dayKcal{
-    width: 179px;
-    height: 77px;
-    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    margin-top: 26px;
+    margin-bottom: 39px;
+}
+.dayKcalAll{
+    display: flex;
+    align-items: flex-end;
+    gap: 13px;
 }
 .kcalNumber{
     color: #F28822;
-font-family: Inter;
-font-size: 64px;
-font-style: normal;
-font-weight: 400;
-line-height: normal;
+    font-family: Inter;
+    font-size: 64px;
 }
 .kcal{
     color: #F28822;
-font-family: Inter;
-font-size: 24px;
-font-style: normal;
-font-weight: 400;
-line-height: normal;
+    font-family: Inter;
+    font-size: 24px;
 }
 .rectangle{
     width: 200px;
@@ -226,30 +246,35 @@ line-height: normal;
     align-self: stretch;
 }
 .table{
+    display: flex;
     width: 360px;
-    height: 320px;
+    flex-direction: column;
+    align-items: flex-start;
     background: #FFF;
 }
 .kindDisplay{
     color: #777;
     font-family: Inter;
     font-size: 15px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
 }
 .sum{
     color: #F28822;
     font-family: Inter;
     font-size: 36px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
     padding: 0px 12px;
+}
+.resultData{
+    display: flex;
+    padding: 0px 20px;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
 }
 
 
-
+input[type="date"]::-webkit-calendar-picker-indicator {
+    display: none;
+}
 
 
 </style>
