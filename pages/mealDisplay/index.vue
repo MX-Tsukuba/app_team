@@ -45,6 +45,7 @@ onMounted(() => {
 });
 
 const supabase = useSupabaseClient<Database>();
+
 const daySum:number[]=[];
 const kindSum:number[][]=[[]];
 const today=new Date();
@@ -75,7 +76,7 @@ async function fetchLatestDate() {
                     }else if(week_view_tables[j].kind=="昼食"){
                         afternoonSum[i] +=week_view_tables[j].calorie;
                     }else if(week_view_tables[j].kind=="夕食"){
-                        dinnerSum[i] +=week_view_tables[j].calorie;
+                        [idinnerSum] +=week_view_tables[j].calorie;
                     }else if(week_view_tables[j].kind=="間食"){
                         snackSum[i] +=week_view_tables[j].calorie;
                     }
