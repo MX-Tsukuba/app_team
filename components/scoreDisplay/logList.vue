@@ -4,9 +4,9 @@
     <div class = "month">2024年6月</div>
     <!-- <button @click='getScore'>クリック</button> -->
     <div class = "subsub_container">
-      <Logcard/>
-      <Logcard/>
-      <Logcard/>
+      <Logcard :golfPlace="sampleData.golfPlace" :details="sampleData.details"/>
+      <Logcard :golfPlace="sampleData.golfPlace" :details="sampleData.details"/>
+      <Logcard :golfPlace="sampleData.golfPlace" :details="sampleData.details"/>
     </div> 
   </div>
 </template>
@@ -32,6 +32,65 @@ const getScore = async () => {
     console.error("Unexpected Error", e);
   }
 }
+
+const sampleData = {
+  golfPlace:'筑波大学',
+  details:[
+        {
+            holeNo:1,
+            par:5,
+            result:5,
+            puts:3,
+            form_Score:80
+        },{
+            holeNo:2,
+            par:4,
+            result:4,
+            puts:2,
+            form_Score:81
+        },{
+            holeNo:3,
+            par:5,
+            result:1,
+            puts:0,
+            form_Score:82
+        },{
+            holeNo:4,
+            par:6,
+            result:6,
+            puts:2,
+            form_Score:83
+        },{
+            holeNo:5,
+            par:5,
+            result:4,
+            puts:2,
+            form_Score:84
+        },{
+            holeNo:6,
+            par:5,
+            result:5,
+            puts:2,
+            form_Score:85
+        },{
+            holeNo:7,
+            par:5,
+            result:6,
+            puts:3,
+            form_Score:86
+        },{
+            holeNo:8,
+            par:3,
+            result:4,
+            puts:2,
+            form_Score:87
+        },{
+            holeNo:9,
+            par:5,
+            result:7,
+            puts:4,
+            form_Score:88
+  }]}
 </script>
 
 <style scoped>

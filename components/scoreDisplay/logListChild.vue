@@ -54,7 +54,12 @@ interface holeDetails{
     form_Score:number
 }
 
-class scoreDetails{
+interface scoreDetas{
+    golfPlace:string;
+    details: holeDetails[];
+}
+
+class scoreDetails implements scoreDetas{
     // ?totalScore:number;
     golfPlace:string;
     details: holeDetails[];
@@ -75,67 +80,9 @@ class scoreDetails{
     }
 }
 
-// const pops = defineProps<scoreDetails>();
+const props = defineProps<scoreDetas>();
 
-const sampleData = new scoreDetails(
-    '筑波大学',
-    [
-        {
-            holeNo:1,
-            par:5,
-            result:6,
-            puts:3,
-            form_Score:80
-        },{
-            holeNo:2,
-            par:4,
-            result:4,
-            puts:2,
-            form_Score:81
-        },{
-            holeNo:3,
-            par:5,
-            result:1,
-            puts:0,
-            form_Score:82
-        },{
-            holeNo:4,
-            par:6,
-            result:6,
-            puts:2,
-            form_Score:83
-        },{
-            holeNo:5,
-            par:5,
-            result:4,
-            puts:2,
-            form_Score:84
-        },{
-            holeNo:6,
-            par:5,
-            result:5,
-            puts:2,
-            form_Score:85
-        },{
-            holeNo:7,
-            par:5,
-            result:6,
-            puts:3,
-            form_Score:86
-        },{
-            holeNo:8,
-            par:3,
-            result:4,
-            puts:2,
-            form_Score:87
-        },{
-            holeNo:9,
-            par:5,
-            result:7,
-            puts:4,
-            form_Score:88
-        }]   
-)
+const sampleData = new scoreDetails(props.golfPlace, props.details);
 </script>
 
 <style scoped>
