@@ -39,13 +39,12 @@ const signInWithGoogle = async () => {
 <style scoped lang="css">
 .loginPage {
   display: flex;
- /* padding: 214px 45px 115px 45px;*/
   flex-direction: column;
-  /*justify-content: flex-end;*/
+  justify-content: center;
   align-items: center;
-  height: 100%;
-  gap: 161px;
+  gap: 110px;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.30) 0.05%, rgba(254, 254, 254, 0.50) 50.29%, #777 99.93%);
+  box-sizing: border-box;
 }
 
 .logo {
@@ -65,6 +64,7 @@ const signInWithGoogle = async () => {
   border-radius: 32px;
   background: #FFF;
   box-shadow: 0px 2px 4px 0px #000;
+  
 }
 
 .gsi-material-button {
@@ -74,7 +74,6 @@ const signInWithGoogle = async () => {
   -webkit-appearance: none;
   background-color: WHITE;
   background-image: none;
-  /*border: 1px solid #747775;*/
   -webkit-border-radius: 20px;
   border-radius: 20px;
   -webkit-box-sizing: border-box;
@@ -96,7 +95,7 @@ const signInWithGoogle = async () => {
   white-space: nowrap;
   width: auto;
   max-width: 400px;
-  min-width: min-content;
+  min-width: 250px;
   box-shadow: 0px 2px 4px 0px #000;
 }
 
