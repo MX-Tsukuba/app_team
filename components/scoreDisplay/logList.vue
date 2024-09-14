@@ -17,17 +17,37 @@ import type { Database } from "~/types/database.types";
 const supabase = useSupabaseClient<Database>();
 
 interface holeDetails{
-    holeNo:number,
-    par:number,
-    result: number,
-    puts:number,
-    form_Score:number
+  holeNo:number,
+  result: number,
+  puts:number,
+  form_Score:number
+}
+interface golfPlaceDetails{
+  golfPlcaeName: string;
+  par_1h: number;
+  par_2h: number;
+  par_3h: number;
+  par_4h: number;
+  par_5h: number;
+  par_6h: number;
+  par_7h: number;
+  par_8h: number;
+  par_9h: number;
+  par_10h: number;
+  par_11h: number;
+  par_12h: number;
+  par_13h: number;
+  par_14h: number;
+  par_15h: number;
+  par_16h: number;
+  par_17h: number;
+  par_18h: number;
 }
 
 interface roundDetail{
-  date: any,
-  golfPlaceName: string,
-  holes: holeDetails[],
+  date: string,
+  golfPlaceDetails: golfPlaceDetails[],
+  holeDetails: holeDetails[],
 }
 
 let roundDetails = Array<roundDetail>();
@@ -35,46 +55,70 @@ let roundDetails = Array<roundDetail>();
 const getScore = async () => {
   try{
     //特定のユーザのデータゴルフデータを全て取得、ユーザの識別についてはローレベルセキュリティで実行する。
-    const { data:roundDetas, error:error1 } = await supabase
+    const { data:roundDatas, error } = await supabase
       .from('t_rounds')
       .select("id, golf_place_id, date")
       .eq('user_id', 1);
-    if (error1){
-      console.error('Error fetching data from t_round table:', error1);
+    if (error){
+      console.error('Error fetching data from t_round table:', error);
       return null;
     }else{
-      console.log(roundDetas);
-    }
+      console.log(roundDatas);
 
-    
-    //要素一つ一つについてゴルフ場、ホールの情報等必要な情報を取得する。
-    for(let roundDeta of roundDetas){  
-      let r:roundDetail = {date: "", golfPlaceName: "a", holes: []};   
-      const {data:golfPlaceInfos, error:error2}
-        = await supabase
-          .from("m_golfplaces")
-          .select("*")
-          .eq("id", roundDeta[<any>"golf_place_id"]);
-      if(error2){
-        console.error('Error fetching data from m_golfplaces table:', error2);
-      }else{
-        console.log("golfPlacesInfos: ", golfPlaceInfos);
-        r.date = roundDeta[<any>"date"]
-        r.golfPlaceName = golfPlaceInfos[0].golf_place_name;
-        console.log("r: " , r);
+      const golfPlaceIds = new Set<string>();
+      const roundIds = new Set<string>();
+
+      for (let roundData of roundDatas){
+        let r:roundDetail = {date: "", golfPlaceDetails: [], holeDetails: []};
+        r.date = roundData[<any>"date"];
+        golfPlaceIds.add(roundData[<any>"golf_place_id"]);
+        roundIds.add(roundData[<any>"id"]);
+        console.log(r);
+        roundDetails.push(r);
       }
 
-      const {data:scoreDetails, error:error3} = await supabase
+      const {data:golfPlaceInfos, error} = await supabase
+        .from("m_golfplaces")
+        .select("*")
+        .in("id", golfPlaceIds);
+      if(error)console.error('Error fetching data from m_golfplaces table:', error);
+      else console.log("golfPlaceInfos: ", golfPlaceInfos);
+
+      const {data:holeInfos, error:error2} = await supabase
         .from("t_holes")
-        .select("*").
-        eq("round_id", roundDeta[<any>"id"]);
-      if (error3){
-        console.error('Error fetching data from t_holes table:', error3);
-      }else{
-        console.log(scoreDetails)
-      }
-    }
+        .select("*")
+        .in("round_id", roundIds);
+      if(error)console.error('Error fetching data from t_holes table:', error2);
+      else console.log(holeInfos);
 
+      for(let i = 0; i < roundDetails.length; i++){
+        for(let golfPlaceInfo of golfPlaceInfos){
+          if(roundDatas[i][<any>"golf_place_id"] === golfPlaceInfo[<any>"id"]){
+            roundDetails[i].golfPlaceDetails = {golfPlaceName: golfPlaceInfo[<any>"golf_place_name"],
+              par_1h: golfPlaceInfo[<any>"par_1h"],
+              par_2h: golfPlaceInfo[<any>"par_2h"],
+              par_3h: golfPlaceInfo[<any>"par_3h"],
+              par_4h: golfPlaceInfo[<any>"par_4h"],
+              par_5h: golfPlaceInfo[<any>"par_5h"],
+              par_6h: golfPlaceInfo[<any>"par_6h"],
+              par_7h: golfPlaceInfo[<any>"par_7h"],
+              par_8h: golfPlaceInfo[<any>"par_8h"],
+              par_9h: golfPlaceInfo[<any>"par_9h"],
+              par_10h: golfPlaceInfo[<any>"par_10h"],
+              par_11h: golfPlaceInfo[<any>"par_11h"],
+              par_12h: golfPlaceInfo[<any>"par_12h"],
+              par_13h: golfPlaceInfo[<any>"par_13h"],
+              par_14h: golfPlaceInfo[<any>"par_14h"],
+              par_15h: golfPlaceInfo[<any>"par_15h"],
+              par_16h: golfPlaceInfo[<any>"par_16h"],
+              par_17h: golfPlaceInfo[<any>"par_17h"],
+              par_18h:golfPlaceInfo[<any>"par_18h"],
+            };
+          }
+        }
+      }
+      console.log(roundDetails);
+    }
   }catch(e){
     console.error("Unexpected Error", e);
   }
