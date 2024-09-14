@@ -17,4 +17,5 @@ import Footer from '~/components/bases/footer.vue';
     flex-direction: column;
     align-items: center;
     background: #F0F0F0;
-}</style>
+}
+</style>
