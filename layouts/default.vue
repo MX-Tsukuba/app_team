@@ -18,11 +18,4 @@ import Footer from '~/components/bases/footer.vue';
     align-items: center;
     background: #F0F0F0;
 }
-/*
-.whole{
-    padding: 80px 0;
-    height: 100vh;
-    background: #F0F0F0;
-    overflow: hidden;
-}*/
 </style>
