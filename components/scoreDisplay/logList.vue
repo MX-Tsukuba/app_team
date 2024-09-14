@@ -24,17 +24,21 @@ interface holeDetails{
     form_Score:number
 }
 
-interface roundDeteail{
+interface roundDetail{
   date: any,
   golfPlaceName: string,
   holes: holeDetails[],
 }
 
+let roundDetails = Array<roundDetail>();
+
 const getScore = async () => {
   try{
-    let roundDeteails = Array<roundDeteail>();
     //特定のユーザのデータゴルフデータを全て取得、ユーザの識別についてはローレベルセキュリティで実行する。
-    const { data:roundDetas, error:error1 } = await supabase.from('t_rounds').select("id, golfPlace_id, date").eq('user_id', 1);
+    const { data:roundDetas, error:error1 } = await supabase
+      .from('t_rounds')
+      .select("id, golf_place_id, date")
+      .eq('user_id', 1);
     if (error1){
       console.error('Error fetching data from t_round table:', error1);
       return null;
@@ -45,25 +49,32 @@ const getScore = async () => {
     
     //要素一つ一つについてゴルフ場、ホールの情報等必要な情報を取得する。
     for(let roundDeta of roundDetas){  
-      let r:roundDeteail = {date: "", golfPlaceName: "", holes: []};   
-      const {data:golfPlaceinfo, error:error2} = await supabase.from("m_golfplaces").select("*").eq("id", roundDeta[<any>"golfPlace_id"]);
+      let r:roundDetail = {date: "", golfPlaceName: "a", holes: []};   
+      const {data:golfPlaceInfos, error:error2}
+        = await supabase
+          .from("m_golfplaces")
+          .select("*")
+          .eq("id", roundDeta[<any>"golf_place_id"]);
       if(error2){
         console.error('Error fetching data from m_golfplaces table:', error2);
       }else{
-        console.log(golfPlaceinfo);
+        console.log("golfPlacesInfos: ", golfPlaceInfos);
         r.date = roundDeta[<any>"date"]
-        r.golfPlaceName = golfPlaceinfo;
-        console.log(r);
+        r.golfPlaceName = golfPlaceInfos[0].golf_place_name;
+        console.log("r: " , r);
       }
 
-      const {data:scoreDetails, error:error3} = await supabase.from("t_holes").select("*").eq("round_id", roundDeta[<any>"id"])
+      const {data:scoreDetails, error:error3} = await supabase
+        .from("t_holes")
+        .select("*").
+        eq("round_id", roundDeta[<any>"id"]);
       if (error3){
         console.error('Error fetching data from t_holes table:', error3);
       }else{
         console.log(scoreDetails)
       }
-
     }
+
   }catch(e){
     console.error("Unexpected Error", e);
   }

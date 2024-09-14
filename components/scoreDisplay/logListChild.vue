@@ -21,7 +21,7 @@
         <div class = "score_table" v-show = "isScoreTableVisible">
             <table>
                 <thead>
-                    <tr><th>ホール</th><th>パー</th><th>ホール</th><th>パッド</th><th>フォーム</th></tr>
+                    <tr><th>ホール</th><th>パー</th><th>スコア</th><th>パッド</th><th>フォーム</th></tr>
                 </thead>
                 <tbody class = "t_body">
                     <LogListTableRow v-for="item in sampleData.details" :holeNo="item.holeNo" :par="item.par" :result="item.result" :puts="item.puts" :form_Score="item.form_Score"/>
