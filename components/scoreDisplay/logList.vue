@@ -19,11 +19,11 @@ const supabase = useSupabaseClient<Database>();
 interface holeDetails{
   holeNo:number,
   result: number,
-  puts:number,
+  pats:number,
   form_Score:number
 }
 interface golfPlaceDetails{
-  golfPlcaeName: string;
+  golfPlaceName: string;
   par_1h: number;
   par_2h: number;
   par_3h: number;
@@ -46,7 +46,7 @@ interface golfPlaceDetails{
 
 interface roundDetail{
   date: string,
-  golfPlaceDetails: golfPlaceDetails[],
+  golfPlaceDetails: golfPlaceDetails|null,
   holeDetails: holeDetails[],
 }
 
@@ -69,7 +69,7 @@ const getScore = async () => {
       const roundIds = new Set<string>();
 
       for (let roundData of roundDatas){
-        let r:roundDetail = {date: "", golfPlaceDetails: [], holeDetails: []};
+        let r:roundDetail = {date: "", golfPlaceDetails: null, holeDetails: new Array<holeDetails>()};
         r.date = roundData[<any>"date"];
         golfPlaceIds.add(roundData[<any>"golf_place_id"]);
         roundIds.add(roundData[<any>"id"]);
@@ -93,27 +93,38 @@ const getScore = async () => {
 
       for(let i = 0; i < roundDetails.length; i++){
         for(let golfPlaceInfo of golfPlaceInfos){
-          if(roundDatas[i][<any>"golf_place_id"] === golfPlaceInfo[<any>"id"]){
-            roundDetails[i].golfPlaceDetails = {golfPlaceName: golfPlaceInfo[<any>"golf_place_name"],
-              par_1h: golfPlaceInfo[<any>"par_1h"],
-              par_2h: golfPlaceInfo[<any>"par_2h"],
-              par_3h: golfPlaceInfo[<any>"par_3h"],
-              par_4h: golfPlaceInfo[<any>"par_4h"],
-              par_5h: golfPlaceInfo[<any>"par_5h"],
-              par_6h: golfPlaceInfo[<any>"par_6h"],
-              par_7h: golfPlaceInfo[<any>"par_7h"],
-              par_8h: golfPlaceInfo[<any>"par_8h"],
-              par_9h: golfPlaceInfo[<any>"par_9h"],
-              par_10h: golfPlaceInfo[<any>"par_10h"],
-              par_11h: golfPlaceInfo[<any>"par_11h"],
-              par_12h: golfPlaceInfo[<any>"par_12h"],
-              par_13h: golfPlaceInfo[<any>"par_13h"],
-              par_14h: golfPlaceInfo[<any>"par_14h"],
-              par_15h: golfPlaceInfo[<any>"par_15h"],
-              par_16h: golfPlaceInfo[<any>"par_16h"],
-              par_17h: golfPlaceInfo[<any>"par_17h"],
-              par_18h:golfPlaceInfo[<any>"par_18h"],
+          if(roundDatas[i][<any>"golf_place_id"] === <any>golfPlaceInfo[<any>"id"]){
+            roundDetails[i].golfPlaceDetails = {"golfPlaceName": golfPlaceInfo[<any>"golf_place_name"],
+              "par_1h": golfPlaceInfo[<any>"par_1h"],
+              "par_2h": golfPlaceInfo[<any>"par_2h"],
+              "par_3h": golfPlaceInfo[<any>"par_3h"],
+              "par_4h": golfPlaceInfo[<any>"par_4h"],
+              "par_5h": golfPlaceInfo[<any>"par_5h"],
+              "par_6h": golfPlaceInfo[<any>"par_6h"],
+              "par_7h": golfPlaceInfo[<any>"par_7h"],
+              "par_8h": golfPlaceInfo[<any>"par_8h"],
+              "par_9h": golfPlaceInfo[<any>"par_9h"],
+              "par_10h": golfPlaceInfo[<any>"par_10h"],
+              "par_11h": golfPlaceInfo[<any>"par_11h"],
+              "par_12h": golfPlaceInfo[<any>"par_12h"],
+              "par_13h": golfPlaceInfo[<any>"par_13h"],
+              "par_14h": golfPlaceInfo[<any>"par_14h"],
+              "par_15h": golfPlaceInfo[<any>"par_15h"],
+              "par_16h": golfPlaceInfo[<any>"par_16h"],
+              "par_17h": golfPlaceInfo[<any>"par_17h"],
+              "par_18h":golfPlaceInfo[<any>"par_18h"],
             };
+          }
+        }
+
+        for (let holeInfo of holeInfos){
+          if(roundDatas[<any>"id"] === <any>holeInfo.round_id){
+            roundDetails[i].holeDetails.push({
+              "holeNo": holeInfo.hole_number,
+              "result": holeInfo.score_number,
+              "pats": holeInfo.pat_number,
+              "form_Score": 100,
+            })
           }
         }
       }
