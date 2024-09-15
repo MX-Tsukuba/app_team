@@ -1,21 +1,21 @@
 <template>
     <div class = "card_whole">
-        <div class = "date">6月22日 水曜日</div>
+        <div class = "date">{{ props.date }}</div>
         <div class = "button_fram" @click="toggleScoreTable">
-            <div v-if="isScoreTableVisible" class='arrow'>
+            <div v-if="isScoreTableVisible" class='arrow open'>
                 <LogListArrow/>
             </div>
-            <div v-if="!isScoreTableVisible" class='arrow open'>
+            <div v-if="!isScoreTableVisible" class='arrow'>
                 <LogListArrow/>
             </div>
         </div>
         <div class = "tags">
             <div class = "score_tag">
                 <div class = "score_text">合計スコア</div>
-                <div class = "score_value">{{ sampleData.calculate() }}</div>
+                <div class = "score_value">{{ calculate(props.holedetails) }}</div>
             </div>
             <div class = "place_tag">
-                <div class = "place_text">📍{{ sampleData.golfPlace }}</div>
+                <div class = "place_text">📍{{ props.golfPlaceName }}</div>
             </div>
         </div>
         <div class = "score_table" v-show = "isScoreTableVisible">
@@ -24,7 +24,7 @@
                     <tr><th>ホール</th><th>パー</th><th>スコア</th><th>パッド</th><th>フォーム</th></tr>
                 </thead>
                 <tbody class = "t_body">
-                    <LogListTableRow v-for="item in sampleData.details" :holeNo="item.holeNo" :par="item.par" :result="item.result" :puts="item.puts" :form_Score="item.form_Score"/>
+                    <LogListTableRow v-for="item in props.holedetails" :holeNo="item.holeNo" :par="item.par" :result="item.result" :puts="item.pats" :form_Score="item.form_Score"/>
                 </tbody>
             </table>
         </div>
@@ -46,43 +46,58 @@ const  toggleScoreTable = () =>{
     isScoreTableVisible.value = !isScoreTableVisible.value
 };
 
-interface holeDetails{
+interface holeDetail{
     holeNo:number,
     par:number,
     result: number,
-    puts:number,
+    pats:number,
     form_Score:number
 }
 
 interface scoreDetas{
-    golfPlace:string;
-    details: holeDetails[];
+    date: string;
+    golfPlaceName: string;
+    holedetails: holeDetail[];
 }
 
-class scoreDetails implements scoreDetas{
-    // ?totalScore:number;
-    golfPlace:string;
-    details: holeDetails[];
+function calculate(holedetails:holeDetail[]){
+    let result = 0;
+    holedetails.forEach(element => {
+        result += element.result;
+    });
+    return result;
+}
 
-    constructor(golfPlace: string, details: holeDetails[]){
-        // this.totalScore = 0;
-        this.golfPlace = golfPlace;
-        this.details = details;
-    }
+// class scoreDetails implements scoreDetas{
+//     // ?totalScore:number;
+//     date: string;
+//     golfPlaceName:string;
+//     holedetails: holeDetails[];
+
+//     constructor(date: string, golfPlaceName: string, details: holeDetails[]){
+//         // this.totalScore = 0;
+//         this.date = date;
+//         this.golfPlaceName = golfPlaceName;
+//         this.holedetails = details;
+//     }
     
-    calculate(){
-        let tmp = 0;
-        for (let detail of this.details){
-            tmp += detail.result;
-        }
-        // this.totalScore = tmp;
-        return tmp
-    }
-}
+//     calculate(){
+//         let tmp = 0;
+//         for (let detail of this.holedetails){
+//             tmp += detail.result;
+//         }
+//         // this.totalScore = tmp;
+//         console.log("date: ",this.date)
+//         console.log("golfPlaceName: ",this.golfPlaceName)
+//         console.log("Props:", props); // 追加
+//         return tmp
+//     }
+// }
 
 const props = defineProps<scoreDetas>();
 
-const sampleData = new scoreDetails(props.golfPlace, props.details);
+// const sampleData = new scoreDetails(props.date, props.golfPlaceName, props.holedetails);
+
 </script>
 
 <style scoped>
@@ -146,13 +161,13 @@ const sampleData = new scoreDetails(props.golfPlace, props.details);
 
     .place_tag{
         display: flex;
-        width: 115px;
         height: 24px;
         justify-content: center;
         align-items: center;
         gap: 10px;
         border-radius: 18px;
         background: #EBEBEB;
+        padding-right: 10px;
     }
 
     .place_text{
