@@ -25,24 +25,26 @@ interface holeDetails{
 }
 interface golfPlaceDetails{
   golfPlaceName: string;
-  par_1h: number;
-  par_2h: number;
-  par_3h: number;
-  par_4h: number;
-  par_5h: number;
-  par_6h: number;
-  par_7h: number;
-  par_8h: number;
-  par_9h: number;
-  par_10h: number;
-  par_11h: number;
-  par_12h: number;
-  par_13h: number;
-  par_14h: number;
-  par_15h: number;
-  par_16h: number;
-  par_17h: number;
-  par_18h: number;
+  par_obj: {
+    par_1h: number;
+    par_2h: number;
+    par_3h: number;
+    par_4h: number;
+    par_5h: number;
+    par_6h: number;
+    par_7h: number;
+    par_8h: number;
+    par_9h: number;
+    par_10h: number;
+    par_11h: number;
+    par_12h: number;
+    par_13h: number;
+    par_14h: number;
+    par_15h: number;
+    par_16h: number;
+    par_17h: number;
+    par_18h: number;
+  }
 }
 
 interface roundDetail{
@@ -69,7 +71,7 @@ const getScore = async () => {
       const roundIds = new Set<number>();
 
       for (let roundData of roundDatas){
-        let r:roundDetail = {date: "", golfPlaceName: null, holeDetails: new Array<holeDetails>()};
+        let r:roundDetail = {date: "", golfPlaceName: "", holeDetails: new Array<holeDetails>()};
         r.date = roundData.date;
         golfPlaceIds.add(roundData.golf_place_id);
         roundIds.add(roundData.id);
@@ -92,25 +94,48 @@ const getScore = async () => {
       if(error)console.error('Error fetching data from t_holes table:', error2);
       else console.log(holeInfos);
 
-      for(let i = 0; i < roundDetails.value.length; i++){
-        const Pars = Array<number>();
-        for(let golfPlaceInfo of golfPlaceInfos){
-          if(roundDatas[i].golf_place_id === golfPlaceInfo.id){
-            roundDetails.value[i].golfPlaceName = golfPlaceInfo.golf_place_name;
-          }
-        }
+      const {data:parInfos, error:error3} = await supabase
+        .from("m_holes")
+        .select("*")
+        .in("golfplaces_id", [...golfPlaceIds]);
+      if (error3)console.error('Error fetching data from m_holes table:', error3)
+      else console.log("parInfos: ",parInfos);
 
-        for (let holeInfo of holeInfos){
-          if(roundDatas[i].id === <any>holeInfo.round_id){
-            roundDetails.value[i].holeDetails.push({
-              holeNo: holeInfo.hole_number,
-              par: 1,
-              result: holeInfo.score_number,
-              pats: holeInfo.putts_number,
-              form_Score: 100,
-            })
+      for(let i = 0; i < roundDetails.value.length; i++){
+        if(golfPlaceInfos != null){
+          for(let golfPlaceInfo of [...golfPlaceInfos]){
+            if(roundDatas[i].golf_place_id === golfPlaceInfo.id){
+              roundDetails.value[i].golfPlaceName = golfPlaceInfo.golf_place_name;
+            }
           }
-        }
+        }else console.error("golfPlaceInfos are null");
+
+        if(holeInfos != null){
+          for (let holeInfo of holeInfos){
+            if(roundDatas[i].id === <any>holeInfo.round_id){
+              const tmp:holeDetails = {
+                holeNo: holeInfo.hole_number,
+                par: -1,
+                result: holeInfo.score_number,
+                pats: holeInfo.putts_number,
+                form_Score: 100,
+              }
+              if(parInfos != null){
+                [...parInfos].forEach((item)=>{
+                  if(holeInfo.hole_number === item.hole_number && roundDatas[i].golf_place_id === item.golfplaces_id){
+                    tmp.par = item.par_number;
+                  }
+                })
+              }else console.error("parInfos are null");
+              roundDetails.value[i].holeDetails.push(tmp)
+            }
+          }
+        }else console.error("holeInfos are null");
+
+        
+
+
+        roundDetails.value[i].holeDetails.sort((a, b)=> a.holeNo - b.holeNo)
       }
     }
     console.log("roundDetails: ", roundDetails.value);
