@@ -32,14 +32,6 @@ interface roundDetail{
 
 const roundDetails = ref<roundDetail[]>([]);
 
-function stringToDate(date:string){
-  const ymd = date.split("-")
-  const Y = Number(ymd[0]);
-  const M = Number(ymd[1]);
-  const D = Number(ymd[2]);
-  return new Date(Y, M, D);
-}
-
 const getScore = async () => {
   try{
     //特定のユーザのデータゴルフデータを全て取得、ユーザの識別についてはローレベルセキュリティで実行する。
@@ -57,7 +49,6 @@ const getScore = async () => {
 
       for (let roundData of roundDatas){
         let r:roundDetail = {date: new Date(2000, 1, 1), golfPlaceName: "", holeDetails: new Array<holeDetails>()};
-        // r.date = stringToDate(roundData.date);
         r.date = new Date(roundData.date);
         console.log("date: ", r.date);
         golfPlaceIds.add(roundData.golf_place_id);
