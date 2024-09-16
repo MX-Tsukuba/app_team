@@ -23,37 +23,22 @@ interface holeDetails{
   pats:number,
   form_Score:number
 }
-interface golfPlaceDetails{
-  golfPlaceName: string;
-  par_obj: {
-    par_1h: number;
-    par_2h: number;
-    par_3h: number;
-    par_4h: number;
-    par_5h: number;
-    par_6h: number;
-    par_7h: number;
-    par_8h: number;
-    par_9h: number;
-    par_10h: number;
-    par_11h: number;
-    par_12h: number;
-    par_13h: number;
-    par_14h: number;
-    par_15h: number;
-    par_16h: number;
-    par_17h: number;
-    par_18h: number;
-  }
-}
 
 interface roundDetail{
-  date: string,
+  date: Date,
   golfPlaceName: string,
   holeDetails: holeDetails[],
 }
 
 const roundDetails = ref<roundDetail[]>([]);
+
+function stringToDate(date:string){
+  const ymd = date.split("-")
+  const Y = Number(ymd[0]);
+  const M = Number(ymd[1]);
+  const D = Number(ymd[2]);
+  return new Date(Y, M, D);
+}
 
 const getScore = async () => {
   try{
@@ -71,8 +56,10 @@ const getScore = async () => {
       const roundIds = new Set<number>();
 
       for (let roundData of roundDatas){
-        let r:roundDetail = {date: "", golfPlaceName: "", holeDetails: new Array<holeDetails>()};
-        r.date = roundData.date;
+        let r:roundDetail = {date: new Date(2000, 1, 1), golfPlaceName: "", holeDetails: new Array<holeDetails>()};
+        // r.date = stringToDate(roundData.date);
+        r.date = new Date(roundData.date);
+        console.log("date: ", r.date);
         golfPlaceIds.add(roundData.golf_place_id);
         roundIds.add(roundData.id);
         roundDetails.value.push(r);
@@ -139,6 +126,7 @@ const getScore = async () => {
       }
     }
     console.log("roundDetails: ", roundDetails.value);
+    roundDetails.value.sort((a,b)=>b.date.getTime() - a.date.getTime())
   }catch(e){
     console.error("Unexpected Error", e);
   }

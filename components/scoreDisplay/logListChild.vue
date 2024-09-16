@@ -1,6 +1,6 @@
 <template>
     <div class = "card_whole">
-        <div class = "date">{{ props.date }}</div>
+        <div class = "date">{{ props.date.getMonth()+1 }}月{{ props.date.getDate() }}日 {{ calculateDays(props.date) }}</div>
         <div class = "button_fram" @click="toggleScoreTable">
             <div v-if="isScoreTableVisible" class='arrow open'>
                 <LogListArrow/>
@@ -12,7 +12,7 @@
         <div class = "tags">
             <div class = "score_tag">
                 <div class = "score_text">合計スコア</div>
-                <div class = "score_value">{{ calculate(props.holedetails) }}</div>
+                <div class = "score_value">{{ calculateScore(props.holedetails) }}</div>
             </div>
             <div class = "place_tag">
                 <div class = "place_text">📍{{ props.golfPlaceName }}</div>
@@ -55,17 +55,22 @@ interface holeDetail{
 }
 
 interface scoreDetas{
-    date: string;
+    date: Date;
     golfPlaceName: string;
     holedetails: holeDetail[];
 }
 
-function calculate(holedetails:holeDetail[]){
+function calculateScore(holedetails:holeDetail[]){
     let result = 0;
     holedetails.forEach(element => {
         result += element.result;
     });
     return result;
+}
+
+function calculateDays(date:Date){
+    const item = ["日曜日", "月曜日", "火曜日", "水曜日", "木曜日", "金曜日", "土曜日"]
+    return item[date.getDay()];
 }
 
 // class scoreDetails implements scoreDetas{
