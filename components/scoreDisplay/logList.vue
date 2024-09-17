@@ -1,10 +1,10 @@
 
 <template>
-  <div class = "sub_container">
-    <div class = "month">2024年6月</div>
+  <div class = "sub_container" v-for="(item, index) in monthDetails">
+    <div class = "month">{{monthDetails[index].Y}}年{{monthDetails[index].M}}月</div>
     <!-- <button @click='getScore'>クリック</button> -->
     <div class = "subsub_container" >
-      <Logcard v-for="item in roundDetails" :date="item.date" :golfPlaceName="item.golfPlaceName" :holedetails="item.holeDetails"/>
+      <Logcard v-for="item in monthDetails[index].monthDatas" :date="item.date" :golfPlaceName="item.golfPlaceName" :holedetails="item.holeDetails"/>
     </div> 
   </div>
 </template>
@@ -30,7 +30,14 @@ interface roundDetail{
   holeDetails: holeDetails[],
 }
 
-const roundDetails = ref<roundDetail[]>([]);
+interface monthDetail{
+  Y:number;
+  M:number;
+  monthDatas: roundDetail[]
+}
+
+const roundDetails = Array<roundDetail>();
+const monthDetails = ref<monthDetail[]>([]);
 
 const getScore = async () => {
   try{
@@ -53,7 +60,7 @@ const getScore = async () => {
         console.log("date: ", r.date);
         golfPlaceIds.add(roundData.golf_place_id);
         roundIds.add(roundData.id);
-        roundDetails.value.push(r);
+        roundDetails.push(r);
       }
 
       const {data:golfPlaceInfos, error} = await supabase
@@ -79,11 +86,11 @@ const getScore = async () => {
       if (error3)console.error('Error fetching data from m_holes table:', error3)
       else console.log("parInfos: ",parInfos);
 
-      for(let i = 0; i < roundDetails.value.length; i++){
+      for(let i = 0; i < roundDetails.length; i++){
         if(golfPlaceInfos != null){
           for(let golfPlaceInfo of [...golfPlaceInfos]){
             if(roundDatas[i].golf_place_id === golfPlaceInfo.id){
-              roundDetails.value[i].golfPlaceName = golfPlaceInfo.golf_place_name;
+              roundDetails[i].golfPlaceName = golfPlaceInfo.golf_place_name;
             }
           }
         }else console.error("golfPlaceInfos are null");
@@ -105,7 +112,7 @@ const getScore = async () => {
                   }
                 })
               }else console.error("parInfos are null");
-              roundDetails.value[i].holeDetails.push(tmp)
+              roundDetails[i].holeDetails.push(tmp)
             }
           }
         }else console.error("holeInfos are null");
@@ -113,11 +120,16 @@ const getScore = async () => {
         
 
 
-        roundDetails.value[i].holeDetails.sort((a, b)=> a.holeNo - b.holeNo)
+        roundDetails[i].holeDetails.sort((a, b)=> a.holeNo - b.holeNo)
       }
     }
-    console.log("roundDetails: ", roundDetails.value);
-    roundDetails.value.sort((a,b)=>b.date.getTime() - a.date.getTime())
+    console.log("roundDetails: ", roundDetails);
+    roundDetails.sort((a,b)=>b.date.getTime() - a.date.getTime())
+    monthDetails.value.push({
+      Y: 2024,
+      M: 9,
+      monthDatas: roundDetails
+    })
   }catch(e){
     console.error("Unexpected Error", e);
   }
@@ -126,65 +138,6 @@ const getScore = async () => {
 onMounted(()=>{
   getScore();
 });
-
-// const sampleData = {
-//   golfPlace:'筑波大学',
-//   details:[
-//         {
-//             holeNo:1,
-//             par:5,
-//             result:5,
-//             puts:3,
-//             form_Score:80
-//         },{
-//             holeNo:2,
-//             par:4,
-//             result:4,
-//             puts:2,
-//             form_Score:81
-//         },{
-//             holeNo:3,
-//             par:5,
-//             result:1,
-//             puts:0,
-//             form_Score:82
-//         },{
-//             holeNo:4,
-//             par:6,
-//             result:6,
-//             puts:2,
-//             form_Score:83
-//         },{
-//             holeNo:5,
-//             par:5,
-//             result:4,
-//             puts:2,
-//             form_Score:84
-//         },{
-//             holeNo:6,
-//             par:5,
-//             result:5,
-//             puts:2,
-//             form_Score:85
-//         },{
-//             holeNo:7,
-//             par:5,
-//             result:6,
-//             puts:3,
-//             form_Score:86
-//         },{
-//             holeNo:8,
-//             par:3,
-//             result:4,
-//             puts:2,
-//             form_Score:87
-//         },{
-//             holeNo:9,
-//             par:5,
-//             result:7,
-//             puts:4,
-//             form_Score:88
-//   }]}
 </script>
 
 <style scoped>
