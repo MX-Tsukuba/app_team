@@ -45,7 +45,13 @@ import { useModalStore } from '~/src/store/modal';
 import information from './information.vue';
 
 const supabase = useSupabaseClient<Database>();
+
+//この３つのデータは他から受け取る必要あり。
+const roundId = 1; 
 const golfPlaceName = 'つくばゴルフ場';
+const golfPlaceId = 1;
+
+
 const headVarStore = useHeadVarStore()
 headVarStore.title = `${golfPlaceName}`;
 const modalStore = useModalStore();
@@ -57,31 +63,34 @@ const playData = reactive({
   puttsNumber: 0,
 });
 //ホール選択（クリック）とパー表示
-const offset: number = 3;
 const currentHole = ref<number>(3);
-const par = ref<number|null>(0);
+const par = ref<number|null>();
 const fetchPar = async (hole: number) => {
   const { data, error } = await supabase
-    .from('m_golfplaces')
-    .select(`par_${hole}H`)
-    .eq('golfPlaceName', golfPlaceName)
-    .single();
+    .from('m_holes')
+    .select('par_number')
+    .eq('golfplaces_id', golfPlaceId)
+    .eq('hole_number', hole)
+    .single()
   if (error) {
     console.error('Error fetching data:', error);
-    return null;
+    return;
   } else {
-    return data ? data[hole+offset]: null;
+    par.value = data["par_number"];
+    return;
   }
 };
-const { data: golfPlaces, refresh } = await useAsyncData(async () => {
-  return fetchPar(currentHole.value);
-}, {
-  immediate: true
-});
-watch(currentHole, async (newHole) => {
-  par.value= await Number(fetchPar(newHole));
+
+const {data, refresh}  = await useAsyncData(async()=>{ fetchPar(currentHole.value);}, {immediate: false},);
+
+watch(currentHole, async () => {
   refresh();
 });
+
+onMounted(()=>{
+  fetchPar(currentHole.value)
+})
+
 const updateCurrentHole = (holeId:number) =>{
   currentHole.value = holeId;
 };
@@ -89,7 +98,14 @@ const updateCurrentHole = (holeId:number) =>{
 //データ挿入
 const addPlayData = async () => {
   playData.holeNumber = currentHole.value;
-  const { error } = await supabase.from('t_holes').insert(playData);
+  const { error } = await supabase.from('t_holes').insert({
+    "created_at": undefined,
+    "hole_number": playData.holeNumber,
+    "round_id": roundId,
+    "putts_number": playData.puttsNumber,
+    "score_number": playData.scoreNumber,
+    "updated_at": undefined,
+  });
   if (error) {
     alert(error.message);
   } else {

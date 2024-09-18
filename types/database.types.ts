@@ -194,7 +194,7 @@ export type Database = {
           putts_number: number
           round_id: number
           score_number: number
-          updated_at: string
+          updated_at?: string
         }
         Update: {
           created_at?: string
@@ -300,33 +300,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      t_sample_kazuki: {
-        Row: {
-          course: string | null
-          created_at: string
-          hole: number | null
-          id: number
-          putts: number | null
-          score: number | null
-        }
-        Insert: {
-          course?: string | null
-          created_at?: string
-          hole?: number | null
-          id?: number
-          putts?: number | null
-          score?: number | null
-        }
-        Update: {
-          course?: string | null
-          created_at?: string
-          hole?: number | null
-          id?: number
-          putts?: number | null
-          score?: number | null
-        }
-        Relationships: []
       }
     }
     Views: {
