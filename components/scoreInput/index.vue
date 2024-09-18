@@ -74,6 +74,7 @@ const fetchPar = async (hole: number) => {
     .single()
   if (error) {
     console.error('Error fetching data:', error);
+    par.value = null;
     return;
   } else {
     par.value = data["par_number"];
