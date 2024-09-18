@@ -81,10 +81,11 @@ const fetchPar = async (hole: number) => {
   }
 };
 
-const {data, refresh}  = await useAsyncData(async()=>{ fetchPar(currentHole.value);}, {immediate: false},);
+//const {data, refresh}  = await useAsyncData(async()=>{ fetchPar(currentHole.value);}, {immediate: false},);
 
 watch(currentHole, async () => {
-  refresh();
+  fetchPar(currentHole.value);
+  //refresh();
 });
 
 onMounted(()=>{
