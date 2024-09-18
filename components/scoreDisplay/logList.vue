@@ -125,6 +125,10 @@ const getScore = async () => {
     }
     console.log("roundDetails: ", roundDetails);
     roundDetails.sort((a,b)=>b.date.getTime() - a.date.getTime())
+    let tmpDate:Date|null = null;
+    roundDetails.forEach(item =>{
+      if(item.date != null || item.date===tmpDate)tmpDate=item.date;
+    })
     monthDetails.value.push({
       Y: 2024,
       M: 9,
