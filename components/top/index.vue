@@ -7,7 +7,7 @@
     <div class="inputTags">
       <inputTag  v-for="(v,i) in inputAll" :key="i" :images="inputAll[i].images" :tag-title="inputAll[i].tagTitle" :tag-description="inputAll[i].tagDescription" :link="inputAll[i].link" :onclick="inputAll[i].onclick" ></inputTag>
     </div>
-    <NuxtLink to="../camera/video"  class="circleBtn"><img src="~assets/img/camera.png" width="48"></NuxtLink>
+    <NuxtLink to="../camera"  class="circleBtn"><img src="~assets/img/camera.png" width="48"></NuxtLink>
   </section>
 </template>
 
