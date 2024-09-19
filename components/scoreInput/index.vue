@@ -3,7 +3,7 @@
     <div class="displayBox">
       <div class="displayHolePar">
         {{ currentHole }}H
-        <p class="displayPar">par{{ par }}</p>
+        <p class="displayPar">par{{ data }}</p>
       </div>
       <hr class="displayLine"/>
     </div>
@@ -65,7 +65,7 @@ const playData = reactive({
 //ホール選択（クリック）とパー表示
 const currentHole = ref<number>(3);
 const par = ref<number|null>();
-const fetchPar = async (hole: number) => {
+async function fetchPar(hole: number){
   const { data, error } = await supabase
     .from('m_holes')
     .select('par_number')
@@ -74,24 +74,14 @@ const fetchPar = async (hole: number) => {
     .single()
   if (error) {
     console.error('Error fetching data:', error);
-    par.value = null;
-    return;
+    // par.value = null;
+    return null;
   } else {
-    par.value = data["par_number"];
-    return;
+    return data["par_number"];
   }
 };
 
-//const {data, refresh}  = await useAsyncData(async()=>{ fetchPar(currentHole.value);}, {immediate: false},);
-
-watch(currentHole, async () => {
-  fetchPar(currentHole.value);
-  //refresh();
-});
-
-onMounted(()=>{
-  fetchPar(currentHole.value)
-})
+const {data}  = await useAsyncData(()=>fetchPar(currentHole.value), {watch: [currentHole]});
 
 const updateCurrentHole = (holeId:number) =>{
   currentHole.value = holeId;
