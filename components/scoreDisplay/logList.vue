@@ -1,16 +1,14 @@
 
 <template>
-  <div class = "sub_container" v-for="(item, index) in monthDetails">
-    <div class = "month">{{monthDetails[index].Y}}年{{monthDetails[index].M}}月</div>
-    <!-- <button @click='getScore'>クリック</button> -->
+  <div class = "sub_container" v-for="item in data">
+    <div class = "month">{{item.Y}}年{{item.M}}月</div>
     <div class = "subsub_container" >
-      <Logcard v-for="item in monthDetails[index].monthDatas" :date="item.date" :golfPlaceName="item.golfPlaceName" :holedetails="item.holeDetails"/>
+      <Logcard v-for="item1 in item.monthDatas" :date="item1.date" :golfPlaceName="item1.golfPlaceName" :holedetails="item1.holeDetails"/>
     </div> 
   </div>
 </template>
 
 <script setup lang = "ts">
-import{ref, onMounted} from "vue"
 import Logcard from "./logListChild.vue";
 import type { Database } from "~/types/database.types";
 
@@ -37,9 +35,10 @@ interface monthDetail{
 }
 
 const roundDetails = Array<roundDetail>();
-const monthDetails = ref<monthDetail[]>([]);
+//const monthDetails = ref<monthDetail[]>([]);
 
-const getScore = async () => {
+async function getScore(){
+  const monthDetails = Array<monthDetail>();
   try{
     //特定のユーザのデータゴルフデータを全て取得、ユーザの識別についてはローレベルセキュリティで実行する。
     const { data:roundDatas, error } = await supabase
@@ -129,19 +128,19 @@ const getScore = async () => {
     roundDetails.forEach(item =>{
       if(item.date != null || item.date===tmpDate)tmpDate=item.date;
     })
-    monthDetails.value.push({
+    monthDetails.push({
       Y: 2024,
       M: 9,
       monthDatas: roundDetails
     })
+    console.log(monthDetails);
+    return monthDetails;
   }catch(e){
     console.error("Unexpected Error", e);
   }
 }
 
-onMounted(()=>{
-  getScore();
-});
+const {data} = useAsyncData(()=>getScore());
 </script>
 
 <style scoped>

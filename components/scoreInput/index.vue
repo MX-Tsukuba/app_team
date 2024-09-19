@@ -64,7 +64,6 @@ const playData = reactive({
 });
 //ホール選択（クリック）とパー表示
 const currentHole = ref<number>(3);
-const par = ref<number|null>();
 async function fetchPar(hole: number){
   const { data, error } = await supabase
     .from('m_holes')
