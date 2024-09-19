@@ -5,7 +5,7 @@
           <p class="tagTitle">{{ tagTitle }}</p>
           <p class="tagDescription">{{ tagDescription }}</p>
         </div>
-        <NuxtLink :to="link" ><img src="~assets/img/right.png" class="goButton" @click="onclick"></NuxtLink>
+        <NuxtLink :to="link" ><img src="~assets/img/right.png" class="goButton" @click="onclick('top')"></NuxtLink>
       </div> 
 </template>
 

@@ -1,6 +1,6 @@
 <template>
   <section class="wholeHome">
-    <enterGolfCourseName v-if="isShowModal"/>
+    <enterGolfCourseName v-if="isShowModal && modalName === 'top'"/>
     <div class="recentRecord">
       <p>直近の記録エリア</p>
     </div>
@@ -22,7 +22,8 @@ const headVarStore = useHeadVarStore();
 headVarStore.title = 'Home';
 const modalStore = useModalStore();
 const isShowModal = computed(() => modalStore.isShowModal);
-const toggleModal = () => modalStore.toggleModal();
+const modalName = computed(() => modalStore.modalName);
+const toggleModal = (name:string) => modalStore.toggleModal(name);
 
 onMounted(async ()=>{
   const foodInput=await import('@/assets/img/foodInput.png')

@@ -2,11 +2,9 @@
   <div class="modal" @click.self="toggleModal">
     <div class="card">
     <span class="closeModal" @click="toggleModal">×</span>
-      <p class="title">ゴルフ場登録</p>
-      <p>ゴルフ場を選択してください</p>
-      <!-- ここにゴルフ場検索機能を実装する -->
-      <input type="text" placeholder="course">
-      <Nuxt-link @click="toggleModal" to="/scoreInput" class="bButton">登録</Nuxt-link>  
+      <p class="title">注意！</p>
+      <p>動画はラウンドにつき一度しか登録できません。撮影を開始しますか？</p>       
+      <Nuxt-link @click="toggleModal" to="/camera" class="bButton">撮影</Nuxt-link>  
     </div>
   </div>
 </template>
