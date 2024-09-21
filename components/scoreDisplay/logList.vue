@@ -47,7 +47,6 @@ async function getScore(){
       .eq('user_id', 1);
     if (error){
       console.error('Error fetching data from t_round table:', error);
-      return null;
     }else{
 
       const golfPlaceIds = new Set<number>();
@@ -96,7 +95,7 @@ async function getScore(){
 
         if(holeInfos != null){
           for (let holeInfo of holeInfos){
-            if(roundDatas[i].id === <any>holeInfo.round_id){
+            if(roundDatas[i].id === holeInfo.round_id){
               const tmp:holeDetails = {
                 holeNo: holeInfo.hole_number,
                 par: -1,
@@ -115,23 +114,32 @@ async function getScore(){
             }
           }
         }else console.error("holeInfos are null");
-
-        
-
-
         roundDetails[i].holeDetails.sort((a, b)=> a.holeNo - b.holeNo)
       }
     }
     console.log("roundDetails: ", roundDetails);
     roundDetails.sort((a,b)=>b.date.getTime() - a.date.getTime())
-    let tmpDate:Date|null = null;
+
+
+    let tmpDate:Date = roundDetails[0].date;
+    let tmpDatas:roundDetail[] = [];
     roundDetails.forEach(item =>{
-      if(item.date != null || item.date===tmpDate)tmpDate=item.date;
+      if(item.date.getFullYear()=== tmpDate.getFullYear() && item.date.getMonth() === tmpDate.getMonth()){
+        tmpDatas.push(item);
+      }else{
+        monthDetails.push({
+          Y: tmpDate.getFullYear(),
+          M: tmpDate.getMonth()+1,
+          monthDatas: tmpDatas
+        })
+        tmpDatas = [item]
+        tmpDate = item.date;
+      }
     })
     monthDetails.push({
-      Y: 2024,
-      M: 9,
-      monthDatas: roundDetails
+      Y: tmpDate.getFullYear(),
+      M: tmpDate.getMonth()+1,
+      monthDatas: tmpDatas
     })
     console.log(monthDetails);
     return monthDetails;
