@@ -61,11 +61,6 @@ const moveDate = (days: number): void => {
   selectedDate.value = newDate
 }
 
-// 前日に移動する関数
-const moveToPreviousDay = (): void => moveDate(-1)
-
-// 翌日に移動する関数
-const moveToNextDay = (): void => moveDate(1)
 
 class myClass {
   title: string;
@@ -122,12 +117,12 @@ const mealTypes = ['朝食', '昼食', '夕食', '間食'] as const
 type MealType = typeof mealTypes[number]
 
 const mealImages: Record<MealType, () => Promise<any>> = {
-  '朝食': () => import('@/assets/img/icon_morning.png'),
-  '昼食': () => import('@/assets/img/icon_afternoon.png'),
-  '夕食': () => import('@/assets/img/icon_night.png'),
-  '間食': () => import('@/assets/img/icon_snack.png')
+  '朝食': () => import('@/assets/img/icon_morning_default.png'),
+  '昼食': () => import('@/assets/img/icon_afternoon_default.png'),
+  '夕食': () => import('@/assets/img/icon_night_default.png'),
+  '間食': () => import('@/assets/img/icon_snack_default.png')
 }
-
+//kindBtnを動的に変更させる処理
 const currentMealTypeIndex = ref(0)
 const currentImageSrc = ref('')
 
@@ -137,12 +132,10 @@ const changeMealType = () => {
   currentMealTypeIndex.value = (currentMealTypeIndex.value + 1) % mealTypes.length
   loadImage()
 }
-
 const loadImage = async () => {
   const imageModule = await mealImages[currentMealType.value]()
   currentImageSrc.value = imageModule.default
 }
-
 onMounted(loadImage)
 
 </script>

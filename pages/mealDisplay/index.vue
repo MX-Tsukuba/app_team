@@ -1,41 +1,51 @@
 <template>
     <div class="homebody">
         <div class="gragh">
-            <div class="graghChart"></div>
+            <div class="graghChart">
+                <div v-if="isLoading">データを読み込んでいます</div>
+                <ClientOnly>
+                    <Line v-if="!isLoading" :data="chartData" :options="chartOptions" />
+                </ClientOnly>
+            </div>
             <div class="changeWeeks">
-                <div>
+                <div style="display: flex;">
                     <img class="weekBtn reverse" src="~/assets/img/right.png">
-                    <p>前の週</p>
+                    <p class="weeks">前の週</p>
                 </div>
-                <div>
-                    <p>次の週</p>
+                <div style="display: flex;">
+                    <p class="weeks">次の週</p>
                     <img class="weekBtn " src="~/assets/img/right.png">
                 </div>
             </div>
         </div>
         <div class="resultCard">
             <div class="day">
-                <input type="date" v-model="dateNow">
+                <input type="date" v-model="dateNow" @change="changeDate">
             </div>
             <div class="dayKcal">
                 <div class="dayKcalAll">
                     <div class="kcalNumber">{{ daySum[dateNowIndex] }}</div>
                     <p class="kcal">kcal</p>
                 </div>
-                <div class="rectangle"></div>
+                <div class="rectangle" ></div>
             </div>
             <div class="eachOfResult">
-                <div class="kindBtn">
-                    <img src="@/assets/img/icon_morning.png" width="60px" height="60px"></img>
-                    <img src="@/assets/img/icon_afternoon.png"width="60px" height="60px" ></img>
-                    <img src="@/assets/img/icon_night.png"width="60px" height="60px" ></img>
-                    <img src="@/assets/img/icon_snack.png" width="60px" height="60px"></img>
+                <div class="kindBtn" >
+                    <kindBtnDisplay v-for="(v,i) in kindImages" :key="i" :title="v.title"  :ifClick="v.ifClick"  @changeKind="changeKind(v, i)" ></kindBtnDisplay>
                 </div>
                 <div class="table">
                     <p class="kindDisplay">{{ kindNow[kindNowIndex] }} 合計</p>
                     <p class="sum">{{ kindSum[kindNowIndex][dateNowIndex] }}kcal</p>
-                    <div class="resultData" v-for="(v,i) in week_view_tables" :key="i">
-                        <resultData :title="v.title" :calorie="v.calorie" v-if="v.kind==kindNow[kindNowIndex] && v.date==dateNow" />
+                    <div class="resultData" >
+                        <div v-if="!isLoading" >
+                            <resultData
+                            v-for="item in selectedView"
+                            :key="item.id"
+                            :title="item.title"
+                            :calorie="item.calorie"
+                            />
+                        </div>
+                        <div v-if="isLoading">Loading...</div>
                     </div>
                 </div>
             </div>
@@ -45,34 +55,93 @@
 
 <script setup lang="ts">
 import resultData from '~/components/meal/resultData.vue';
+import kindBtnDisplay from '~/components/meal/kindBtnDisplay.vue';
 import { onMounted } from 'vue';
 import { useHeadVarStore } from '~/src/store/headVar.js';
 import { usePageStore } from '~/src/store/currentPage';
 import type { Database } from '~/types/database.types.ts';
+import { Line } from 'vue-chartjs';
 
 const headVarStore = useHeadVarStore()
-headVarStore.title = '食事記録'
+
 const pageStore = usePageStore();
 onMounted(() => {
-  pageStore.setCurrentPage('food');
+    headVarStore.title = '食事記録'
+  pageStore.setCurrentPage('food');//CSRとSSRで中身を同じにするためにonMounted内に移動
 });
 
-const supabase = useSupabaseClient<Database>();
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js'
 
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend)
+
+const labels=ref<string[]>([]);
+const datasets=ref<number[]>([]);
+
+const chartData = computed(() => ({
+  labels: labels.value,
+  datasets: [{
+    label: '食事記録',
+    data: datasets.value,
+    borderColor: 'rgb(242, 136, 34)',
+    tension: 0.1
+  }]
+}))
+const chartOptions = {
+  responsive: true,
+  maintainAspectRatio: false
+}
+let kindImages=reactive( [
+    {
+        title:'朝食',
+        ifClick:true
+    },
+    {
+        title:"昼食",
+        ifClick:false
+    },
+    {
+        title:"夕食",
+        ifClick:false
+    },
+    {
+        title:"間食",
+        ifClick:false
+    }
+])
+// 定義
+const supabase = useSupabaseClient<Database>();
 const daySum=ref<number[]>([0,0,0,0,0,0,0]);
 const kindSum=ref<number[][]>([[],[],[],[]]);
 const today=new Date();
-const kindNowIndex=ref<number>(0);
+let kindNowIndex=ref<number>(0);
 const kindNow=["朝食","昼食","夕食","間食"];
-const dateNowIndex =ref<number>(today.getDay())
-const dateNow=ref<string>("");
 
+let dateNowIndex =ref<number>(today.getDay())
+const dateNow=ref<string>("");
+const isLoading = ref<boolean>(true);
+const week_view_tables=ref<any[]>([]);
+
+
+// 関数
 const formatDateToString = (date: Date): string => {
   const year = date.getFullYear()
   const month = String(date.getMonth() + 1).padStart(2, '0')
   const day = String(date.getDate()).padStart(2, '0')
   return `${year}-${month}-${day}`
 }
+const changeDate=()=>{
+    dateNowIndex.value=weekDates.indexOf(dateNow.value)
+};
+const changeKind=(value: {
+    label: string, ifClick: boolean
+}, i:number)=>{
+    kindNowIndex.value=i
+    kindImages.forEach(record=>record.ifClick?record.ifClick=false:null)
+    value.ifClick=true
+};
+
+
+
 function getCurrentWeekDates(startDay:number=1):string[]{
     const today=new Date();
     const dayOfWeek =today.getDay();//日曜日=0,土曜日=6
@@ -81,24 +150,30 @@ function getCurrentWeekDates(startDay:number=1):string[]{
     const startOfWeek = new Date(today);
     startOfWeek.setDate(today.getDate()-diff);
 
-    const weekDates:string[]=[];
+    const weekDates=ref<string[]>([]);
     for(let i=0;i<7;i++){
         const date=new Date(startOfWeek);
         date.setDate(startOfWeek.getDate()+i);
-        weekDates.push(formatDateToString(date));
+        weekDates.value.push(formatDateToString(date));
     }
     // dateNow.value=weekDates[dateNowIndex.value];
-    return weekDates;
+    labels.value=weekDates.value;
+    return weekDates.value;
 }
+
+// 代入
 const weekDates = getCurrentWeekDates();
 console.log(weekDates,"現在の週の配列");
+dateNow.value=formatDateToString(today);
 
 
-const {data:week_view_tables,error} = await supabase
-.from('view_tables')
-.select('*')
-.in('date', weekDates)
-.order('date',{ascending:true})
+// Mount時の処理
+onMounted(async ()=>{
+    const {data,error} = await supabase
+    .from('view_tables')
+    .select('*')
+    .in('date', weekDates)
+    .order('date',{ascending:true})
 
 if(error){
     console.error('最新のデータの取得に失敗しました',error);
@@ -113,7 +188,7 @@ if(error){
     [0, 0, 0, 0, 0, 0, 0]  // 間食
     ]
 
-    week_view_tables.forEach(record => {
+    data.forEach(record => {
         const dayIndex = weekDates.indexOf(record.date)
         if (dayIndex !== -1) {
             const kindIndex = kindNow.indexOf(record.kind)
@@ -123,15 +198,26 @@ if(error){
             }
         }
     })
+    datasets.value=daySum.value;
     console.log("朝食:", kindSum.value[0])
     console.log("昼食:", kindSum.value[1])
     console.log("夕食:", kindSum.value[2])
     console.log("間食:", kindSum.value[3])
     console.log("日別合計:", daySum.value)
+    isLoading.value=false;
+    week_view_tables.value=data;
 }
+})
 
-dateNow.value=formatDateToString(today);
+let selectedView = computed(() => {
+  return week_view_tables.value.filter(
+    item => item.kind === kindNow[kindNowIndex.value] && item.date === dateNow.value
+  );
+});
 
+
+
+console.log('chartData:', chartData.value);
 
 </script>
 
@@ -174,6 +260,11 @@ dateNow.value=formatDateToString(today);
 
 .reverse{
     transform: rotate(180deg);
+}
+.weeks{
+    color: #777;
+    font-family: Inter;
+    font-size: 15px;
 }
 .resultCard{
     width: 390px;
@@ -264,6 +355,8 @@ dateNow.value=formatDateToString(today);
     padding: 0px 12px;
 }
 .resultData{
+    height: 180px;
+    overflow-y: auto;
     display: flex;
     padding: 0px 20px;
     flex-direction: column;
