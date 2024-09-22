@@ -34,115 +34,79 @@ interface monthDetail{
   monthDatas: roundDetail[]
 }
 
-const roundDetails = Array<roundDetail>();
-//const monthDetails = ref<monthDetail[]>([]);
-
 async function getScore(){
   const monthDetails = Array<monthDetail>();
   try{
-    //特定のユーザのデータゴルフデータを全て取得、ユーザの識別についてはローレベルセキュリティで実行する。
+    //TODO: 特定のユーザのデータゴルフデータを全て取得、ユーザの識別についてはローレベルセキュリティで実行する。
     const { data:roundDatas, error } = await supabase
       .from('t_rounds')
-      .select("id, golf_place_id, date")
+      .select("date, t_holes(hole_number, score_number, putts_number), m_golfplaces(golf_place_name, m_holes(hole_number, par_number))")
       .eq('user_id', 1);
     if (error){
       console.error('Error fetching data from t_round table:', error);
     }else{
+      //console.log(roundDatas);
+      roundDatas.sort((a, b)=>{
+        const dateA = new Date(a.date);
+        const dateB = new Date(b.date);
+        if(dateA > dateB)return -1;
+        else if(dateA === dateB)return 0;
+        else return 1;
+      })
+        //console.log(roundDatas);
 
-      const golfPlaceIds = new Set<number>();
-      const roundIds = new Set<number>();
+        //TODO: 一度データをpropsに渡せる形に直す。
+        //できれば以下の実装を省略していきなりpropsに渡せる形にする＆月ごとに分けたい。
+        const tmpDetails:roundDetail[] = [];
+        roundDatas.forEach(item=>{
+          if(item.m_golfplaces !== null )item.m_golfplaces.m_holes.sort((a, b)=>a.hole_number - b.hole_number );
+          item.t_holes.sort((a,b)=>a.hole_number - b.hole_number);
 
-      for (let roundData of roundDatas){
-        let r:roundDetail = {date: new Date(2000, 1, 1), golfPlaceName: "", holeDetails: new Array<holeDetails>()};
-        r.date = new Date(roundData.date);
-        console.log("date: ", r.date);
-        golfPlaceIds.add(roundData.golf_place_id);
-        roundIds.add(roundData.id);
-        roundDetails.push(r);
-      }
+          const tmpHoleDetails: holeDetails[] = []
+          item.t_holes.forEach(item1=>{
+            const tmpMHoles = item.m_golfplaces?.m_holes.find(value =>{return value.hole_number == item1.hole_number});
+            tmpHoleDetails.push({
+              holeNo: item1.hole_number,
+              par: tmpMHoles? tmpMHoles.par_number: -1,
+              result: item1.score_number,
+              pats: item1.putts_number,
+              form_Score: 100
+            })
+          })
+          tmpDetails.push({
+            date: new Date(item.date),
+            golfPlaceName: item.m_golfplaces? item.m_golfplaces.golf_place_name: "情報がありません",
+            holeDetails: tmpHoleDetails
+          })
+        })
+        //console.log(tmpDetails);
+        //
 
-      const {data:golfPlaceInfos, error} = await supabase
-        .from("m_golfplaces")
-        .select("*")
-        .in("id", [...golfPlaceIds]);
-      if(error)console.error('Error fetching data from m_golfplaces table:', error);
-      else {
-        console.log("golfPlaceInfos: ", golfPlaceInfos);
-      }
-
-      const {data:holeInfos, error:error2} = await supabase
-        .from("t_holes")
-        .select("*")
-        .in("round_id", [...roundIds]);
-      if(error)console.error('Error fetching data from t_holes table:', error2);
-      else console.log(holeInfos);
-
-      const {data:parInfos, error:error3} = await supabase
-        .from("m_holes")
-        .select("*")
-        .in("golfplaces_id", [...golfPlaceIds]);
-      if (error3)console.error('Error fetching data from m_holes table:', error3)
-      else console.log("parInfos: ",parInfos);
-
-      for(let i = 0; i < roundDetails.length; i++){
-        if(golfPlaceInfos != null){
-          for(let golfPlaceInfo of [...golfPlaceInfos]){
-            if(roundDatas[i].golf_place_id === golfPlaceInfo.id){
-              roundDetails[i].golfPlaceName = golfPlaceInfo.golf_place_name;
-            }
+        let tmpDate:Date = tmpDetails[0].date;
+        let tmpDatas:roundDetail[] = [];
+        tmpDetails.forEach(item =>{
+          const itemDate = item.date;
+          if(itemDate.getFullYear()=== tmpDate.getFullYear() && itemDate.getMonth() === tmpDate.getMonth()){
+            tmpDatas.push(item);
+          }else{
+            monthDetails.push({
+              Y: tmpDate.getFullYear(),
+              M: tmpDate.getMonth()+1,
+              monthDatas: tmpDatas
+            })
+            tmpDatas = [item]
+            tmpDate = item.date;
           }
-        }else console.error("golfPlaceInfos are null");
-
-        if(holeInfos != null){
-          for (let holeInfo of holeInfos){
-            if(roundDatas[i].id === holeInfo.round_id){
-              const tmp:holeDetails = {
-                holeNo: holeInfo.hole_number,
-                par: -1,
-                result: holeInfo.score_number,
-                pats: holeInfo.putts_number,
-                form_Score: 100,
-              }
-              if(parInfos != null){
-                [...parInfos].forEach((item)=>{
-                  if(holeInfo.hole_number === item.hole_number && roundDatas[i].golf_place_id === item.golfplaces_id){
-                    tmp.par = item.par_number;
-                  }
-                })
-              }else console.error("parInfos are null");
-              roundDetails[i].holeDetails.push(tmp)
-            }
-          }
-        }else console.error("holeInfos are null");
-        roundDetails[i].holeDetails.sort((a, b)=> a.holeNo - b.holeNo)
-      }
-    }
-    console.log("roundDetails: ", roundDetails);
-    roundDetails.sort((a,b)=>b.date.getTime() - a.date.getTime())
-
-
-    let tmpDate:Date = roundDetails[0].date;
-    let tmpDatas:roundDetail[] = [];
-    roundDetails.forEach(item =>{
-      if(item.date.getFullYear()=== tmpDate.getFullYear() && item.date.getMonth() === tmpDate.getMonth()){
-        tmpDatas.push(item);
-      }else{
+        })
         monthDetails.push({
           Y: tmpDate.getFullYear(),
           M: tmpDate.getMonth()+1,
           monthDatas: tmpDatas
         })
-        tmpDatas = [item]
-        tmpDate = item.date;
-      }
-    })
-    monthDetails.push({
-      Y: tmpDate.getFullYear(),
-      M: tmpDate.getMonth()+1,
-      monthDatas: tmpDatas
-    })
-    console.log(monthDetails);
-    return monthDetails;
+      //console.log(monthDetails);
+      return monthDetails;
+    }
+    
   }catch(e){
     console.error("Unexpected Error", e);
   }
