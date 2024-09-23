@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {defineProps, ref} from 'vue';
+import { defineProps } from 'vue';
 const isActive = ref(false);
 const props = defineProps<{
   isOpen: Boolean,
@@ -12,10 +12,18 @@ const handleLink = () => {
 const stopPropagation = (event: MouseEvent) => {
   event.stopPropagation();
 };
+
+watch(() => props.isOpen, (newVal) => {
+  if (newVal) {
+    document.querySelector('.menu')?.classList.add('menu-open');
+  } else {
+    document.querySelector('.menu')?.classList.remove('menu-open');
+  }
+});
 </script>
 
 <template>
-  <div class="back" @click="props.onClick">
+  <div :class="{'back': props.isOpen}" @click="props.onClick">
   <div class="menu"  :class="{'menu-open': props.isOpen}"  @click.stop="stopPropagation">
     <button @click="props.onClick" class="close">x</button>
     <div class="content">
@@ -48,15 +56,16 @@ const stopPropagation = (event: MouseEvent) => {
   margin: 0;
   width: 40vw;
   height: 100vh;
-  background: #FFF;
+  background: #E45D5D;
+  color: #fff;
   box-shadow: -2px 0px 16px 0px rgba(0, 0, 0, 0.25);
   border-top-left-radius: 4px;
   border-bottom-left-radius:4px;
   text-align: center;
   position: absolute;
   top: 0;
-  right: -40vw;
-  transition: right 0.3s ease-out;
+  right: -50vw;
+  transition: right .3s;
 }
 .menu-open {
   right: 0;
@@ -67,19 +76,20 @@ const stopPropagation = (event: MouseEvent) => {
   right: 7%;
 }
 .content{
-  margin-top: 50px;
+  margin-top: 80px;
   text-align: left;
 }
 .clicked{
-  background-color: rgb(200 200 200 / .1);
-  box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.5);
+  color: rgb(200 200 200 / .1);
 }
 .title{
-  margin-top: 16px;
-  padding: 8px 20px;
+  color: #fff;
+  border-bottom: 1px solid #fff;
+  margin: 24px 20px 8px;
   font-size: 16px;
 }
 .version{
+  color: #fff;
   font-size: 12px;
   position: absolute;
   bottom: 20px;
