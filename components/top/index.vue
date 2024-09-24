@@ -1,13 +1,13 @@
 <template>
   <section class="wholeHome">
-    <enterGolfCourseName v-if="isShowModal"/>
+    <enterGolfCourseName v-if="isShowModal && modalName === 'top'"/>
     <div class="recentRecord">
       <p>直近の記録エリア</p>
     </div>
     <div class="inputTags">
       <inputTag  v-for="(v,i) in inputAll" :key="i" :images="inputAll[i].images" :tag-title="inputAll[i].tagTitle" :tag-description="inputAll[i].tagDescription" :link="inputAll[i].link" :onclick="inputAll[i].onclick" ></inputTag>
     </div>
-    <NuxtLink to="../camera/video"  class="circleBtn"><img src="~assets/img/camera.png" width="48"></NuxtLink>
+    <NuxtLink to="../camera"  class="circleBtn"><img src="~assets/img/camera.png" width="48"></NuxtLink>
   </section>
 </template>
 
@@ -22,7 +22,8 @@ const headVarStore = useHeadVarStore();
 headVarStore.title = 'Home';
 const modalStore = useModalStore();
 const isShowModal = computed(() => modalStore.isShowModal);
-const toggleModal = () => modalStore.toggleModal();
+const modalName = computed(() => modalStore.modalName);
+const toggleModal = (name:string) => modalStore.toggleModal(name);
 
 onMounted(async ()=>{
   const foodInput=await import('@/assets/img/foodInput.png')

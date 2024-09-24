@@ -11,7 +11,7 @@
 <script setup lang="ts">
 import { useModalStore } from '~/src/store/modal';
 const modalStore = useModalStore();
-const toggleModal = modalStore.toggleModal;
+const toggleModal = () => modalStore.toggleModal('');
 </script>
 
 <style scoped>
