@@ -37,20 +37,15 @@ const moveDate = (days: number): void => {
   selectedDate.value = newDate
 }
 
-// 前日に移動する関数
-const moveToPreviousDay = (): void => moveDate(-1)
-
-// 翌日に移動する関数
-const moveToNextDay = (): void => moveDate(1)
 
 const insertBody=async ()=>{
   const {error}=await supabase
   .from('body_inputs')
   .insert({
-    date:formattedDate,
-    weight:bodyWeight,
-    flexibility:flexibility,
-    height:bodyHeight,
+    date:formattedDate.value,
+    weight:bodyWeight.value,
+    flexibility:flexibility.value,
+    height:bodyHeight.value,
   });
   if (error) {
   console.error('Error inserting data:', error);
@@ -97,7 +92,7 @@ let flexibility=ref(0);
           </div>
         </div>
       </div>
-      <div class="BaddBtn">
+      <div class="BaddBtn" @click="insertBody">
         <div class="addName">追加</div>
       </div>
     </div>

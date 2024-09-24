@@ -8,11 +8,11 @@
                 </ClientOnly>
             </div>
             <div class="changeWeeks">
-                <div style="display: flex;">
+                <div style="display: flex;" @click="changeWeeks(-7)">
                     <img class="weekBtn reverse" src="~/assets/img/right.png">
                     <p class="weeks">前の週</p>
                 </div>
-                <div style="display: flex;">
+                <div style="display: flex;" @click="changeWeeks(7)">
                     <p class="weeks">次の週</p>
                     <img class="weekBtn " src="~/assets/img/right.png">
                 </div>
@@ -112,7 +112,7 @@ let kindImages=reactive( [
 const supabase = useSupabaseClient<Database>();
 const daySum=ref<number[]>([0,0,0,0,0,0,0]);
 const kindSum=ref<number[][]>([[],[],[],[]]);
-const today=new Date();
+let today=new Date();
 let kindNowIndex=ref<number>(0);
 const kindNow=["朝食","昼食","夕食","間食"];
 
@@ -130,7 +130,11 @@ const formatDateToString = (date: Date): string => {
   return `${year}-${month}-${day}`
 }
 const changeDate=()=>{
-    dateNowIndex.value=weekDates.indexOf(dateNow.value)
+    dateNowIndex.value=weekDates.indexOf(dateNow.value);
+    if(dateNowIndex.value=-1){
+        //変更前の日付に戻す処理
+    }
+
 };
 const changeKind=(value: {
     label: string, ifClick: boolean
@@ -140,10 +144,17 @@ const changeKind=(value: {
     value.ifClick=true
 };
 
+const changeWeeks=(i:number)=>{
+    const weekago= new Date(today);
+    weekago.setDate(today.getDate()+i);
+    today=weekago;
+    dateNow.value=formatDateToString(today);
+    weekDates=getCurrentWeekDates();
+    selectData();
+}
 
 
 function getCurrentWeekDates(startDay:number=1):string[]{
-    const today=new Date();
     const dayOfWeek =today.getDay();//日曜日=0,土曜日=6
     const diff=(dayOfWeek +7-startDay) % 7;
 
@@ -161,14 +172,7 @@ function getCurrentWeekDates(startDay:number=1):string[]{
     return weekDates.value;
 }
 
-// 代入
-const weekDates = getCurrentWeekDates();
-console.log(weekDates,"現在の週の配列");
-dateNow.value=formatDateToString(today);
-
-
-// Mount時の処理
-onMounted(async ()=>{
+const selectData=async ()=>{
     const {data,error} = await supabase
     .from('view_tables')
     .select('*')
@@ -178,7 +182,7 @@ onMounted(async ()=>{
 if(error){
     console.error('最新のデータの取得に失敗しました',error);
 }else{
-    console.log("データの取得に成功しました",week_view_tables);
+    console.log("データの取得に成功しました",data);
 
     daySum.value = [0, 0, 0, 0, 0, 0, 0]
     kindSum.value = [
@@ -206,8 +210,20 @@ if(error){
     console.log("日別合計:", daySum.value)
     isLoading.value=false;
     week_view_tables.value=data;
+    return;
 }
-})
+}
+
+// 代入
+let weekDates = getCurrentWeekDates();
+console.log(weekDates,"現在の週の配列");
+dateNow.value=formatDateToString(today);
+
+
+// Mount時の処理
+onMounted(() => {
+      selectData();
+    })
 
 let selectedView = computed(() => {
   return week_view_tables.value.filter(
