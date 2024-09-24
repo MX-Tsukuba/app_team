@@ -116,6 +116,8 @@ onBeforeUnmount(() => {
   align-items: center;
   justify-content: center;
   gap: 60px;
+    overflow: hidden;
+  touch-action: none;
 }
 .backButton{
     margin: 0;

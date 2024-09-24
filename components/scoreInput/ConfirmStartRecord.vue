@@ -3,8 +3,10 @@
     <div class="card">
     <span class="closeModal" @click="toggleModal">×</span>
       <p class="title">注意！</p>
-      <p>動画はラウンドにつき一度しか登録できません。撮影を開始しますか？</p>       
-      <Nuxt-link @click="toggleModal" to="/camera" class="bButton">撮影</Nuxt-link>  
+      <p>動画は各ホールにつき一度しか登録できません。</p>
+      <p>launching camera...</p>
+      <!-- <p>動画はラウンドにつき一度しか登録できません。撮影を開始しますか？</p>       
+      <Nuxt-link @click="toggleModal" to="/camera" class="bButton">撮影</Nuxt-link>   -->
     </div>
   </div>
 </template>
@@ -13,6 +15,13 @@
 import { useModalStore } from '~/src/store/modal';
 const modalStore = useModalStore();
 const toggleModal = () => modalStore.toggleModal('');
+const router = useRouter();
+onMounted(() => {
+  setTimeout(() => {
+    router.push('/camera');
+    toggleModal();
+  }, 2000);
+});
 </script>
 
 <style scoped>
