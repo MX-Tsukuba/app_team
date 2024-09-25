@@ -18,7 +18,7 @@ interface holeDetails{
   holeNo:number,
   par: number
   result: number,
-  pats:number,
+  putts:number,
   form_Score:number
 }
 
@@ -69,7 +69,7 @@ async function getScore(){
               holeNo: item1.hole_number,
               par: tmpMHoles? tmpMHoles.par_number: -1,
               result: item1.score_number,
-              pats: item1.putts_number,
+              putts: item1.putts_number,
               form_Score: 100
             })
           })
