@@ -24,7 +24,7 @@
                     <tr><th>ホール</th><th>パー</th><th>スコア</th><th>パッド</th><th>フォーム</th></tr>
                 </thead>
                 <tbody class = "t_body">
-                    <LogListTableRow v-for="item in props.holedetails" :holeNo="item.holeNo" :par="item.par" :result="item.result" :puts="item.pats" :form_Score="item.form_Score"/>
+                    <LogListTableRow v-for="item in props.holedetails" :holeNo="item.holeNo" :par="item.par" :result="item.result" :putts="item.putts" :form_Score="item.form_Score"/>
                 </tbody>
             </table>
         </div>
@@ -39,7 +39,6 @@
 <script setup lang = "ts">
 import LogListTableRow from './logListTableRow.vue';
 import LogListArrow from './logListArrow.vue';
-import {ref} from 'vue';
 
 const isScoreTableVisible = ref(false);
 const  toggleScoreTable = () =>{
@@ -50,7 +49,7 @@ interface holeDetail{
     holeNo:number,
     par:number,
     result: number,
-    pats:number,
+    putts:number,
     form_Score:number
 }
 
@@ -60,7 +59,7 @@ interface scoreDetas{
     holedetails: holeDetail[];
 }
 
-function calculateScore(holedetails:holeDetail[]){
+const calculateScore = (holedetails:holeDetail[])=>{
     let result = 0;
     holedetails.forEach(element => {
         result += element.result;
@@ -73,35 +72,7 @@ function calculateDays(date:Date){
     return item[date.getDay()];
 }
 
-// class scoreDetails implements scoreDetas{
-//     // ?totalScore:number;
-//     date: string;
-//     golfPlaceName:string;
-//     holedetails: holeDetails[];
-
-//     constructor(date: string, golfPlaceName: string, details: holeDetails[]){
-//         // this.totalScore = 0;
-//         this.date = date;
-//         this.golfPlaceName = golfPlaceName;
-//         this.holedetails = details;
-//     }
-    
-//     calculate(){
-//         let tmp = 0;
-//         for (let detail of this.holedetails){
-//             tmp += detail.result;
-//         }
-//         // this.totalScore = tmp;
-//         console.log("date: ",this.date)
-//         console.log("golfPlaceName: ",this.golfPlaceName)
-//         console.log("Props:", props); // 追加
-//         return tmp
-//     }
-// }
-
 const props = defineProps<scoreDetas>();
-
-// const sampleData = new scoreDetails(props.date, props.golfPlaceName, props.holedetails);
 
 </script>
 
