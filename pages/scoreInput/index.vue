@@ -11,6 +11,8 @@ import CameraTransparentImg from '~/assets/img/cameraTransparent.png';
 const headVarStore = useHeadVarStore()
 headVarStore.title = 'スコア入力'
 
+const buttonMessage = ref<string>('登録')
+
 const pageStore = usePageStore();
 
 const videoPlayer = ref<HTMLVideoElement | null>(null);
@@ -74,6 +76,11 @@ const addPlayData = async () => {
   } else {
   if(currentHole.value === 18){
     await navigateTo('./scoreDisplay')
+  }else{
+    currentHole.value++;
+    playData.scoreNumber = 0;
+    playData.puttsNumber = 0;
+    playData.holeNumber = 0
   }
     return true;
   }
@@ -149,6 +156,8 @@ watch(currentHole, () => items.forEach(item => {
     item.card.isMedium = false;
     item.card.isSmall = true;
   } 
+  if(currentHole.value === 18)buttonMessage.value = '完了'
+  else buttonMessage.value = '登録'
 }))
 
 const videoInsert = async()=>{
@@ -202,7 +211,7 @@ onMounted(()=>{
       <div v-else class="videoArea">
         <p>フォームを撮影すると、ここに動画が表示されます。</p>
       </div>
-      <button @click="addPlayData" class="bButton">完了</button>
+      <button @click="addPlayData" class="bButton">{{ buttonMessage }}</button>
     <div class="circleBtn" @click="toggleModal('confirm')" :class="{'inActive': videoUrl}">
       <img :src="videoUrl ? CameraTransparentImg : CameraImg" width="48">
     </div>
