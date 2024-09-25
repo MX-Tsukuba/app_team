@@ -8,14 +8,14 @@
                 </ClientOnly>
       </div>
       <div class="changeWeeks">
-        <div style="display: flex;" @click="changeWeeks(-7)">
+        <button style="display: flex;" @click="changeWeeks(-7)">
           <img class="weekBtn reverse" src="~/assets/img/right.png">
           <p class="weeks">前の週</p>
-      </div>
-      <div style="display: flex;" @click="changeWeeks(7)">
-          <p class="weeks">次の週</p>
-          <img class="weekBtn " src="~/assets/img/right.png">
-      </div>
+        </button>
+        <button style="display: flex;" @click="changeWeeks(7)">
+            <p class="weeks">次の週</p>
+            <img class="weekBtn " src="~/assets/img/right.png">
+        </button>
     </div>
   </div>
 </div>
@@ -43,7 +43,9 @@ import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend)
 
 const labels=ref<string[]>([]);
-const datasets=ref<number[]>([]);
+let datasets=ref<number[]>([]);
+let height=ref<number[]>([]);
+let flexibility=ref<number[]>([]);
 
 const chartData = computed(() => ({
   labels: labels.value,
@@ -74,7 +76,7 @@ const formatDateToString = (date: Date): string => {
 const selectData =async ()=>{
   const {data:body_inputs,error}= await supabase
   .from('body_inputs')
-  .select('bodyWeight')
+  .select('*')
   .in('date', weekDates)
   .order('date',{ascending:true})
 
@@ -83,7 +85,17 @@ const selectData =async ()=>{
   }else{
     console.log("データの取得に成功しました",body_inputs);
     isLoading.value=false;
-    datasets.value=body_inputs
+    datasets.value=[0,0,0,0,0,0,0];
+    height.value=[0,0,0,0,0,0,0];
+    flexibility.value=[0,0,0,0,0,0,0];
+    body_inputs.forEach(record => {
+        const dayIndex = weekDates.indexOf(record.date)
+        if (dayIndex !== -1) {
+                datasets.value[dayIndex] = record.weight
+                height.value[dayIndex] = record.height
+                flexibility.value[dayIndex] = record.flexibility
+        }
+    })
 }}
 
 function getCurrentWeekDates(startDay:number=1):string[]{

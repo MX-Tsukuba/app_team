@@ -162,7 +162,7 @@ onMounted(loadImage)
                     <input class="input" type="number" v-model="myArr[counter].calorie" placeholder="カロリーを入力">
                 </div>
             </div>
-            <div class="addBtn" @click="addObject()"><p class="addName">追加</p></div>
+            <button class="addBtn" @click="addObject()"><p class="addName">追加</p></button>
         </div>
     </div>
     <div class="resultTable">
@@ -177,12 +177,10 @@ onMounted(loadImage)
                     </svg>
                 </div>
                 <div class="insertBtn" >
-                    <!-- <NuxtLink to="./mealDisplay" > -->
                         <button @click="insertToDatabase">
                         <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 50 50" fill="none">
                         <path d="M28.6687 25.0212L6.25208 22.7629L6.25 8.48785C6.25027 8.10665 6.34793 7.73184 6.53372 7.39898C6.7195 7.06611 6.98724 6.78623 7.31155 6.58589C7.63586 6.38554 8.00598 6.27138 8.38679 6.25422C8.76761 6.23706 9.14649 6.31748 9.4875 6.48785L42.5125 23.0004C42.8835 23.1864 43.1954 23.472 43.4134 23.8252C43.6314 24.1784 43.7468 24.5853 43.7468 25.0004C43.7468 25.4154 43.6314 25.8223 43.4134 26.1755C43.1954 26.5287 42.8835 26.8143 42.5125 27.0004L9.49167 43.5128C9.15066 43.6832 8.77177 43.7636 8.39096 43.7465C8.01014 43.7293 7.64003 43.6152 7.31572 43.4148C6.99141 43.2145 6.72367 42.9346 6.53788 42.6017C6.3521 42.2689 6.25444 41.8941 6.25417 41.5129V27.2379L28.6687 25.0212Z" fill="#F28822"/></svg>
                     </button>
-                    <!-- </NuxtLink> -->
                 </div>
             </div>
         </div>

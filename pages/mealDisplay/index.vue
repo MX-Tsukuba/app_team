@@ -8,19 +8,19 @@
                 </ClientOnly>
             </div>
             <div class="changeWeeks">
-                <div style="display: flex;" @click="changeWeeks(-7)">
+                <button style="display: flex;" @click="changeWeeks(-7)">
                     <img class="weekBtn reverse" src="~/assets/img/right.png">
                     <p class="weeks">前の週</p>
-                </div>
-                <div style="display: flex;" @click="changeWeeks(7)">
+                </button>
+                <button style="display: flex;" @click="changeWeeks(7)">
                     <p class="weeks">次の週</p>
                     <img class="weekBtn " src="~/assets/img/right.png">
-                </div>
+                </button>
             </div>
         </div>
         <div class="resultCard">
             <div class="day">
-                <input type="date" v-model="dateNow" @change="changeDate">
+                <input type="date" v-model="dateNow" @change="changeDate"> <!--日付の変更がうまくいかないから表示方法とか変える予定-->
             </div>
             <div class="dayKcal">
                 <div class="dayKcalAll">
@@ -132,7 +132,7 @@ const formatDateToString = (date: Date): string => {
 const changeDate=()=>{
     dateNowIndex.value=weekDates.indexOf(dateNow.value);
     if(dateNowIndex.value=-1){
-        //変更前の日付に戻す処理
+        changeWeeks(-7);
     }
 
 };

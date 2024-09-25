@@ -92,9 +92,9 @@ let flexibility=ref(0);
           </div>
         </div>
       </div>
-      <div class="BaddBtn" @click="insertBody">
+      <button class="BaddBtn" @click="insertBody">
         <div class="addName">追加</div>
-      </div>
+      </button>
     </div>
   </div>
 </div>
