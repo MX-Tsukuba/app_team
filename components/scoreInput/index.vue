@@ -14,8 +14,8 @@
     </ul>
 
     <div class="inputData">
-      <img src="~assets/img/information.png" alt="information" class="information" @click="toggleModal">
-      <information v-if="isShowModal"/>
+      <img src="~assets/img/information.png" alt="information" class="information" @click="toggleModal('info')">
+      <Information v-if="isShowModal && modalName === 'info'"/>
       <div class="scorePuttsBox">
         <div>
           <p class="scorePuttsTitle">スコア</p>
@@ -30,40 +30,53 @@
           </div>
         </div>
       </div>
-      <video></video>
-      <NuxtLink @click="addPlayData" to="../scoreDisplay"  class="bButton">完了</NuxtLink>
-    <NuxtLink to="../camera/video"  class="circleBtn"><img src="~assets/img/camera.png" width="48"></NuxtLink>
+      <video v-if="videoUrl" ref="videoPlayer" controls class="videoArea"></video>
+      <div v-else class="videoArea">
+        <p>フォームを撮影すると、ここに動画が表示されます。</p>
+      </div>
+      <button @click="addPlayData" class="bButton">完了</button>
+    <div class="circleBtn" @click="toggleModal('confirm')" :class="{'inActive': videoUrl}">
+      <img :src="videoUrl ? CameraTransparentImg : CameraImg" width="48">
+    </div>
+    <StartRecord v-if="isShowModal && modalName === 'confirm' && !videoUrl"/>
     </div>
   </section>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, watch } from 'vue';
+import { ref, reactive, watch, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
 import type { Database } from '~/types/database.types';
 import { useHeadVarStore } from '~/src/store/headVar.js'
 import { useModalStore } from '~/src/store/modal';
-import information from './information.vue';
+import Information from './information.vue';
+import StartRecord from './ConfirmStartRecord.vue';
+import CameraImg from '~/assets/img/camera.png';
+import CameraTransparentImg from '~/assets/img/cameraTransparent.png';
 
+const videoPlayer = ref<HTMLVideoElement | null>(null);
+const videoUrl = ref<string | null>(null);
+const route = useRoute();
 const supabase = useSupabaseClient<Database>();
 const golfPlaceName = 'つくばゴルフ場';
 const headVarStore = useHeadVarStore()
 headVarStore.title = `${golfPlaceName}`;
 const modalStore = useModalStore();
 const isShowModal = computed(() => modalStore.isShowModal);
-const toggleModal = () => modalStore.toggleModal();
+const modalName = computed(() => modalStore.modalName);
+const toggleModal = (name:string) => modalStore.toggleModal(name);
 const playData = reactive({
   holeNumber: 0,
   scoreNumber: 0,
   puttsNumber: 0,
 });
-
 //ホール選択（クリック）とパー表示
 const offset: number = 3;
 const currentHole = ref<number>(3);
 const par = ref<number|null>(0);
 const fetchPar = async (hole: number) => {
   const { data, error } = await supabase
-    .from('m_golfPlaces')
+    .from('m_golfplaces')
     .select(`par_${hole}H`)
     .eq('golfPlaceName', golfPlaceName)
     .single();
@@ -94,6 +107,9 @@ const addPlayData = async () => {
   if (error) {
     alert(error.message);
   } else {
+  if(currentHole.value === 18){
+    await navigateTo('./scoreDisplay')
+  }
     return true;
   }
 };
@@ -128,24 +144,32 @@ for (let i = 1; i <= 18; i++) {
 };
 
 const moveLeft = () =>{
-  currentHole.value -= 5;
-  if (currentHole.value < 5) {
-    currentHole.value = 5; // 最終的な表示範囲をリセット
+  currentHole.value -= 1;
+  if (currentHole.value < 1) {
+    currentHole.value = 1; 
   }
 }
 const moveRight = () =>{
-  currentHole.value += 5;
-  if (currentHole.value > 15) {
-    currentHole.value = 18; // 最終的な表示範囲をリセット
+  currentHole.value += 1;
+  if (currentHole.value > 18) {
+    currentHole.value = 18; 
   }
 }
-
 const isItemVisible = computed(() => {
-  const start = Math.max(0, currentHole.value - 3);
-  const end = Math.min(items.length, currentHole.value + 2);
+  let start;
+  let end;
+  if(currentHole.value > 16){
+    start = 13;
+  }else{
+    start = Math.max(0, currentHole.value - 3)
+  };
+  if(currentHole.value < 3){
+    end = 5;
+  }else{
+    end = Math.min(items.length, currentHole.value + 2);
+  };
   return { start, end };
 })
-
 watch(currentHole, () => items.forEach(item => {
   if (item.id === currentHole.value) {
     item.card.isLarge = true;
@@ -161,6 +185,13 @@ watch(currentHole, () => items.forEach(item => {
     item.card.isSmall = true;
   } 
 }))
+onMounted(async () => {
+  videoUrl.value = route.query.video as string;
+  await nextTick();
+  if (videoPlayer.value && videoUrl.value) {
+    videoPlayer.value.src = videoUrl.value;
+  }
+});
 </script>
 
 <style scoped>
@@ -202,7 +233,9 @@ background: #007BE5;
 box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, .5);
 }
 .selectHole{
+  width: 100vw;
   display: flex;
+  justify-content: center;
   align-items: end;
   gap: 10px;
   position: relative;
@@ -309,7 +342,18 @@ border-radius: 8px;
 border: 1px solid #000;
 background: rgba(51, 51, 51, 0.03);
 }
+.videoArea{
+  width: 300px;
+  height: 150px;
+  font-size: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 .addBtn{
   justify-content: center;
+}
+.circleBtn.inActive{
+  background-color: rgb(225 225 225 /.7);
 }
 </style>

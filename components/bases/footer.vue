@@ -1,11 +1,24 @@
 <template>
   <div class="footer">
-    <NuxtLink to="/top"><img src="~assets/img/home.png"></NuxtLink>
-    <img src="~assets/img/food.png">
-    <img src="~assets/img/body.png">
-    <NuxtLink to="/scoreDisplay"><img src="~assets/img/golf.png"></NuxtLink>
+    <NuxtLink to="/top"><img :src="pageStore.currentPage === 'home' ? homeActiveImg : homeImg"></NuxtLink>
+    <NuxtLink to="./mealDisplay"><img :src="pageStore.currentPage === 'food' ? foodActiveImg : foodImg"></NuxtLink>
+    <NuxtLink to="/bodyDisplay"><img :src="pageStore.currentPage === 'body' ? bodyActiveImg : bodyImg"></NuxtLink>
+    <NuxtLink to="/scoreDisplay"><img :src="pageStore.currentPage === 'score' ? scoreActiveImg : scoreImg"></NuxtLink>
   </div>
 </template>
+<script setup>
+import homeImg from '~/assets/img/home.png';
+import homeActiveImg from '~/assets/img/homeActive.png';
+import foodImg from '~/assets/img/food.png';
+import foodActiveImg from '~/assets/img/foodActive.png';
+import bodyImg from '~/assets/img/body.png';
+import bodyActiveImg from '~/assets/img/bodyActive.png';
+import scoreImg from '~/assets/img/score.png';
+import scoreActiveImg from '~/assets/img/scoreActive.png';
+
+import { usePageStore } from '~/src/store/currentPage';
+const pageStore = usePageStore();
+</script>
 
 <style scoped>
 .footer{
