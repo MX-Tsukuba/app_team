@@ -9,80 +9,88 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      m_golfPlaces: {
+      body_inputs: {
+        Row: {
+          created_at: string | null
+          date: string
+          flexibility: number | null
+          height: number | null
+          id: number
+          updated_at: string | null
+          weight: number
+        }
+        Insert: {
+          created_at?: string | null
+          date: string
+          flexibility?: number | null
+          height?: number | null
+          id?: never
+          updated_at?: string | null
+          weight: number
+        }
+        Update: {
+          created_at?: string | null
+          date?: string
+          flexibility?: number | null
+          height?: number | null
+          id?: never
+          updated_at?: string | null
+          weight?: number
+        }
+        Relationships: []
+      }
+      m_golfplaces: {
         Row: {
           created_at: string
-          golfPlaceName: string | null
+          golf_place_name: string
           id: number
-          par_10H: number | null
-          par_11H: number | null
-          par_12H: number | null
-          par_13H: number | null
-          par_14H: number | null
-          par_15H: number | null
-          par_16H: number | null
-          par_17H: number | null
-          par_18H: number | null
-          par_1H: number | null
-          par_2H: number | null
-          par_3H: number | null
-          par_4H: number | null
-          par_5H: number | null
-          par_6H: number | null
-          par_7H: number | null
-          par_8H: number | null
-          par_9H: number | null
-          updated_at: string | null
+          updated_at: string
         }
         Insert: {
           created_at?: string
-          golfPlaceName?: string | null
+          golf_place_name: string
           id?: number
-          par_10H?: number | null
-          par_11H?: number | null
-          par_12H?: number | null
-          par_13H?: number | null
-          par_14H?: number | null
-          par_15H?: number | null
-          par_16H?: number | null
-          par_17H?: number | null
-          par_18H?: number | null
-          par_1H?: number | null
-          par_2H?: number | null
-          par_3H?: number | null
-          par_4H?: number | null
-          par_5H?: number | null
-          par_6H?: number | null
-          par_7H?: number | null
-          par_8H?: number | null
-          par_9H?: number | null
-          updated_at?: string | null
+          updated_at?: string
         }
         Update: {
           created_at?: string
-          golfPlaceName?: string | null
+          golf_place_name?: string
           id?: number
-          par_10H?: number | null
-          par_11H?: number | null
-          par_12H?: number | null
-          par_13H?: number | null
-          par_14H?: number | null
-          par_15H?: number | null
-          par_16H?: number | null
-          par_17H?: number | null
-          par_18H?: number | null
-          par_1H?: number | null
-          par_2H?: number | null
-          par_3H?: number | null
-          par_4H?: number | null
-          par_5H?: number | null
-          par_6H?: number | null
-          par_7H?: number | null
-          par_8H?: number | null
-          par_9H?: number | null
-          updated_at?: string | null
+          updated_at?: string
         }
         Relationships: []
+      }
+      m_holes: {
+        Row: {
+          created_at: string
+          golfplaces_id: number
+          hole_number: number
+          par_number: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          golfplaces_id: number
+          hole_number: number
+          par_number: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          golfplaces_id?: number
+          hole_number?: number
+          par_number?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "m_holes_golfplaces_id_fkey"
+            columns: ["golfplaces_id"]
+            isOneToOne: false
+            referencedRelation: "m_golfplaces"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       m_kind_options: {
         Row: {
@@ -96,69 +104,6 @@ export type Database = {
         Update: {
           kind?: string
           kind_options_id?: never
-        }
-        Relationships: []
-      }
-      t_body_flexibility: {
-        Row: {
-          created_at: string
-          flexibility: number
-          flexibility_id: number
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          flexibility: number
-          flexibility_id?: never
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          flexibility?: number
-          flexibility_id?: never
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      t_body_height: {
-        Row: {
-          created_at: string
-          height: number
-          height_id: number
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          height: number
-          height_id?: never
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          height?: number
-          height_id?: never
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      t_body_weight: {
-        Row: {
-          created_at: string
-          updated_at: string
-          weight: number
-          weight_id: number
-        }
-        Insert: {
-          created_at?: string
-          updated_at?: string
-          weight: number
-          weight_id?: never
-        }
-        Update: {
-          created_at?: string
-          updated_at?: string
-          weight?: number
-          weight_id?: never
         }
         Relationships: []
       }
@@ -235,30 +180,30 @@ export type Database = {
       t_holes: {
         Row: {
           created_at: string
-          holeNumber: number | null
+          hole_number: number
           id: number
-          puttsNumber: number | null
-          round_id: number | null
-          scoreNumber: number | null
-          updated_at: string | null
+          putts_number: number
+          round_id: number
+          score_number: number
+          updated_at: string
         }
         Insert: {
           created_at?: string
-          holeNumber?: number | null
+          hole_number: number
           id?: number
-          puttsNumber?: number | null
-          round_id?: number | null
-          scoreNumber?: number | null
-          updated_at?: string | null
+          putts_number: number
+          round_id: number
+          score_number: number
+          updated_at?: string
         }
         Update: {
           created_at?: string
-          holeNumber?: number | null
+          hole_number?: number
           id?: number
-          puttsNumber?: number | null
-          round_id?: number | null
-          scoreNumber?: number | null
-          updated_at?: string | null
+          putts_number?: number
+          round_id?: number
+          score_number?: number
+          updated_at?: string
         }
         Relationships: [
           {
@@ -321,67 +266,40 @@ export type Database = {
       t_rounds: {
         Row: {
           created_at: string
-          date: string | null
-          golfPlace_id: number | null
+          date: string
+          golf_place_id: number
           id: number
-          roundNumber: number | null
-          updated_at: string | null
-          user_id: number | null
+          round_number: number
+          updated_at: string
+          user_id: number
         }
         Insert: {
           created_at?: string
-          date?: string | null
-          golfPlace_id?: number | null
+          date: string
+          golf_place_id: number
           id?: number
-          roundNumber?: number | null
-          updated_at?: string | null
-          user_id?: number | null
+          round_number: number
+          updated_at?: string
+          user_id: number
         }
         Update: {
           created_at?: string
-          date?: string | null
-          golfPlace_id?: number | null
+          date?: string
+          golf_place_id?: number
           id?: number
-          roundNumber?: number | null
-          updated_at?: string | null
-          user_id?: number | null
+          round_number?: number
+          updated_at?: string
+          user_id?: number
         }
         Relationships: [
           {
             foreignKeyName: "t_rounds_golfPlace_id_fkey"
-            columns: ["golfPlace_id"]
+            columns: ["golf_place_id"]
             isOneToOne: false
-            referencedRelation: "m_golfPlaces"
+            referencedRelation: "m_golfplaces"
             referencedColumns: ["id"]
           },
         ]
-      }
-      t_sample_kazuki: {
-        Row: {
-          course: string | null
-          created_at: string
-          hole: number | null
-          id: number
-          putts: number | null
-          score: number | null
-        }
-        Insert: {
-          course?: string | null
-          created_at?: string
-          hole?: number | null
-          id?: number
-          putts?: number | null
-          score?: number | null
-        }
-        Update: {
-          course?: string | null
-          created_at?: string
-          hole?: number | null
-          id?: number
-          putts?: number | null
-          score?: number | null
-        }
-        Relationships: []
       }
     }
     Views: {
@@ -398,6 +316,321 @@ export type Database = {
     }
     Functions: {
       [_ in never]: never
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
+  storage: {
+    Tables: {
+      buckets: {
+        Row: {
+          allowed_mime_types: string[] | null
+          avif_autodetection: boolean | null
+          created_at: string | null
+          file_size_limit: number | null
+          id: string
+          name: string
+          owner: string | null
+          owner_id: string | null
+          public: boolean | null
+          updated_at: string | null
+        }
+        Insert: {
+          allowed_mime_types?: string[] | null
+          avif_autodetection?: boolean | null
+          created_at?: string | null
+          file_size_limit?: number | null
+          id: string
+          name: string
+          owner?: string | null
+          owner_id?: string | null
+          public?: boolean | null
+          updated_at?: string | null
+        }
+        Update: {
+          allowed_mime_types?: string[] | null
+          avif_autodetection?: boolean | null
+          created_at?: string | null
+          file_size_limit?: number | null
+          id?: string
+          name?: string
+          owner?: string | null
+          owner_id?: string | null
+          public?: boolean | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      migrations: {
+        Row: {
+          executed_at: string | null
+          hash: string
+          id: number
+          name: string
+        }
+        Insert: {
+          executed_at?: string | null
+          hash: string
+          id: number
+          name: string
+        }
+        Update: {
+          executed_at?: string | null
+          hash?: string
+          id?: number
+          name?: string
+        }
+        Relationships: []
+      }
+      objects: {
+        Row: {
+          bucket_id: string | null
+          created_at: string | null
+          id: string
+          last_accessed_at: string | null
+          metadata: Json | null
+          name: string | null
+          owner: string | null
+          owner_id: string | null
+          path_tokens: string[] | null
+          updated_at: string | null
+          user_metadata: Json | null
+          version: string | null
+        }
+        Insert: {
+          bucket_id?: string | null
+          created_at?: string | null
+          id?: string
+          last_accessed_at?: string | null
+          metadata?: Json | null
+          name?: string | null
+          owner?: string | null
+          owner_id?: string | null
+          path_tokens?: string[] | null
+          updated_at?: string | null
+          user_metadata?: Json | null
+          version?: string | null
+        }
+        Update: {
+          bucket_id?: string | null
+          created_at?: string | null
+          id?: string
+          last_accessed_at?: string | null
+          metadata?: Json | null
+          name?: string | null
+          owner?: string | null
+          owner_id?: string | null
+          path_tokens?: string[] | null
+          updated_at?: string | null
+          user_metadata?: Json | null
+          version?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "objects_bucketId_fkey"
+            columns: ["bucket_id"]
+            isOneToOne: false
+            referencedRelation: "buckets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      s3_multipart_uploads: {
+        Row: {
+          bucket_id: string
+          created_at: string
+          id: string
+          in_progress_size: number
+          key: string
+          owner_id: string | null
+          upload_signature: string
+          user_metadata: Json | null
+          version: string
+        }
+        Insert: {
+          bucket_id: string
+          created_at?: string
+          id: string
+          in_progress_size?: number
+          key: string
+          owner_id?: string | null
+          upload_signature: string
+          user_metadata?: Json | null
+          version: string
+        }
+        Update: {
+          bucket_id?: string
+          created_at?: string
+          id?: string
+          in_progress_size?: number
+          key?: string
+          owner_id?: string | null
+          upload_signature?: string
+          user_metadata?: Json | null
+          version?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "s3_multipart_uploads_bucket_id_fkey"
+            columns: ["bucket_id"]
+            isOneToOne: false
+            referencedRelation: "buckets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      s3_multipart_uploads_parts: {
+        Row: {
+          bucket_id: string
+          created_at: string
+          etag: string
+          id: string
+          key: string
+          owner_id: string | null
+          part_number: number
+          size: number
+          upload_id: string
+          version: string
+        }
+        Insert: {
+          bucket_id: string
+          created_at?: string
+          etag: string
+          id?: string
+          key: string
+          owner_id?: string | null
+          part_number: number
+          size?: number
+          upload_id: string
+          version: string
+        }
+        Update: {
+          bucket_id?: string
+          created_at?: string
+          etag?: string
+          id?: string
+          key?: string
+          owner_id?: string | null
+          part_number?: number
+          size?: number
+          upload_id?: string
+          version?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "s3_multipart_uploads_parts_bucket_id_fkey"
+            columns: ["bucket_id"]
+            isOneToOne: false
+            referencedRelation: "buckets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "s3_multipart_uploads_parts_upload_id_fkey"
+            columns: ["upload_id"]
+            isOneToOne: false
+            referencedRelation: "s3_multipart_uploads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      can_insert_object: {
+        Args: {
+          bucketid: string
+          name: string
+          owner: string
+          metadata: Json
+        }
+        Returns: undefined
+      }
+      extension: {
+        Args: {
+          name: string
+        }
+        Returns: string
+      }
+      filename: {
+        Args: {
+          name: string
+        }
+        Returns: string
+      }
+      foldername: {
+        Args: {
+          name: string
+        }
+        Returns: string[]
+      }
+      get_size_by_bucket: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          size: number
+          bucket_id: string
+        }[]
+      }
+      list_multipart_uploads_with_delimiter: {
+        Args: {
+          bucket_id: string
+          prefix_param: string
+          delimiter_param: string
+          max_keys?: number
+          next_key_token?: string
+          next_upload_token?: string
+        }
+        Returns: {
+          key: string
+          id: string
+          created_at: string
+        }[]
+      }
+      list_objects_with_delimiter: {
+        Args: {
+          bucket_id: string
+          prefix_param: string
+          delimiter_param: string
+          max_keys?: number
+          start_after?: string
+          next_token?: string
+        }
+        Returns: {
+          name: string
+          id: string
+          metadata: Json
+          updated_at: string
+        }[]
+      }
+      operation: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      search: {
+        Args: {
+          prefix: string
+          bucketname: string
+          limits?: number
+          levels?: number
+          offsets?: number
+          search?: string
+          sortcolumn?: string
+          sortorder?: string
+        }
+        Returns: {
+          name: string
+          id: string
+          updated_at: string
+          created_at: string
+          last_accessed_at: string
+          metadata: Json
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
