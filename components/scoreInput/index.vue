@@ -3,7 +3,7 @@
     <div class="displayBox">
       <div class="displayHolePar">
         {{ currentHole }}H
-        <p class="displayPar">par{{ par }}</p>
+        <p class="displayPar">par{{ data }}</p>
       </div>
       <hr class="displayLine"/>
     </div>
@@ -58,7 +58,13 @@ const videoPlayer = ref<HTMLVideoElement | null>(null);
 const videoUrl = ref<string | null>(null);
 const route = useRoute();
 const supabase = useSupabaseClient<Database>();
+
+//この３つのデータは他から受け取る必要あり。
+const roundId = 1; 
 const golfPlaceName = 'つくばゴルフ場';
+const golfPlaceId = 1;
+
+
 const headVarStore = useHeadVarStore()
 headVarStore.title = `${golfPlaceName}`;
 const modalStore = useModalStore();
@@ -71,31 +77,25 @@ const playData = reactive({
   puttsNumber: 0,
 });
 //ホール選択（クリック）とパー表示
-const offset: number = 3;
 const currentHole = ref<number>(3);
-const par = ref<number|null>(0);
-const fetchPar = async (hole: number) => {
+async function fetchPar(hole: number){
   const { data, error } = await supabase
-    .from('m_golfplaces')
-    .select(`par_${hole}H`)
-    .eq('golfPlaceName', golfPlaceName)
-    .single();
+    .from('m_holes')
+    .select('par_number')
+    .eq('golfplaces_id', golfPlaceId)
+    .eq('hole_number', hole)
+    .single()
   if (error) {
     console.error('Error fetching data:', error);
+    // par.value = null;
     return null;
   } else {
-    return data ? data[hole+offset]: null;
+    return data["par_number"];
   }
 };
-const { data: golfPlaces, refresh } = await useAsyncData(async () => {
-  return fetchPar(currentHole.value);
-}, {
-  immediate: true
-});
-watch(currentHole, async (newHole) => {
-  par.value= await Number(fetchPar(newHole));
-  refresh();
-});
+
+const {data}  = await useAsyncData(()=>fetchPar(currentHole.value), {watch: [currentHole]});
+
 const updateCurrentHole = (holeId:number) =>{
   currentHole.value = holeId;
 };
@@ -103,7 +103,14 @@ const updateCurrentHole = (holeId:number) =>{
 //データ挿入
 const addPlayData = async () => {
   playData.holeNumber = currentHole.value;
-  const { error } = await supabase.from('t_holes').insert(playData);
+  const { error } = await supabase.from('t_holes').insert({
+    "created_at": undefined,
+    "hole_number": playData.holeNumber,
+    "round_id": roundId,
+    "putts_number": playData.puttsNumber,
+    "score_number": playData.scoreNumber,
+    "updated_at": undefined,
+  });
   if (error) {
     alert(error.message);
   } else {

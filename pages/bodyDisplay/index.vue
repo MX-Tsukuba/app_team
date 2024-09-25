@@ -3,7 +3,6 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue'
 import BodyDisplay from '~/components/bodyDisplay/index.vue';
 import { useHeadVarStore } from '~/src/store/headVar.js'
 import { usePageStore } from '~/src/store/currentPage';
