@@ -1,6 +1,5 @@
 <template>
-    <tr v-if = "props.holeNo % 2 ===0" class="even"><td>{{props.holeNo}}</td><td>{{ props.par }}</td><td>{{ props.result }}</td><td>{{ props.puts }}</td><td>{{ props.form_Score }}</td></tr>
-    <tr v-else class="odd"><td>{{props.holeNo}}</td><td>{{ props.par }}</td><td>{{ props.result }}</td><td>{{ props.puts }}</td><td>{{ props.form_Score }}</td></tr>
+    <tr :class = "props.holeNo % 2 ===0 ? 'even' : 'odd'" ><td>{{props.holeNo}}</td><td>{{ props.par }}</td><td>{{ props.result }}</td><td>{{ props.putts }}</td><td>{{ props.form_Score }}</td></tr>
 </template>
 
 <script setup lang = "ts">
@@ -8,7 +7,7 @@ interface holeDetails{
     holeNo:number,
     par:number,
     result: number,
-    puts:number,
+    putts:number,
     form_Score:number
 }
 const props = defineProps<holeDetails>();
