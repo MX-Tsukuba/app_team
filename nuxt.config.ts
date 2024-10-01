@@ -6,8 +6,28 @@ export default defineNuxtConfig({
     '@pinia/nuxt'
   ],
 
-  supabase:{
-    redirect:false
+  supabase: {
+    redirect: true,
+    redirectOptions: {
+      login: '/login',
+      callback: '/login/confirm',
+      include: undefined,
+      exclude: [],
+      cookieRedirect: false,
+    },
+    // cookieOptions: {
+    //   maxAge: 60 * 60 * 8,
+    //   sameSite: 'lax',
+    //   secure: true
+    // },
+    // clientOptions: {
+    //   auth: {
+    //     flowType: 'pkce',
+    //     detectSessionInUrl: true,
+    //     persistSession: true,
+    //     autoRefreshToken: true
+    //   },
+    // },
   },
 
   hooks:{

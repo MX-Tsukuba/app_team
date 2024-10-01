@@ -1,10 +1,10 @@
 <template>
   <div class="homebody">
     <div class="gragh">
-      <div class="graghChart">
-        <div v-if="isLoading">データを読み込んでいます</div>
+      <div class="graghChart" v-if="isLoading">データを読み込んでいます</div>
+      <div class="graghChart" v-if="!isLoading">
                 <ClientOnly>
-                    <Line v-if="!isLoading" :data="chartData" :options="chartOptions" />
+                    <Line  :data="chartData" :options="chartOptions" />
                 </ClientOnly>
       </div>
       <div class="changeWeeks">
@@ -150,6 +150,9 @@ onMounted(() => {
 .graghChart{
     width: 330px;
     height: 223.462px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 .changeWeeks{
     display: flex;

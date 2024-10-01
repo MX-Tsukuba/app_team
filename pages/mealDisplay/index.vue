@@ -1,10 +1,10 @@
 <template>
     <div class="homebody">
         <div class="gragh">
-            <div class="graghChart">
-                <div v-if="isLoading">データを読み込んでいます</div>
+            <div class="graghChart" v-if="isLoading">データを読み込んでいます</div>
+            <div class="graghChart" v-if="!isLoading">
                 <ClientOnly>
-                    <Line v-if="!isLoading" :data="chartData" :options="chartOptions" />
+                    <Line  :data="chartData" :options="chartOptions" />
                 </ClientOnly>
             </div>
             <div class="changeWeeks">
@@ -20,7 +20,9 @@
         </div>
         <div class="resultCard">
             <div class="day">
-                <input type="date" v-model="dateNow" @change="changeDate"> <!--日付の変更がうまくいかないから表示方法とか変える予定-->
+                <button @click="changeDate(-1)" class="dayfont daybtn">-</button>
+                <p class="dayfont">{{ weekDates[dateNowIndex] }}</p> <!--日付の変更がうまくいかないから表示方法とか変える予定-->
+                <button @click="changeDate(1)" class="dayfont daybtn">+</button>
             </div>
             <div class="dayKcal">
                 <div class="dayKcalAll">
@@ -117,7 +119,6 @@ let kindNowIndex=ref<number>(0);
 const kindNow=["朝食","昼食","夕食","間食"];
 
 let dateNowIndex =ref<number>(today.getDay())
-const dateNow=ref<string>("");
 const isLoading = ref<boolean>(true);
 const week_view_tables=ref<any[]>([]);
 
@@ -129,12 +130,16 @@ const formatDateToString = (date: Date): string => {
   const day = String(date.getDate()).padStart(2, '0')
   return `${year}-${month}-${day}`
 }
-const changeDate=()=>{
-    dateNowIndex.value=weekDates.indexOf(dateNow.value);
-    if(dateNowIndex.value=-1){
+const changeDate=(i:number)=>{
+    if(dateNowIndex.value==0 && i<0){
         changeWeeks(-7);
+        dateNowIndex.value=6;
+    }else if(dateNowIndex.value==6 && i>0){
+        changeWeeks(7);
+        dateNowIndex.value=0;
+    }else{
+        dateNowIndex.value+=i;
     }
-
 };
 const changeKind=(value: {
     label: string, ifClick: boolean
@@ -148,7 +153,6 @@ const changeWeeks=(i:number)=>{
     const weekago= new Date(today);
     weekago.setDate(today.getDate()+i);
     today=weekago;
-    dateNow.value=formatDateToString(today);
     weekDates=getCurrentWeekDates();
     selectData();
 }
@@ -167,7 +171,6 @@ function getCurrentWeekDates(startDay:number=1):string[]{
         date.setDate(startOfWeek.getDate()+i);
         weekDates.value.push(formatDateToString(date));
     }
-    // dateNow.value=weekDates[dateNowIndex.value];
     labels.value=weekDates.value;
     return weekDates.value;
 }
@@ -217,7 +220,6 @@ if(error){
 // 代入
 let weekDates = getCurrentWeekDates();
 console.log(weekDates,"現在の週の配列");
-dateNow.value=formatDateToString(today);
 
 
 // Mount時の処理
@@ -227,7 +229,7 @@ onMounted(() => {
 
 let selectedView = computed(() => {
   return week_view_tables.value.filter(
-    item => item.kind === kindNow[kindNowIndex.value] && item.date === dateNow.value
+    item => item.kind === kindNow[kindNowIndex.value] && item.date === weekDates[dateNowIndex.value]
   );
 });
 
@@ -243,6 +245,7 @@ console.log('chartData:', chartData.value);
     padding: 52px 0;
     flex-direction: column;
     align-items: center;
+    gap: 30px
 }
 .gragh{
     display: flex;
@@ -257,6 +260,9 @@ console.log('chartData:', chartData.value);
 .graghChart{
     width: 330px;
     height: 223.462px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 .changeWeeks{
     display: flex;
@@ -296,14 +302,26 @@ console.log('chartData:', chartData.value);
     position: relative;
     top: 12px;
     left: 25px;
-    color: #777;
+    display: flex;
+    /* color: #777;
     font-family: Inter;
     font-size: 15px;
-    border: white;
+    border: white; */
     /* font-style: normal;デフォルト値だからいらない
     font-weight: 400;
     line-height: normal; */
 }
+.dayfont{
+    color: #777;
+    font-family: Inter;
+    font-size: 15px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+/* .daybtn{
+    border: 1px solid #000;
+} */
 .dayKcal{
     display: flex;
     flex-direction: column;
