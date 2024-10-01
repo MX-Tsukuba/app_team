@@ -1,7 +1,9 @@
 <script setup lang="ts">
+import changeDate from '~/components/meal/changeDate.vue';
 import { onMounted } from 'vue'
 import { useHeadVarStore } from '~/src/store/headVar.js'
 import { usePageStore } from '~/src/store/currentPage';
+
 
 const headVarStore = useHeadVarStore()
 headVarStore.title = '身体情報入力'
@@ -9,6 +11,10 @@ const pageStore = usePageStore();
 onMounted(() => {
   pageStore.setCurrentPage('body');
 });
+
+import type { Database } from '~/types/database.types.ts';
+
+const supabase = useSupabaseClient<Database>();
 
 // 現在の日付を保持するref
 const selectedDate = ref<Date>(new Date());
@@ -31,11 +37,22 @@ const moveDate = (days: number): void => {
   selectedDate.value = newDate
 }
 
-// 前日に移動する関数
-const moveToPreviousDay = (): void => moveDate(-1)
 
-// 翌日に移動する関数
-const moveToNextDay = (): void => moveDate(1)
+const insertBody=async ()=>{
+  const {error}=await supabase
+  .from('body_inputs')
+  .insert({
+    date:formattedDate.value,
+    weight:bodyWeight.value,
+    flexibility:flexibility.value,
+    height:bodyHeight.value,
+  });
+  if (error) {
+  console.error('Error inserting data:', error);
+  } else {
+  console.log('Data inserted successfully');
+  }
+}
 
 let bodyWeight=ref(0);
 let bodyHeight=ref(0);
@@ -47,9 +64,7 @@ let flexibility=ref(0);
 <template>
 <div class="bodyLayout">
   <div class="BchangeDate">
-    <button @click="moveToPreviousDay"><img class="dateBtn reverse" src="~assets/img/right.png"></button>
-    <p class="date">{{formattedDate}}</p>
-    <button @click="moveToNextDay"><img class="dateBtn" src="~assets/img/right.png"></button>
+    <changeDate :formatted-date="formattedDate" @firstclick="moveDate(-1)" @secondclick="moveDate(1)" ></changeDate>
   </div>
 
   <div class="mainInputBody">
@@ -77,9 +92,9 @@ let flexibility=ref(0);
           </div>
         </div>
       </div>
-      <div class="BaddBtn">
+      <button class="BaddBtn" @click="insertBody">
         <div class="addName">追加</div>
-      </div>
+      </button>
     </div>
   </div>
 </div>
