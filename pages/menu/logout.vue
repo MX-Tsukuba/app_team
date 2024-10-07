@@ -1,31 +1,19 @@
 <script setup lang="ts">
-import { useModalStore } from '~/src/store/modal';
-const modalStore = useModalStore();
-const toggleModal = () => modalStore.toggleModal('');
 const supabase = useSupabaseClient();
 
 const signOut = async () => {
   const { error } = await supabase.auth.signOut()
   if (error) console.log(error)
 }
-
-import { usePageStore } from '~/src/store/currentPage';
-const pageStore = usePageStore();
-
-const isShowLogoutModal = computed(() => modalStore.isShowModal);
 </script>
 
 <template>
-  <div class="logout" v-if="isShowLogoutModal">
-    <button class="bButton">ログアウト</button>
-  </div>
-  <div class="modal" @click.self="toggleModal">
+  <div class="logout">
     <div class="card">
-    <span class="closeModal" @click="toggleModal">×</span>
       <p class="title">ログアウトしますか？</p>
       <div class="buttons">
-        <Nuxt-link @click="toggleModal, signOut" to="../login" class="bButton">確認</Nuxt-link>
-        <button @click="toggleModal" class="bButton">キャンセル</button>
+        <Nuxt-link to="../top" class="canselButton">キャンセル</Nuxt-link>
+        <Nuxt-link @click="signOut" to="../login" class="confirmButton">確認</Nuxt-link>
       </div>
     </div>
   </div>
@@ -34,44 +22,76 @@ const isShowLogoutModal = computed(() => modalStore.isShowModal);
 <style scoped>
 .logout{
   background-color: #fff;
-  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+  width: 100%;
+  gap: 300px;
+  border-radius: 32px;
+  background: linear-gradient(0deg, rgba(0, 0, 0, 0.60) 0%, rgba(0, 0, 0, 0.60) 100%), #FFF;
+  box-sizing: border-box;
+  padding: 20px;
 }
 
-.modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, .7);
+.card {
+  display: flex;
+  height: 128px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  align-self: stretch;
+  border-radius: 16px;
+  background: #FFF;
+}
+
+.title{
+  color: #000;
+  font-family: Inter;
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}
+
+.buttons{
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1;
+  gap: 10px;
 }
-.card {
-  width: 70%;
-  margin: 0 auto;
-  padding: 32px;
-  background: #fff;
-  border-radius: 10px;
-  position: relative;
+
+.confirmButton{
   display: flex;
-  flex-direction: column;
+  width: 140px;
+  justify-content: center;
   align-items: center;
-  gap: 64px;
+  gap: 10px;
+  border-radius: 32px;
+  background: #E45D5D;
+  color: #FFF;
+  font-family: Inter;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
 }
-.closeModal {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  cursor: pointer;
-}
-.title{
-  font-size: 24px;
-  font-weight: bold;
+
+.canselButton{
+  display: flex;
+  width: 140px;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  border-radius: 32px;
+  border: 1px solid #E45D5D;
+  background: #FFF;
+  color: rgba(228, 93, 93, 0.75);
+  font-family: Inter;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
 }
 </style>
