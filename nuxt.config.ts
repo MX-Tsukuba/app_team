@@ -48,6 +48,7 @@ export default defineNuxtConfig({
       });
     },
   },
+  plugins: ['~/plugins/chartjs.ts'],
 
   compatibilityDate: '2024-09-05',
 });
