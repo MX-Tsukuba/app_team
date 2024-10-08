@@ -33,14 +33,7 @@
           </tr>
         </thead>
         <tbody class="t_body">
-          <LogListTableRow
-            v-for="item in props.holedetails"
-            :holeNo="item.holeNo"
-            :par="item.par"
-            :result="item.result"
-            :putts="item.putts"
-            :form_Score="item.form_Score"
-          />
+          <LogListTableRow v-for="i in 18" v-bind="getHoleDetails(i)" />
         </tbody>
       </table>
     </div>
@@ -53,8 +46,23 @@
 </template>
 
 <script setup lang="ts">
-import LogListTableRow from "./logListTableRow.vue";
-import LogListArrow from "./logListArrow.vue";
+import LogListTableRow from './logListTableRow.vue';
+import LogListArrow from './logListArrow.vue';
+
+function getHoleDetails(i: number) {
+  const detail = props.holedetails.find((item) => item.holeNo === i);
+  if (detail) {
+    return detail;
+  } else {
+    return {
+      holeNo: i,
+      par: null,
+      result: null,
+      putts: null,
+      form_Score: null,
+    };
+  }
+}
 
 const isScoreTableVisible = ref(false);
 const toggleScoreTable = () => {
@@ -78,20 +86,20 @@ interface scoreDetas {
 const calculateScore = (holedetails: holeDetail[]) => {
   let result = 0;
   holedetails.forEach((element) => {
-    result += element.result;
+    if (element.result) result += element.result;
   });
   return result;
 };
 
 function calculateDays(date: Date) {
   const item = [
-    "日曜日",
-    "月曜日",
-    "火曜日",
-    "水曜日",
-    "木曜日",
-    "金曜日",
-    "土曜日",
+    '日曜日',
+    '月曜日',
+    '火曜日',
+    '水曜日',
+    '木曜日',
+    '金曜日',
+    '土曜日',
   ];
   return item[date.getDay()];
 }

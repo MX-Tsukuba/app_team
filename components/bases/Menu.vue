@@ -2,41 +2,61 @@
 import { defineProps } from 'vue';
 const isActive = ref(false);
 const props = defineProps<{
-  isOpen: Boolean,
-  onClick: (payload: MouseEvent) => void
+  isOpen: Boolean;
+  onClick: (payload: MouseEvent) => void;
 }>();
 const handleLink = () => {
   isActive.value = !isActive.value;
   props.onClick(new MouseEvent('click'));
-}
+};
 const stopPropagation = (event: MouseEvent) => {
   event.stopPropagation();
 };
 
-watch(() => props.isOpen, (newVal) => {
-  if (newVal) {
-    document.querySelector('.menu')?.classList.add('menu-open');
-  } else {
-    document.querySelector('.menu')?.classList.remove('menu-open');
+watch(
+  () => props.isOpen,
+  (newVal) => {
+    if (newVal) {
+      document.querySelector('.menu')?.classList.add('menu-open');
+    } else {
+      document.querySelector('.menu')?.classList.remove('menu-open');
+    }
   }
-});
+);
 </script>
 
 <template>
-  <div :class="{'back': props.isOpen}" @click="props.onClick">
-  <div class="menu"  :class="{'menu-open': props.isOpen}"  @click.stop="stopPropagation">
-    <button @click="props.onClick" class="close">x</button>
-    <div class="content">
-      <NuxtLink to="../menu/settings" @click="handleLink"><p class="title" :class="{'clicked' : isActive}">設定</p></NuxtLink>
-      <NuxtLink to="../menu/logout"  @click="handleLink"><p class="title" :class="{'clicked' : isActive}">ログアウト</p></NuxtLink>
-      
-      <NuxtLink to="../menu/termsOfUse"  @click="handleLink"><p class="title" :class="{'clicked' : isActive}">利用規約</p></NuxtLink>
-      
-      <NuxtLink to="../menu/contact"  @click="handleLink"><p class="title" :class="{'clicked' : isActive}">お問い合わせ</p></NuxtLink>
-      
+  <div :class="{ back: props.isOpen }" @click="props.onClick">
+    <div
+      class="menu"
+      :class="{ 'menu-open': props.isOpen }"
+      @click.stop="stopPropagation"
+    >
+      <button @click="props.onClick" class="close">x</button>
+      <div class="content">
+        <NuxtLink to="../menu/settings" @click="handleLink"
+          ><p class="title" :class="{ clicked: isActive }">設定</p></NuxtLink
+        >
+        <NuxtLink to="../menu/logout" @click="handleLink"
+          ><p class="title" :class="{ clicked: isActive }">
+            ログアウト
+          </p></NuxtLink
+        >
+
+        <NuxtLink to="../menu/termsOfUse" @click="handleLink"
+          ><p class="title" :class="{ clicked: isActive }">
+            利用規約
+          </p></NuxtLink
+        >
+
+        <NuxtLink to="../menu/contact" @click="handleLink"
+          ><p class="title" :class="{ clicked: isActive }">
+            お問い合わせ
+          </p></NuxtLink
+        >
+      </div>
+      <p class="version">Ver. 1.0.1</p>
     </div>
-    <p class="version">Ver. 1.0.1</p>
-  </div>
   </div>
 </template>
 
