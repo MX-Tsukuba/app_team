@@ -2,22 +2,18 @@
 export default defineNuxtConfig({
   devtools: { enabled: true },
 
-  modules: [`@nuxtjs/supabase`,
-    '@pinia/nuxt'
-  ],
+  modules: [`@nuxtjs/supabase`, '@pinia/nuxt'],
 
-  app:{
-      head: {
-        title: "Motion-X",
-        meta: [
-          { charset: "utf-8" },
-          { name: "viewport", content: "width=device-width, initial-scale=1" },
-        ],
-        link: [
-          { rel: "icon",type: "image/x-icon", href: "/favicon.png" }, 
-        ],
-      },
+  app: {
+    head: {
+      title: 'Motion-X',
+      meta: [
+        { charset: 'utf-8' },
+        { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+      ],
+      link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.png' }],
     },
+  },
 
   supabase: {
     redirect: false,
@@ -43,15 +39,15 @@ export default defineNuxtConfig({
     // },
   },
 
-  hooks:{
-    'pages:extend'(pages){
+  hooks: {
+    'pages:extend'(pages) {
       pages.push({
-        name:'index',
-        path:'/',
+        name: 'index',
+        path: '/',
         file: '~/pages/top/index.vue',
-      })
-    }
+      });
+    },
   },
 
   compatibilityDate: '2024-09-05',
-})
+});
