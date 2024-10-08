@@ -2,7 +2,7 @@
   <div class="sub_container" v-for="item in data">
     <div class="month">{{ item.Y }}年{{ item.M }}月</div>
     <div class="subsub_container">
-      <Logcard
+      <logListChild
         v-for="item1 in item.monthDatas"
         :date="item1.date"
         :golfPlaceName="item1.golfPlaceName"
@@ -13,7 +13,7 @@
 </template>
 
 <script setup lang="ts">
-import Logcard from './logListChild.vue';
+import logListChild from './logListChild.vue';
 import type { Database } from '~/types/database.types';
 
 const supabase = useSupabaseClient<Database>();
@@ -45,13 +45,18 @@ async function getScore() {
     const { data: roundDatas, error } = await supabase
       .from('t_rounds')
       .select(
-        'date, t_holes(hole_number, score_number, putts_number), m_golfplaces(golf_place_name, m_holes(hole_number, par_number))'
+        'date, t_holes(hole_number, score_number, putts_number), m_golfplaces(golf_place_name, m_holes(hole_number, par_number))'//m_holesとt_holesがわかりずらすぎる
       )
-      .eq('user_id', 1);
+      .eq('user_id', 1)
+      // .order('date',{ascending:true})
+      // .order('t_holes.hole_number',{ascending:true})
+      // .order('m_golfplaces.m_holes.hole_number',{ascending:true})
+      ;
+      //selectの時点でsortはできるので、以下で行っているsortの処理はなくして大丈夫です
     if (error) {
       console.error('Error fetching data from t_round table:', error);
     } else {
-      //console.log(roundDatas);
+      console.log("取得してきたデータ",roundDatas);
       roundDatas.sort((a, b) => {
         const dateA = new Date(a.date);
         const dateB = new Date(b.date);
@@ -63,7 +68,7 @@ async function getScore() {
 
       //TODO: 一度データをpropsに渡せる形に直す。
       //できれば以下の実装を省略していきなりpropsに渡せる形にする＆月ごとに分けたい。
-      const tmpDetails: roundDetail[] = [];
+      const tmpDetails: roundDetail[] = [];//変数名が何を表すかわかりにくいのでinterface名と変数名を一致させてください
       roundDatas.forEach((item) => {
         if (item.m_golfplaces !== null)
           item.m_golfplaces.m_holes.sort(
@@ -71,7 +76,7 @@ async function getScore() {
           );
         item.t_holes.sort((a, b) => a.hole_number - b.hole_number);
 
-        const tmpHoleDetails: holeDetails[] = [];
+        const tmpHoleDetails: holeDetails[] = [];//変数名が何を表すかわかりにくいのでinterface名と変数名を一致させてください
         item.t_holes.forEach((item1) => {
           const tmpMHoles = item.m_golfplaces?.m_holes.find((value) => {
             return value.hole_number == item1.hole_number;
@@ -92,11 +97,10 @@ async function getScore() {
           holeDetails: tmpHoleDetails,
         });
       });
-      //console.log(tmpDetails);
-      //
+      console.log("roundのデータ",tmpDetails);
 
-      let tmpDate: Date = tmpDetails[0].date;
-      let tmpDatas: roundDetail[] = [];
+      let tmpDate: Date = tmpDetails[0].date;//表示している月に格納されるデータなのでNowとかCurrentとか変数名に加えてほしい
+      let tmpDatas: roundDetail[] = [];//この二つの変数名が似すぎてわかりずらいので変えてほしい
       tmpDetails.forEach((item) => {
         const itemDate = item.date;
         if (
@@ -119,7 +123,7 @@ async function getScore() {
         M: tmpDate.getMonth() + 1,
         monthDatas: tmpDatas,
       });
-      //console.log(monthDetails);
+      console.log("月ごとのデータ",monthDetails);
       return monthDetails;
     }
   } catch (e) {
