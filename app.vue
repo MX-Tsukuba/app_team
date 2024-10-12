@@ -1,6 +1,6 @@
 <template>
   <NuxtLayout>
-    <NuxtPage class="whole"/>
+    <NuxtPage class="whole" />
   </NuxtLayout>
 </template>
 
