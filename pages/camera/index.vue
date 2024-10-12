@@ -46,7 +46,7 @@ const startRecording = () => {
       const blob = new Blob(recordedChunks, { type: 'video/mp4' })
       videoSrc.value = URL.createObjectURL(blob)
       recordedChunks.length = 0
-      //upLoadSupabaseStorage(blob) 
+      //upLoadSupabaseStorage(blob)
     }
     mediaRecorder.value.start()
     isRecording.value = true
@@ -76,6 +76,7 @@ const upLoadSupabaseStorage = async (video: Blob | File) => {
         const publicUrl = publicUrlData.publicUrl
         router.push({ path: '/scoreInput', query: { video: publicUrl } } )//router.pushはここを参考にする
     }
+    toggleModal('confirmModal');
 }
 //Function Execution
 const toggleRecording = () => {
@@ -115,7 +116,7 @@ onBeforeUnmount(() => {
         <p class="title">この動画を使用しますか？</p>
         <div class="buttons">
           <button @click="toggleModal('confirmModal')" class="cancelButton">キャンセル</button>
-          <Nuxt-link @click="confirmVideo" to="../scoreInput" class="confirmButton">確認</Nuxt-link>
+          <Nuxt-link @click="upLoadSupabaseStorage" to="../scoreInput" class="confirmButton">確認</Nuxt-link>
         </div>
       </div>
     </div>
