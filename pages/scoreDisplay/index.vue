@@ -1,10 +1,25 @@
 <template>
   <div class="back">
     <div id="tab-container">
-      <div class="label indicator"><p style="opacity: 0.6">スコア一覧</p></div>
-      <div class="label"><p style="opacity: 0.6">動画一覧</p></div>
+      <div class="tab-labels">
+        <button
+          class="label"
+          :class="{ active: activeTab === 0 }"
+          @click="selectTab(0)"
+        >
+          <p>スコア一覧</p>
+        </button>
+        <button
+          class="label"
+          :class="{ active: activeTab === 1 }"
+          @click="selectTab(1)"
+        >
+          <p>動画一覧</p>
+        </button>
+        <div class="indicator" :style="indicatorStyle"></div>
+      </div>
     </div>
-    <ScoreDisplay />
+    <ScoreDisplay v-if="activeTab === 0" />
   </div>
 </template>
 
@@ -18,6 +33,18 @@ headVarStore.title = 'スコア記録';
 const pageStore = usePageStore();
 onMounted(() => {
   pageStore.setCurrentPage('score');
+});
+
+const activeTab = ref(0);
+
+const selectTab = (index: number) => {
+  activeTab.value = index;
+};
+
+const indicatorStyle = computed(() => {
+  return {
+    transform: `translateX(${activeTab.value * 100}%)`,
+  };
 });
 </script>
 
@@ -36,34 +63,56 @@ onMounted(() => {
     gap: 10px;
   }
 
-#tab-container{
+#tab-container {
+  display: flex;
+  justify-content: center;
+}
+
+.tab-labels {
+  position: relative;
   display: flex;
   width: 264px;
   height: 32px;
-  flex-shrink: 0;
   border-radius: 9px;
-  background: #DADADB;
-  flex-direction: row;
+  background: #dadadb;
 }
 
-.label{
+.label {
+  flex: 1;
   display: flex;
-  width: 130px;
-  padding: 7px 22px;
   justify-content: center;
   align-items: center;
-  gap: 10px;
-  color: #000;
+  padding: 7px 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
   font-size: 12px;
-  font-style: normal;
+  color: #000;
   font-weight: 400;
-  line-height: normal;
+  position: relative;
+  z-index: 2;
 }
 
-.indicator{
+.label p {
+  margin: 0;
+  opacity: 0.6;
+}
+
+.label.active p {
+  opacity: 1;
+}
+
+.indicator {
+  position: absolute;
+  z-index: 1;
+  top: 2px;
+  left: 0;
+  width: 50%;
+  height: calc(100% - 4px);
   border-radius: 7px;
-  border: 1px solid rgba(0, 0, 0, 0.04);
-  background: #FFF;
-  box-shadow: 0px 3px 8px 0px rgba(0, 0, 0, 0.12), 0px 3px 1px 0px rgba(0, 0, 0, 0.04);
+  background: #fff;
+  box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.12),
+    0px 3px 1px rgba(0, 0, 0, 0.04);
+  transition: transform 0.3s ease;
 }
 </style>
