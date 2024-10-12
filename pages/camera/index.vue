@@ -19,6 +19,9 @@ const isShowModal = computed(() => modalStore.isShowModal);
 const modalName = computed(() => modalStore.modalName);
 const toggleModal = (name:string) => modalStore.toggleModal(name);
 
+const recordedBlob = ref<Blob | null>(null);  // 録画データを保持する変数
+const selectedFile = ref<File | null>(null);  // 選択されたファイルを保持
+
 //Function Definition
 const startCamera = async () => {
   if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
@@ -43,8 +46,8 @@ const startRecording = () => {
       }
     }
     mediaRecorder.value.onstop = () => {
-      const blob = new Blob(recordedChunks, { type: 'video/mp4' })
-      videoSrc.value = URL.createObjectURL(blob)
+      recordedBlob.value = new Blob(recordedChunks, { type: 'video/mp4' })
+      videoSrc.value = URL.createObjectURL(recordedBlob.value)
       recordedChunks.length = 0
       //upLoadSupabaseStorage(blob)
     }
@@ -59,13 +62,7 @@ const stopRecording = () => {
     toggleModal('confirmModal')
   }
 }
-const confirmVideo = async () => {
-  if (videoSrc.value) {
-    const blob = new Blob(recordedChunks, { type: 'video/mp4' });
-    await upLoadSupabaseStorage(blob);
-  }
-  toggleModal('confirmModal'); // Close modal after confirmation
-}
+
 const upLoadSupabaseStorage = async (video: Blob | File) => {
   const fileName: string = videoSrc.value ? videoSrc.value.split('/').pop()?.split('.')[0] ?? 'test/test.mp4' : 'test/test.mp4'
   const { data, error } = await useSupabaseClient().storage.from('Movie').upload(fileName, video)
@@ -77,6 +74,17 @@ const upLoadSupabaseStorage = async (video: Blob | File) => {
         router.push({ path: '/scoreInput', query: { video: publicUrl } } )//router.pushはここを参考にする
     }
     toggleModal('confirmModal');
+}
+const confirmVideo = async () => {
+  if (recordedBlob.value) {
+    await upLoadSupabaseStorage(recordedBlob.value);
+    toggleModal('confirmModal');
+  } else if (selectedFile.value) {
+    await upLoadSupabaseStorage(selectedFile.value);  // 選択されたファイルのアップロード
+    toggleModal('confirmModal');
+  }else{
+    console.error('録画データがありません');
+  }
 }
 //Function Execution
 const toggleRecording = () => {
@@ -92,6 +100,7 @@ const onFileChange = (event: Event) =>{
     const file = input.files[0];
     videoSrc.value = URL.createObjectURL(file);
     //upLoadSupabaseStorage(file)
+    selectedFile.value = file;  // ファイルを一時的に保持
     toggleModal('confirmModal')
   }
 }
@@ -111,12 +120,12 @@ onBeforeUnmount(() => {
 
 <template>
   <div class="whole">
-    <div v-if="isShowModal && modalName === 'confirmModal'" class="modal" @click.self="toggleModal('confirmModal')">
+    <div v-if="isShowModal && modalName === 'confirmModal'" class="modal">
       <div class="card">
         <p class="title">この動画を使用しますか？</p>
         <div class="buttons">
           <button @click="toggleModal('confirmModal')" class="cancelButton">キャンセル</button>
-          <Nuxt-link @click="upLoadSupabaseStorage" to="../scoreInput" class="confirmButton">確認</Nuxt-link>
+          <Nuxt-link @click="confirmVideo" to="../scoreInput" class="confirmButton">確認</Nuxt-link>
         </div>
       </div>
     </div>
