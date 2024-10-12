@@ -39,8 +39,8 @@ const startRecording = () => {
       const blob = new Blob(recordedChunks, { type: 'video/mp4' })
       videoSrc.value = URL.createObjectURL(blob)
       recordedChunks.length = 0
-      upLoadSupabaseStorage(blob)
-    }
+      upLoadSupabaseStorage(blob) 
+    }//ここを後で実行
     mediaRecorder.value.start()
     isRecording.value = true
   }
@@ -49,6 +49,7 @@ const stopRecording = () => {
   if (mediaRecorder.value && isRecording.value) {
     mediaRecorder.value.stop()
     isRecording.value = false
+    router.push('./preview')
   }
 }
 const upLoadSupabaseStorage = async (video: Blob | File) => {
@@ -59,12 +60,12 @@ const upLoadSupabaseStorage = async (video: Blob | File) => {
     }else{
         const { data: publicUrlData } = useSupabaseClient().storage.from('Movie').getPublicUrl(fileName)
         const publicUrl = publicUrlData.publicUrl
-        router.push({ path: '/scoreInput', query: { video: publicUrl } })
+        router.push({ path: '/scoreInput', query: { video: publicUrl } } )//router.pushはここを参考にする
     }
 }
 //Function Execution
 const toggleRecording = () => {
-  if (isRecording.value) {
+  if (isRecording.value) { //録画のトグル
     stopRecording()
   } else {
     startRecording()
@@ -75,7 +76,8 @@ const onFileChange = (event: Event) =>{
   if(input.files && input.files[0]){
     const file = input.files[0];
     videoSrc.value = URL.createObjectURL(file);
-    upLoadSupabaseStorage(file)
+    //upLoadSupabaseStorage(file)
+    router.push("./preview")
   }
 }
 
@@ -97,7 +99,7 @@ onBeforeUnmount(() => {
     <img src="~/assets/img/backWhite.png" alt="Left" class="backButton" @click="$router.go(-1)">
     <video ref="video" autoplay playsinline></video>
     <div class="upBtnBox">
-      <label class="upLoadLabel">
+      <label class="upLoadLabel"><!--すでにある動画を選択する-->
         動画を選択
         <input type = "file" accept = "video/*" @change="onFileChange"/>
       </label>
