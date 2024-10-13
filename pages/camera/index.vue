@@ -6,6 +6,7 @@ import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 import { useSupabaseClient } from '#imports';
 import { useModalStore } from '~/src/store/modal';
+// import { SupabaseClient } from '@supabase/supabase-js';
 
 const video = ref<HTMLVideoElement | null>(null)
 const videoSrc = ref<string | null>(null)
@@ -22,11 +23,14 @@ const toggleModal = (name:string) => modalStore.toggleModal(name);
 const recordedBlob = ref<Blob | null>(null);  // 録画データを保持する変数
 const selectedFile = ref<File | null>(null);  // 選択されたファイルを保持
 
+const supabaseClient = useSupabaseClient();
+
+
 //Function Definition
 const startCamera = async () => {
   if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { exact: 'environment' } }
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { exact: 'environment' }}
      })
       if (video.value) {
         video.value.srcObject = stream
@@ -49,7 +53,6 @@ const startRecording = () => {
       recordedBlob.value = new Blob(recordedChunks, { type: 'video/mp4' })
       videoSrc.value = URL.createObjectURL(recordedBlob.value)
       recordedChunks.length = 0
-      //upLoadSupabaseStorage(blob)
     }
     mediaRecorder.value.start()
     isRecording.value = true
@@ -64,16 +67,47 @@ const stopRecording = () => {
 }
 
 const upLoadSupabaseStorage = async (video: Blob | File) => {
-  const fileName: string = videoSrc.value ? videoSrc.value.split('/').pop()?.split('.')[0] ?? 'test/test.mp4' : 'test/test.mp4'
-  const { data, error } = await useSupabaseClient().storage.from('Movie').upload(fileName, video)
-    if (error) {
-      console.log(error)
-    }else{
-        const { data: publicUrlData } = useSupabaseClient().storage.from('Movie').getPublicUrl(fileName)
-        const publicUrl = publicUrlData.publicUrl
-        router.push({ path: '/scoreInput', query: { video: publicUrl } } )//router.pushはここを参考にする
+  try{
+    const user = await supabaseClient.auth.getSession()
+    .then(({data: {session}}) => {
+      if (!session) return null;
+      return supabaseClient.auth.getUser()
+        .then(({data: { user }}) => user)
+    })
+    if(!user){
+      console.error('ユーザIDが取得できません');
+      return;
     }
-    toggleModal('confirmModal');
+    const fileName: string = videoSrc.value ? videoSrc.value.split('/').pop()?.split('.')[0] ?? 'test/test.mp4' : 'test/test.mp4'
+    const { data, error } = await useSupabaseClient().storage.from('Movie').upload(fileName, video)
+    if (error) {
+      console.log('ファイルのアップロードに失敗しました:',error);
+    }else{
+
+    const { error : dbError } = await supabaseClient
+      .from('t_movie')
+      .insert([
+        {
+          movie_name: fileName,
+          created_at: new Date(),
+          updated_at: new Date(),
+          user_id: user.id
+        }
+      ]);
+    if (dbError) {
+      console.log('データベースへの挿入に失敗しました:', dbError);
+    } else {
+      console.log('動画情報が t_movie に挿入されました');
+    }
+    const { data: publicUrlData } = useSupabaseClient().storage.from('Movie').getPublicUrl(fileName)
+    const publicUrl = publicUrlData.publicUrl
+    router.push({ path: './scoreInput', query: { video: publicUrl }})//router.pushはここを参考にする
+    }
+  }
+  catch (err) {
+    console.error('エラーが発生しました:', err);
+  }
+
 }
 const confirmVideo = async () => {
   if (recordedBlob.value) {
