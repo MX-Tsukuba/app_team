@@ -213,7 +213,7 @@ export type Database = {
             foreignKeyName: "t_holes_movie_id_fkey"
             columns: ["movie_id"]
             isOneToOne: false
-            referencedRelation: "t_movie"
+            referencedRelation: "t_movies"
             referencedColumns: ["id"]
           },
           {
@@ -249,7 +249,7 @@ export type Database = {
         }
         Relationships: []
       }
-      t_movie: {
+      t_movies: {
         Row: {
           created_at: string
           date: string | null
@@ -258,7 +258,7 @@ export type Database = {
           result: Json | null
           status: number | null
           updated_at: string | null
-          user_id: number | null
+          user_id: string | null
         }
         Insert: {
           created_at?: string
@@ -268,7 +268,7 @@ export type Database = {
           result?: Json | null
           status?: number | null
           updated_at?: string | null
-          user_id?: number | null
+          user_id?: string | null
         }
         Update: {
           created_at?: string
@@ -278,7 +278,7 @@ export type Database = {
           result?: Json | null
           status?: number | null
           updated_at?: string | null
-          user_id?: number | null
+          user_id?: string | null
         }
         Relationships: []
       }

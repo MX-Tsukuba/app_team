@@ -37,7 +37,7 @@ const playData = reactive({
   puttsNumber: 0,
 });
 //ホール選択（クリック）とパー表示
-const currentHole = ref<number>(3); //ホール番号はここに保存、router.pushのqueryにcurrentHole.valueを追加
+const currentHole = ref<number>(3);
 async function fetchPar(hole: number){
   const { data, error } = await supabase
     .from('m_holes')
@@ -215,7 +215,7 @@ onMounted(()=>{
     <div class="circleBtn" @click="toggleModal('confirm')" :class="{'inActive': videoUrl}">
       <img :src="videoUrl ? CameraTransparentImg : CameraImg" width="48">
     </div>
-    <StartRecord v-if="isShowModal && modalName === 'confirm' && !videoUrl"/> <!--ConfirmStartRecordを持ってきているので、propsで渡すことができる-->
+    <StartRecord v-if="isShowModal && modalName === 'confirm' && !videoUrl"/>
     </div>
   </section>
 </template>

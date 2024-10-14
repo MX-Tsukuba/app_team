@@ -20,8 +20,8 @@ const isShowModal = computed(() => modalStore.isShowModal);
 const modalName = computed(() => modalStore.modalName);
 const toggleModal = (name:string) => modalStore.toggleModal(name);
 
-const recordedBlob = ref<Blob | null>(null);  // 録画データを保持する変数
-const selectedFile = ref<File | null>(null);  // 選択されたファイルを保持
+const recordedBlob = ref<Blob | null>(null);
+const selectedFile = ref<File | null>(null);
 
 const supabaseClient = useSupabaseClient();
 
@@ -85,7 +85,7 @@ const upLoadSupabaseStorage = async (video: Blob | File) => {
     }else{
 
     const { error : dbError } = await supabaseClient
-      .from('t_movie')
+      .from('t_movies')
       .insert([
         {
           movie_name: fileName,
@@ -97,7 +97,7 @@ const upLoadSupabaseStorage = async (video: Blob | File) => {
     if (dbError) {
       console.log('データベースへの挿入に失敗しました:', dbError);
     } else {
-      console.log('動画情報が t_movie に挿入されました');
+      console.log('動画情報が t_movies に挿入されました');
     }
     const { data: publicUrlData } = useSupabaseClient().storage.from('Movie').getPublicUrl(fileName)
     const publicUrl = publicUrlData.publicUrl
@@ -114,7 +114,7 @@ const confirmVideo = async () => {
     await upLoadSupabaseStorage(recordedBlob.value);
     toggleModal('confirmModal');
   } else if (selectedFile.value) {
-    await upLoadSupabaseStorage(selectedFile.value);  // 選択されたファイルのアップロード
+    await upLoadSupabaseStorage(selectedFile.value);
     toggleModal('confirmModal');
   }else{
     console.error('録画データがありません');
@@ -122,7 +122,7 @@ const confirmVideo = async () => {
 }
 //Function Execution
 const toggleRecording = () => {
-  if (isRecording.value) { //録画のトグル
+  if (isRecording.value) {
     stopRecording()
   } else {
     startRecording()
@@ -134,7 +134,7 @@ const onFileChange = (event: Event) =>{
     const file = input.files[0];
     videoSrc.value = URL.createObjectURL(file);
     //upLoadSupabaseStorage(file)
-    selectedFile.value = file;  // ファイルを一時的に保持
+    selectedFile.value = file;
     toggleModal('confirmModal')
   }
 }
@@ -167,7 +167,7 @@ onBeforeUnmount(() => {
     <img src="~/assets/img/backWhite.png" alt="Left" class="backButton" @click="$router.go(-1)">
     <video ref="video" autoplay playsinline></video>
     <div class="upBtnBox">
-      <label class="upLoadLabel"><!--すでにある動画を選択する-->
+      <label class="upLoadLabel">
         動画を選択
         <input type = "file" accept = "video/*" @change="onFileChange"/>
       </label>
