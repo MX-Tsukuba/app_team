@@ -213,10 +213,12 @@ const { data } = useAsyncData(() => getScore());
 .label p {
   margin: 0;
   opacity: 0.6;
+  font-size: 12px;
 }
 
 .label.active p {
   opacity: 1;
+  font-size: 12px;
 }
 
 .indicator {
