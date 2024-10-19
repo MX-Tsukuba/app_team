@@ -20,11 +20,13 @@
       </div>
     </div>
     <ScoreDisplay v-if="activeTab === 0" />
+    <MovieDisplay v-else />
   </div>
 </template>
 
 <script setup lang="ts">
 import ScoreDisplay from '~/components/scoreDisplay/logList.vue';
+import MovieDisplay from '~/components/scoreDisplay/movieList.vue';
 import { useHeadVarStore } from '~/src/store/headVar.js';
 import { usePageStore } from '~/src/store/currentPage';
 
@@ -75,6 +77,7 @@ const indicatorStyle = computed(() => {
   height: 32px;
   border-radius: 9px;
   background: #dadadb;
+  font-size: 12px;
 }
 
 .label {
