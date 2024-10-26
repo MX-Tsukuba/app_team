@@ -10,9 +10,9 @@ watch(user, () => {
       // Clear cookie
       useCookie(`${cookieName}-redirect-path`).value = null
       // Redirect to path
-      return navigateTo(redirectPath || '/top/resister');
+      return navigateTo(redirectPath || '../');
   }
-  else return navigateTo('http://localhost:3000/login/login', {external:true});
+  else return navigateTo('/login', {external:true});
 }, { immediate: true })
 </script>
 

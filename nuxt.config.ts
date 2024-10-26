@@ -1,16 +1,24 @@
-import { pushScopeId } from "vue";
-
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   devtools: { enabled: true },
-  modules: ["@nuxtjs/supabase"],
+
+  modules: [`@nuxtjs/supabase`, '@pinia/nuxt'],
+
+  app: {
+    head: {
+      title: 'Motion-X',
+      meta: [
+        { charset: 'utf-8' },
+        { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+      ],
+      link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.png' }],
+    },
+  },
 
   supabase: {
-    url:process.env.SUPABASE_URL,
-    key:process.env.SUPABASE_KEY,
-    redirect: true,
+    redirect: false,
     redirectOptions: {
-      login: '/login/login',
+      login: '/login',
       callback: '/login/confirm',
       include: undefined,
       exclude: [],
@@ -31,12 +39,16 @@ export default defineNuxtConfig({
     // },
   },
 
-  // runtimeConfig:{
-  //   public:{
-  //     supabaseUrl:process.env.SUPABASE_URL || "https://fuuchzmnathzrsqqsuhg.supabase.co",
-  //     supabaseKey:process.env.SUPABASE_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1dWNoem1uYXRoenJzcXFzdWhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTAwNjYwNDksImV4cCI6MjAyNTY0MjA0OX0.V9yZTvTcP-1u8zD1PLSKkGhY_fVWLqMDCGBV0hNFBLU"
-  //   }
-  // },
+  hooks: {
+    'pages:extend'(pages) {
+      pages.push({
+        name: 'index',
+        path: '/',
+        file: '~/pages/top/index.vue',
+      });
+    },
+  },
+  plugins: ['~/plugins/chartjs.ts'],
 
-  compatibilityDate: '2024-08-27',
-})
+  compatibilityDate: '2024-09-05',
+});

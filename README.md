@@ -1,13 +1,31 @@
-# app_authentication
-認証チーム
-
-もとは
-https://zenn.dev/chot/articles/ddd2844ad3ae61
-を参考に進めていたが、完全に詰まってしまったため、公式ドキュメントをベースに作り直すことにした。
-
 # Nuxt 3 Minimal Starter
 
 Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+
+## スマホで動作確認
+env: コメント解除して起動
+```
+NUXT_HOST=0.0.0.0
+NUXT_PORT=3000
+```
+それでも上手くいかない場合...
+→PCのファイアウォール一次解除
+
+##オレオレ証明書の発行
+1. OpenSSLのインストール（Gitに内包されているので不要。別でインストールしたい人は[https://atmarkit.itmedia.co.jp/ait/articles/2406/19/news033.html](https://atmarkit.itmedia.co.jp/ait/articles/2406/19/news033.html)を参考にするといいと思う）
+2. OpenSSLのパスを通す。Gitではデフォルトで「C:\Program Files\Git\usr\bin」に格納されている。
+3. プロジェクトのディレクトリで以下のコマンドを実行してオレオレ証明書を発行する。
+```
+openssl req -x509 -sha256 -nodes -days 9999 -newkey rsa:2048 -keyout localhttps_key.pem -out localhttps_cert.pem
+```
+参考：[https://qiita.com/olisheo/items/12b789d435058624e62a](https://qiita.com/olisheo/items/12b789d435058624e62a)
+
+4. `npm run dev`を実行し、アプリを立ち上げる。
+5. ブラウザで発行されたURLにアクセスする。
+
+スマホでアクセスするときは一番下のURLを使用すること。QRで出てきたURLはうまく読み込むことが出来なかった。
+
+現在Android版のchrome（高木のスマホ）では端末のカメラ使用権限を許可することが出来ずカメラを立ち上げることができなかった。同端末にインストールされているFirefoxブラウザではカメラを起動することができた。したがってchromeの設定によるものだと考えられる。
 
 ## Setup
 
