@@ -1,24 +1,18 @@
 <script setup lang="ts">
 import type { Database } from '~/types/database.types';
-import type { Database } from '~/types/database.types';
 import { useHeadVarStore } from '~/src/store/headVar.js'
 import { usePageStore } from '~/src/store/currentPage';
 import { useModalStore } from '~/src/store/modal';
 import { register } from 'swiper/element/bundle';
 import { InputCard, StartRecord } from '~/components/scoreInput';
-import { register } from 'swiper/element/bundle';
-import { InputCard, StartRecord } from '~/components/scoreInput';
 import CameraImg from '~/assets/img/camera.png';
 import CameraTransparentImg from '~/assets/img/cameraTransparent.png';
-register();
 register();
 
 //この３つのデータは他から受け取る必要あり。
 const roundId = 1; 
 const golfPlaceName = 'つくばゴルフ場';
 const golfPlaceId = 1;
-
-const headVarStore = useHeadVarStore();
 const headVarStore = useHeadVarStore();
 headVarStore.title = `${golfPlaceName}`;
 const pageStore = usePageStore();
@@ -74,15 +68,10 @@ for (let i = 1; i <= 18; i++) {
     }
   };
   if (i === 1) {
-  if (i === 1) {
     singleObject.card.isLarge = true;
   } else if (i === 2) {
-  } else if (i === 2) {
     singleObject.card.isMedium = true;
-  } else
-  {
-  } else
-  {
+  } else {
     singleObject.card.isSmall = true;
   }
   items.push(singleObject)
@@ -140,16 +129,19 @@ onMounted(()=>{
       </div>
       <hr class="displayLine"/>
     </div>
+
     <swiper-container class="selectHole" slides-per-view="auto" centered-slides="true" space-between="5" free-mode="true"
     watch-slides-progress="true">
       <swiper-slide v-for="(item, index) in items" :key="index" class="eachHole" @click="updateCurrentHole(item.id)" :class="{'holeCardLarge': item.card.isLarge, 'holeCardMedium': item.card.isMedium, 'holeCardSmall': item.card.isSmall}">{{ item.id }}H</swiper-slide>    
     </swiper-container>
+
     <swiper-container ref="swiperCards" class='inputCards' slides-per-view="1" centered-slides="true" thumbs-swiper=".selectHole" @slideChange="onSlideChange">
       <swiper-slide v-for="(item) in items" :key="item" class="cardContainer">
         <!-- {{ item.id }} -->
         <InputCard :roundId :currentHole :isShowModal :modalName :toggleModal :videoPlayer :videoUrl :buttonMessage @updateCurrentHole="incrementCurrentHole"/>
       </swiper-slide>
     </swiper-container>
+
     <div class="circleBtn" @click="toggleModal('confirm')" :class="{'inActive': videoUrl}">
       <img :src="videoUrl ? CameraTransparentImg : CameraImg" width="48">
     </div>
@@ -158,9 +150,6 @@ onMounted(()=>{
 </template>
 
 <style scoped>
-element.style{
-  margin: 0;
-}
 element.style{
   margin: 0;
 }
@@ -207,18 +196,13 @@ box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, .5);
   justify-content: center;
   align-items: end;
   gap: 10px;
-  /* position: relative; */
-  /* position: relative; */
 }
 
 .eachHole{
   margin: 5px;
-  margin: 5px;
   display: flex;
   justify-content: center;
   align-items: center;
-  justify-self: center;
-  align-self: end;
   justify-self: center;
   align-self: end;
   border-radius: 5px;
@@ -250,11 +234,7 @@ box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, .5);
 .inputCards{
   width: 95vw;
   z-index: 0;
-.inputCards{
-  width: 95vw;
-  z-index: 0;
-}
-.cardContainer{  
+}  
 .cardContainer{  
   display: flex;
   justify-content: center;
