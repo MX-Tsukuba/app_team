@@ -16,7 +16,7 @@ const golfPlaceId = 1;
 
 const headVarStore = useHeadVarStore();
 headVarStore.title = `${golfPlaceName}`;
-const pageStore = usePageStore();//TODO:pagestoreの設定が消されているので追加
+const pageStore = usePageStore();
 const modalStore = useModalStore();
 const isShowModal = computed(() => modalStore.isShowModal);
 const modalName = computed(() => modalStore.modalName);
@@ -26,6 +26,7 @@ const videoPlayer = ref<HTMLVideoElement | null>(null);
 const videoUrl = ref<string | null>(null);
 const route = useRoute();
 const currentHole = ref<number>(1);
+const swiperCards = ref();
 const buttonMessage = ref<string>('登録');
 
 //ホール選択（クリック）とパー表示
@@ -38,7 +39,6 @@ async function fetchPar(hole: number){
     .single()
   if (error) {
     console.error('Error fetching data:', error);
-    // par.value = null;
     return null;
   } else {
     return data["par_number"];
@@ -81,33 +81,11 @@ for (let i = 1; i <= 18; i++) {
 const incrementCurrentHole = (newHole:number) => {
   currentHole.value = newHole;
 };
-// const moveLeft = () =>{
-//   currentHole.value -= 1;
-//   if (currentHole.value < 1) {
-//     currentHole.value = 1; 
-//   }
-// }
-// const moveRight = () =>{
-//   currentHole.value += 1;
-//   if (currentHole.value > 18) {
-//     currentHole.value = 18; 
-//   }
-// }
-// const isItemVisible = computed(() => {
-//   let start;
-//   let end;
-//   if(currentHole.value > 16){
-//     start = 13;
-//   }else{
-//     start = Math.max(0, currentHole.value - 3)
-//   };
-//   if(currentHole.value < 3){
-//     end = 5;
-//   }else{
-//     end = Math.min(items.length, currentHole.value + 2);
-//   };
-//   return { start, end };
-// })
+const onSlideChange = () => {
+  if (swiperCards.value) {
+    currentHole.value = swiperCards.value.swiper.activeIndex + 1;
+  }
+};
 
 //スワイプで中心に来たカードのindexをcurrentHoleとして表示の変更をする
 watch(currentHole, () => items.forEach(item => {
@@ -119,9 +97,7 @@ watch(currentHole, () => items.forEach(item => {
     item.card.isLarge = false;
     item.card.isMedium = true;
     item.card.isSmall = false;
-  } else
-  // else if (item.id === currentHole.value - 2 || item.id === currentHole.value + 2) 
-  {
+  } else {
     item.card.isLarge = false;
     item.card.isMedium = false;
     item.card.isSmall = true;
@@ -129,14 +105,7 @@ watch(currentHole, () => items.forEach(item => {
   if(currentHole.value === 18)buttonMessage.value = '完了'
   else buttonMessage.value = '登録'
 }))
-
-const onSlideChange = (id:number) => {
-  console.log(id);
-  currentHole.value = id;
-  console.log(currentHole.value);
-} 
 const videoInsert = async()=>{
-  //pageStore.setCurrentPage('score');
   videoUrl.value = route.query.video as string;
   await nextTick();
   if (videoPlayer.value && videoUrl.value) {
@@ -147,6 +116,9 @@ const videoInsert = async()=>{
 onMounted(()=>{
     pageStore.setCurrentPage('score');
     videoInsert();
+    if(swiperCards.value){
+      swiperCards.value.swiper.on('slideChange', onSlideChange);
+    }
   });
 </script>
 
@@ -161,11 +133,10 @@ onMounted(()=>{
     </div>
     <swiper-container class="selectHole" slides-per-view="auto" centered-slides="true" space-between="5" free-mode="true"
     watch-slides-progress="true">
-      <swiper-slide v-for="(item, index) in items" :key="index" class="eachHole" @click="updateCurrentHole(item.id)" :class="{'holeCardLarge': item.card.isLarge, 'holeCardMedium': item.card.isMedium, 'holeCardSmall': item.card.isSmall}">{{ item.id }}H</swiper-slide>
-    
+      <swiper-slide v-for="(item, index) in items" :key="index" class="eachHole" @click="updateCurrentHole(item.id)" :class="{'holeCardLarge': item.card.isLarge, 'holeCardMedium': item.card.isMedium, 'holeCardSmall': item.card.isSmall}">{{ item.id }}H</swiper-slide>    
     </swiper-container>
-    <swiper-container class='inputCards' slides-per-view="1" centered-slides="true" thumbs-swiper=".selectHole">
-      <swiper-slide v-for="(item) in items" :key="item" class="cardContainer" @slideChange="onSlideChange(item.id)">
+    <swiper-container ref="swiperCards" class='inputCards' slides-per-view="1" centered-slides="true" thumbs-swiper=".selectHole" @slideChange="onSlideChange">
+      <swiper-slide v-for="(item) in items" :key="item" class="cardContainer">
         <!-- {{ item.id }} -->
         <InputCard :roundId :currentHole :isShowModal :modalName :toggleModal :videoPlayer :videoUrl :buttonMessage @updateCurrentHole="incrementCurrentHole"/>
       </swiper-slide>
