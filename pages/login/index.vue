@@ -7,7 +7,7 @@ const signInWithGoogle = async () => {
   const { error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: 'https://local-motion-auth.vercel.app/login/confirm', // ここを絶対パス
+      redirectTo: 'https://localhost:3000/login/confirm', // ここを絶対パスにしたら成功する
     }
   })
   if (error) console.log(error)

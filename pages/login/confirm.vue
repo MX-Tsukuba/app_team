@@ -10,14 +10,9 @@ watch(user, () => {
       // Clear cookie
       useCookie(`${cookieName}-redirect-path`).value = null
       // Redirect to path
-      console.log("redirectoooo")
       return navigateTo(redirectPath || '../');
   }
-  else{
-    console.log("damesooooo")
-    return navigateTo('/login', {external:true});
-
-  }
+  else return navigateTo('/login', {external:true});
 }, { immediate: true })
 </script>
 
