@@ -256,7 +256,7 @@ export type Database = {
           id: number
           movie_name: string | null
           result: Json | null
-          status: number | null
+          status: number
           updated_at: string | null
           user_id: string | null
         }
@@ -266,7 +266,7 @@ export type Database = {
           id?: number
           movie_name?: string | null
           result?: Json | null
-          status?: number | null
+          status?: number
           updated_at?: string | null
           user_id?: string | null
         }
@@ -276,7 +276,7 @@ export type Database = {
           id?: number
           movie_name?: string | null
           result?: Json | null
-          status?: number | null
+          status?: number
           updated_at?: string | null
           user_id?: string | null
         }

@@ -19,7 +19,7 @@
         <div class="indicator" :style="indicatorStyle"></div>
       </div>
     </div>
-    <ScoreDisplay v-if="activeTab === 0" :value="<monthDetail[]>data" />
+    <ScoreDisplay v-if="activeTab === 0" :value="<monthDetail[]>data?.logs" />
     <MovieDisplay v-else />
   </div>
 </template>
@@ -30,6 +30,7 @@ import MovieDisplay from '~/components/scoreDisplay/movieList.vue';
 import { useHeadVarStore } from '~/src/store/headVar.js';
 import { usePageStore } from '~/src/store/currentPage';
 import type { Database } from '~/types/database.types';
+import { SupabaseClient } from '@supabase/supabase-js';
 
 const headVarStore = useHeadVarStore();
 headVarStore.title = 'スコア記録';
@@ -72,7 +73,7 @@ interface monthDetail {
   monthDatas: roundDetail[];
 }
 
-async function getScore() {
+async function fetchLog() {
   const monthDetails = Array<monthDetail>();
   try {
     //TODO: 特定のユーザのデータゴルフデータを全て取得、ユーザの識別についてはローレベルセキュリティで実行する。
@@ -161,7 +162,84 @@ async function getScore() {
   }
 }
 
-const { data } = useAsyncData(() => getScore());
+const fetchMovies = async () => {
+  const { data, error } = await supabase
+    .from('t_movies')
+    .select('created_at, id, status, result');
+  if (error) throw error;
+
+  const moviesArray = <
+    { id: number; date: Date; status: number; total_score: number }[]
+  >[];
+
+  data.forEach((item) => {
+    moviesArray.push({
+      id: item.id,
+      date: new Date(item.created_at.slice(0, 10)),
+      status: item.status,
+      total_score: 100,
+    });
+  });
+  moviesArray.sort((a, b) => {
+    const dateA = new Date(a.date);
+    const dateB = new Date(b.date);
+    if (dateA > dateB) return -1;
+    else if (dateA === dateB) return 0;
+    else return 1;
+  });
+  console.log(data);
+  console.log(moviesArray);
+
+  const moviesData: {
+    Y: number;
+    M: number;
+    monthDatas: {
+      id: number;
+      date: Date;
+      status: number;
+      total_score: number;
+    }[];
+  }[] = [];
+  let tmpDate: Date = moviesArray[0].date;
+  let tmpDatas: {
+    id: number;
+    date: Date;
+    status: number;
+    total_score: number;
+  }[] = [];
+  moviesArray.forEach((item) => {
+    const itemDate = item.date;
+    if (
+      itemDate.getFullYear() === tmpDate.getFullYear() &&
+      itemDate.getMonth() === tmpDate.getMonth()
+    ) {
+      tmpDatas.push(item);
+    } else {
+      moviesData.push({
+        Y: tmpDate.getFullYear(),
+        M: tmpDate.getMonth() + 1,
+        monthDatas: tmpDatas,
+      });
+      tmpDatas = [item];
+      tmpDate = item.date;
+    }
+  });
+  moviesData.push({
+    Y: tmpDate.getFullYear(),
+    M: tmpDate.getMonth() + 1,
+    monthDatas: tmpDatas,
+  });
+  console.log(moviesData);
+  return [];
+};
+
+const fetchData = async () => {
+  const Logs = await fetchLog();
+  const Movies = await fetchMovies();
+  return { logs: Logs, movies: Movies };
+};
+
+const { data } = useAsyncData(() => fetchData());
 </script>
 
 <style scoped>
