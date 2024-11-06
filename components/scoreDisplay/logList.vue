@@ -2,7 +2,7 @@
   <div class="sub_container" v-for="item in props.value">
     <div class="month">{{ item.Y }}年{{ item.M }}月</div>
     <div class="subsub_container">
-      <Logcard
+      <logListChild
         v-for="item1 in item.monthDatas"
         :date="item1.date"
         :golfPlaceName="item1.golfPlaceName"
@@ -13,7 +13,7 @@
 </template>
 
 <script setup lang="ts">
-import Logcard from './logListChild.vue';
+import logListChild from './logListChild.vue';
 
 interface holeDetails {
   holeNo: number;
