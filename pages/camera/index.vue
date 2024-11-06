@@ -84,6 +84,7 @@ const upLoadSupabaseStorage = async (video: Blob | File) => {
       console.log('ファイルのアップロードに失敗しました:',error);
     }else{
 
+    const currentDate = new Date().toISOString().split('T')[0];
     const { error : dbError } = await supabaseClient
       .from('t_movies')
       .insert([
@@ -91,7 +92,8 @@ const upLoadSupabaseStorage = async (video: Blob | File) => {
           movie_name: fileName,
           created_at: new Date(),
           updated_at: new Date(),
-          user_id: user.id
+          user_id: user.id,
+          date: currentDate
         }
       ]);
     if (dbError) {
