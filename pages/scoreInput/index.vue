@@ -44,8 +44,11 @@ async function fetchPar(hole: number){
   }
 };
 const {data}  = await useAsyncData(()=>fetchPar(currentHole.value), {watch: [currentHole]});
-const updateCurrentHole = (holeId:number) =>{
+const updateCurrentHole = (holeId:number) => {
   currentHole.value = holeId;
+  if (swiperCards.value) {
+    swiperCards.value.swiper.slideTo(holeId - 1);
+  }
 };
 
 //ホール選択（スライド）
@@ -81,7 +84,8 @@ const incrementCurrentHole = (newHole:number) => {
 };
 const onSlideChange = () => {
   if (swiperCards.value) {
-    currentHole.value = swiperCards.value.swiper.activeIndex + 1;
+    const newIndex = swiperCards.value.swiper.activeIndex;
+    updateCurrentHole(newIndex + 1);
   }
 };
 
@@ -138,7 +142,7 @@ onMounted(()=>{
     <swiper-container ref="swiperCards" class='inputCards' slides-per-view="1" centered-slides="true" thumbs-swiper=".selectHole" @slideChange="onSlideChange">
       <swiper-slide v-for="(item) in items" :key="item" class="cardContainer">
         <!-- {{ item.id }} -->
-        <InputCard :roundId :currentHole :isShowModal :modalName :toggleModal :videoPlayer :videoUrl :buttonMessage @updateCurrentHole="incrementCurrentHole"/>
+        <InputCard :roundId :currentHole :isShowModal :modalName :toggleModal :videoPlayer :videoUrl :buttonMessage  @updateCurrentHole="updateCurrentHole" @incrementCurrentHole="incrementCurrentHole"/>
       </swiper-slide>
     </swiper-container>
 

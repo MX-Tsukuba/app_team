@@ -14,7 +14,7 @@ interface Props {
   buttonMessage: string;
 };
 const props = defineProps<Props>();
-const emit = defineEmits(['updateCurrentHole']);
+const emit = defineEmits(['updateCurrentHole', 'incrementCurrentHole']);
 const playData = reactive({
   holeNumber: 0,
   scoreNumber: 0,
@@ -46,6 +46,9 @@ const addPlayData = async () => {
     return true;
   }
 };
+watch(() => props.currentHole, (newHole) => {
+  emit('incrementCurrentHole', newHole);
+});
 </script>
 
 <template>
