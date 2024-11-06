@@ -10,77 +10,135 @@ import CameraTransparentImg from '~/assets/img/cameraTransparent.png';
 
 const headVarStore = useHeadVarStore()
 headVarStore.title = 'スコア入力'
-
-const buttonMessage = ref<string>('登録')
-
 const pageStore = usePageStore();
 
 const videoPlayer = ref<HTMLVideoElement | null>(null);
 const videoUrl = ref<string | null>(null);
 const route = useRoute();
 const supabase = useSupabaseClient<Database>();
-
-//この３つのデータは他から受け取る必要あり。
-const roundId = 1; 
-const golfPlaceName = 'つくばゴルフ場';
-const golfPlaceId = 1;
-
-
-headVarStore.title = `${golfPlaceName}`;
-const modalStore = useModalStore();
+//モーダル関係
 const isShowModal = computed(() => modalStore.isShowModal);
 const modalName = computed(() => modalStore.modalName);
 const toggleModal = (name:string) => modalStore.toggleModal(name);
-const playData = reactive({
-  holeNumber: 0,
-  scoreNumber: 0,
-  puttsNumber: 0,
-});
-//ホール選択（クリック）とパー表示
-const currentHole = ref<number>(3);
-async function fetchPar(hole: number){
-  const { data, error } = await supabase
-    .from('m_holes')
-    .select('par_number')
-    .eq('golfplaces_id', golfPlaceId)
-    .eq('hole_number', hole)
-    .single()
-  if (error) {
-    console.error('Error fetching data:', error);
-    // par.value = null;
-    return null;
-  } else {
-    return data["par_number"];
+
+//この３つのデータは他から受け取る必要あり。
+let roundId =ref<number>(Number(route.params.id));
+const golfPlaceName = ref<string | undefined>('つくばゴルフ場');
+// const golfPlaceId = ref<number>(1);
+let isLoading=ref<boolean>(true);
+
+const buttonMessage = ref<string>('登録')
+headVarStore.title = `${golfPlaceName.value}`;
+const modalStore = useModalStore();
+
+class playData {
+  holeNumber?: number;
+  scoreNumber?: number;
+  puttsNumber?: number;
+  isSelect:boolean
+
+  constructor(holeNumber?:number,scoreNumber?:number,puttsNumber?:number){
+    this.holeNumber=holeNumber;
+    this.scoreNumber=scoreNumber;
+    this.puttsNumber=puttsNumber;
+    this.isSelect=false;
   }
 };
 
-const {data}  = await useAsyncData(()=>fetchPar(currentHole.value), {watch: [currentHole]});
+class ParData{
+    hole_number?: number;
+    par_number?: number;
 
-const updateCurrentHole = (holeId:number) =>{
-  currentHole.value = holeId;
+    constructor(hole_number?:number,par_number?:number){
+      this.hole_number=hole_number;
+      this.par_number=par_number;
+    }
+}
+
+const playDataArr=ref<playData[]>([]);
+const ParDataArr=ref<ParData[]>([]);
+
+
+
+//データの取得@辻
+const selectData =async()=> {
+  const {data,error:roundError}=await supabase
+  .from('t_rounds')
+  .select('t_holes(hole_number, score_number, putts_number), m_golfplaces(golf_place_name, m_holes(hole_number, par_number))')
+  .eq('id',roundId.value)
+  if(roundError){
+    console.error('roundの取得に失敗しました',roundError.message)
+    return null;
+  }else{
+      //取得したデータをJSの変数に代入していく
+    golfPlaceName.value=data[0].m_golfplaces?.golf_place_name || 'ゴルフ場名がありません';//型定義のundifined許容を何とかする
+    for(let i=0;i<18;i++){
+      ParDataArr.value.push(new ParData(data[0].m_golfplaces?.m_holes[i].hole_number,data[0].m_golfplaces?.m_holes[i].par_number));
+      data[0].t_holes.forEach(item=>{
+      if(item.hole_number===i+1){//ホール数とindexで1の差があるので調整
+        playDataArr.value[i].holeNumber=item.hole_number;
+        playDataArr.value[i].scoreNumber=item.score_number;
+        playDataArr.value[i].puttsNumber=item.putts_number;
+        playDataArr.value[i].isSelect=true;
+      }
+    });
+    }
+    console.log('ParDataArr',ParDataArr.value);
+    console.log('playDataArr',playDataArr.value);
+    isLoading.value=false;
+  }
+}
+
+//ホール選択（クリック）とパー表示
+// const currentHole = ref<number>(3);
+const currentHoleIndex=ref<number>(2);
+// const fetchPar= async (hole: number) => {
+//   const { data, error } = await supabase
+//     .from('m_holes')
+//     .select('par_number')
+//     .eq('golfplaces_id', golfPlaceId);
+//   if (error) {
+//     console.error('Error fetching data:', error);
+//     return null;
+//   } else {
+//     return data;
+//   }
+// };
+
+const setting=()=>{
+  roundId.value=Number(route.params.id);
+  ParDataArr.value=[];
+  playDataArr.value=new Array(18).fill({});
+  for(let i=0;i<18;i++){
+    playDataArr.value[i]=new playData(0,0,0);
+  }
+}
+
+// const {data}  = await useAsyncData(()=>fetchPar(currentHole.value), {watch: [currentHole]});
+
+const updateCurrentHole = (holeId:number) =>{//holeの変更に応じてIndexを変更する
+  currentHoleIndex.value = holeId;
 };
 
 //データ挿入
+//currentHoleではなくindexで選択するようにする+insertしたデータがすでにDBにある場合updateになるように変更@辻
 const addPlayData = async () => {
-  playData.holeNumber = currentHole.value;
-  const { error } = await supabase.from('t_holes').insert({
-    "created_at": undefined,
-    "hole_number": playData.holeNumber,
-    "round_id": roundId,
-    "putts_number": playData.puttsNumber,
-    "score_number": playData.scoreNumber,
-    "updated_at": undefined,
+  // playData.holeNumber = currentHole.value;
+  const { error } = await supabase
+  .from('t_holes')
+  .insert({
+    "hole_number": playDataArr.value[currentHoleIndex.value].holeNumber,
+    "round_id": roundId.value,
+    "putts_number": playDataArr.value[currentHoleIndex.value].puttsNumber,
+    "score_number": playDataArr.value[currentHoleIndex.value].scoreNumber,
   });
   if (error) {
-    alert(error.message);
+    console.error('データの追加に失敗しました',error);
   } else {
-  if(currentHole.value === 18){
-    await navigateTo('./scoreDisplay')
+  if(currentHoleIndex.value === 17){
+    await navigateTo('/scoreDisplay')//useRouterを用いたい@辻
   }else{
-    currentHole.value++;
-    playData.scoreNumber = 0;
-    playData.puttsNumber = 0;
-    playData.holeNumber = 0
+    currentHoleIndex.value++;
   }
     return true;
   }
@@ -96,7 +154,7 @@ interface holeObj {
   }
 };
 const items:holeObj[] = reactive([]);
-for (let i = 1; i <= 18; i++) {
+for (let i = 0; i <= 17; i++) {//indexに合わせて1から17に変更@辻
   const singleObject = {
     id: i,
     card: {
@@ -105,58 +163,58 @@ for (let i = 1; i <= 18; i++) {
       isSmall: false,
     }
   };
-  if (i === 3) {
+  if (i === 2) {
     singleObject.card.isLarge = true;
-  } else if (i === 2 || i === 4) {
+  } else if (i === 1 || i === 3) {
     singleObject.card.isMedium = true;
-  } else if (i === 1 || i === 5) {
+  } else if (i === 0 || i === 4) {
     singleObject.card.isSmall = true;
   }
   items.push(singleObject)
 };
 
 const moveLeft = () =>{
-  currentHole.value -= 1;
-  if (currentHole.value < 1) {
-    currentHole.value = 1; 
+  currentHoleIndex.value -= 1;
+  if (currentHoleIndex.value < 0) {
+    currentHoleIndex.value = 0;
   }
 }
 const moveRight = () =>{
-  currentHole.value += 1;
-  if (currentHole.value > 18) {
-    currentHole.value = 18; 
+  currentHoleIndex.value += 1;
+  if (currentHoleIndex.value > 17) {
+    currentHoleIndex.value = 17;
   }
 }
 const isItemVisible = computed(() => {
   let start;
   let end;
-  if(currentHole.value > 16){
+  if(currentHoleIndex.value > 14){
     start = 13;
   }else{
-    start = Math.max(0, currentHole.value - 3)
+    start = Math.max(0, currentHoleIndex.value - 2)
   };
-  if(currentHole.value < 3){
-    end = 5;
+  if(currentHoleIndex.value < 2){
+    end = 4;
   }else{
-    end = Math.min(items.length, currentHole.value + 2);
+    end = Math.min(items.length, currentHoleIndex.value + 2);
   };
   return { start, end };
 })
-watch(currentHole, () => items.forEach(item => {
-  if (item.id === currentHole.value) {
+watch(currentHoleIndex, () => items.forEach(item => {
+  if (item.id === currentHoleIndex.value) {
     item.card.isLarge = true;
     item.card.isMedium = false;
     item.card.isSmall = false;
-  } else if (item.id === currentHole.value - 1 || item.id === currentHole.value + 1) {
+  } else if (item.id === currentHoleIndex.value - 1 || item.id === currentHoleIndex.value + 1) {
     item.card.isLarge = false;
     item.card.isMedium = true;
     item.card.isSmall = false;
-  } else if (item.id === currentHole.value - 2 || item.id === currentHole.value + 2) {
+  } else if (item.id === currentHoleIndex.value - 2 || item.id === currentHoleIndex.value + 2) {
     item.card.isLarge = false;
     item.card.isMedium = false;
     item.card.isSmall = true;
   } 
-  if(currentHole.value === 18)buttonMessage.value = '完了'
+  if(currentHoleIndex.value === 17)buttonMessage.value = '完了'
   else buttonMessage.value = '登録'
 }))
 
@@ -172,6 +230,8 @@ const videoInsert = async()=>{
 onMounted(()=>{
     pageStore.setCurrentPage('score');
     videoInsert()
+    setting();
+    selectData();
   });
 </script>
 
@@ -179,13 +239,14 @@ onMounted(()=>{
   <section class="scoreInputWhole">
     <div class="displayBox">
       <div class="displayHolePar">
-        {{ currentHole }}H
-        <p class="displayPar">par{{ data }}</p>
+        {{ currentHoleIndex+1 }}H
+        <p class="displayPar" v-if="!isLoading">par{{ ParDataArr[currentHoleIndex].par_number }}</p>
+        <p class="displayPar" v-else >par0</p>
       </div>
       <hr class="displayLine"/>
     </div>
     <ul class="selectHole">
-      <li  v-for="(item, index) in items" :key="index" class="eachHole" v-show="index >= isItemVisible.start && index < isItemVisible.end" @click="updateCurrentHole(item.id)" :class="{'holeCardLarge': item.card.isLarge, 'holeCardMedium': item.card.isMedium, 'holeCardSmall': item.card.isSmall}">{{ item.id }}H</li>
+      <li  v-for="(item, index) in items" :key="index" class="eachHole" v-show="index >= isItemVisible.start && index <= isItemVisible.end" @click="updateCurrentHole(item.id)" :class="{'holeCardLarge': item.card.isLarge, 'holeCardMedium': item.card.isMedium, 'holeCardSmall': item.card.isSmall}">{{ item.id+1 }}H</li>
     <button @click="moveLeft()" class="leftButton">left</button>
     <button @click="moveRight()" class="rightButton">right</button>
     </ul>
@@ -197,13 +258,15 @@ onMounted(()=>{
         <div>
           <p class="scorePuttsTitle">スコア</p>
           <div>
-            <input type="number" pattern="\d*" class="scorePuttsData" v-model="playData.scoreNumber">
+            <input type="number" pattern="\d*" class="scorePuttsData" v-model="playDataArr[currentHoleIndex].scoreNumber" v-if="!isLoading">
+            <input type="number" pattern="\d*" class="scorePuttsData" value="0" v-else>
           </div>
         </div>
         <div>
           <p class="scorePuttsTitle">パット数</p>
           <div>
-            <input type="number" pattern="\d*" class="scorePuttsData" v-model="playData.puttsNumber">
+            <input type="number" pattern="\d*" class="scorePuttsData" v-model="playDataArr[currentHoleIndex].puttsNumber" v-if="!isLoading">
+            <input type="number" pattern="\d*" class="scorePuttsData" value="0" v-else>
           </div>
         </div>
       </div>

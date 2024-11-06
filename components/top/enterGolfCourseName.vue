@@ -5,16 +5,91 @@
       <p class="title">ゴルフ場登録</p>
       <p>ゴルフ場を選択してください</p>
       <!-- ここにゴルフ場検索機能を実装する -->
-      <input type="text" placeholder="course">
-      <Nuxt-link @click="toggleModal" to="/scoreInput" class="bButton">登録</Nuxt-link>  
+       <ClientOnly>
+        <div v-if="isLoading"></div>
+        <select v-else v-model="selectedName">
+          <option :value="v" v-for="(v,i) in golf_place_Name" :key="i" >{{ v }}</option>
+        </select>
+      </ClientOnly>
+      <div @click="ToScoreInput()" class="bButton">登録</div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useModalStore } from '~/src/store/modal';
+import type { Database } from '~/types/database.types';
 const modalStore = useModalStore();
 const toggleModal = () => modalStore.toggleModal('');
+
+const supabase=useSupabaseClient<Database>();
+const router =useRouter();
+
+const formatDateToString = (date: Date): string => {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+let selectedName=ref<string>("");
+let golf_place_Index=ref<number>(0);
+let golf_place_Name:string[]=[];
+let golf_place_Id:number[]=[];
+let isLoading=ref<boolean>(true);
+const rounds_data = {
+  user_id:1,
+  date:formatDateToString(new Date()),
+  golf_place_id:0,
+  round_number:1,
+}
+let round_id=ref<number>(0);
+const selectData =async()=>{
+  const {data:m_golfplaces,error:selectError} =await supabase
+  .from('m_golfplaces')
+  .select('*')
+  .order('golf_place_name',{ascending:true});
+  if(selectError){
+    console.error('データの取得に失敗しました',selectError);
+  }else{
+    console.log("データの取得に成功しました",m_golfplaces);
+    isLoading.value=false;
+    golf_place_Name= m_golfplaces.map(item=>item.golf_place_name);
+    golf_place_Id = m_golfplaces.map(item=>item.id);
+    console.log(golf_place_Id,golf_place_Name);
+  }
+}
+
+const changeIndex=()=>{
+  golf_place_Index.value=golf_place_Name.findIndex(str=>str===selectedName.value);
+  rounds_data.golf_place_id=golf_place_Id[golf_place_Index.value];
+}
+const insertRounds =async ()=>{
+  changeIndex();
+  const {data:returnData,error:insertError} =await supabase
+    .from('t_rounds')
+    .insert(rounds_data)
+    .select();
+    if(insertError){
+      console.error('データの挿入に失敗しました',insertError);
+    }else{
+      console.log('データの挿入に成功しました',returnData);
+      round_id.value=returnData[0].id;
+    }
+}
+
+const ToScoreInput =async () => {
+  await insertRounds();
+  toggleModal();
+  console.log("ページ遷移先のid",round_id.value);
+  router.push(`/scoreInput/${round_id.value}`);
+  // router.push(`/scoreInput/${round_id.value}`);
+};
+
+onMounted(()=>{
+  selectData();
+}
+);
+
 </script>
 
 <style scoped>
