@@ -63,6 +63,7 @@ interface holeDetails {
 interface roundDetail {
   date: Date;
   golfPlaceName: string;
+  roundId: number;
   holeDetails: holeDetails[];
 }
 
@@ -90,7 +91,7 @@ async function fetchLog() {
     const { data: roundDatas, error } = await supabase
       .from('t_rounds')
       .select(
-        'date, t_holes(hole_number, score_number, putts_number), m_golfplaces(golf_place_name, m_holes(hole_number, par_number))'
+        'id, date, t_holes(hole_number, score_number, putts_number), m_golfplaces(golf_place_name, m_holes(hole_number, par_number))'
       )
       .eq('user_id', 1);
     if (error) {
@@ -134,6 +135,7 @@ async function fetchLog() {
           golfPlaceName: item.m_golfplaces
             ? item.m_golfplaces.golf_place_name
             : '情報がありません',
+          roundId: item.id,
           holeDetails: tmpHoleDetails,
         });
       });

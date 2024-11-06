@@ -39,12 +39,12 @@
     </div>
     <div class="links">
       <div v-show="isScoreTableVisible">
-        <div class="text_edit">スコアを編集</div>
+        <div class="text_edit" @click="moveEditPage(props.roundId)">
+          スコアを編集
+        </div>
       </div>
       <div v-show="isScoreTableVisible">
-        <a href="~/../formAnalytics">
-          <div class="text_Analytics">フォームの分析を見る ></div>
-        </a>
+        <div class="text_Analytics">フォームの分析を見る ></div>
       </div>
     </div>
   </div>
@@ -53,6 +53,13 @@
 <script setup lang="ts">
 import LogListTableRow from './logListTableRow.vue';
 import LogListArrow from './logListArrow.vue';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+
+const moveEditPage = async (id: number) => {
+  await navigateTo(`/scoreInput/${id}`);
+};
 
 function getHoleDetails(i: number) {
   const detail = props.holedetails.find((item) => item.holeNo === i);
@@ -85,6 +92,7 @@ interface holeDetail {
 interface scoreDetas {
   date: Date;
   golfPlaceName: string;
+  roundId: number;
   holedetails: holeDetail[];
 }
 
