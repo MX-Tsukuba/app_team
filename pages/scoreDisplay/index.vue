@@ -19,8 +19,8 @@
         <div class="indicator" :style="indicatorStyle"></div>
       </div>
     </div>
-    <ScoreDisplay v-if="activeTab === 0" :value="<monthDetail[]>data?.logs" />
-    <MovieDisplay v-else :values="<movieList[]>data?.movies" />
+    <ScoreDisplay v-if="activeTab === 0" :value="data ? data.logs : []" />
+    <MovieDisplay v-else :values="data ? data.movies : []" />
   </div>
 </template>
 
@@ -189,7 +189,8 @@ const fetchMovies = async () => {
       id: item.id,
       date: new Date(item.created_at.slice(0, 10)),
       status: item.status,
-      total_score: 100,
+      total_score: item.result ? (item.result.total_score as number) : null, //時間ないので型解決を諦めます。
+      //total_score: 0,
     });
   });
   moviesArray.sort((a, b) => {
@@ -239,7 +240,7 @@ const fetchMovies = async () => {
 const fetchData = async () => {
   const Logs = await fetchLog();
   const Movies = await fetchMovies();
-  return { logs: Logs, movies: Movies };
+  return { logs: Logs ? Logs : [], movies: Movies ? Movies : [] };
 };
 
 const { data } = useAsyncData(() => fetchData());

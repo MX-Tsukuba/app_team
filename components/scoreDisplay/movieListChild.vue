@@ -21,6 +21,10 @@ function calculateDays(date: Date) {
   return item[date.getDay()];
 }
 
+const toAnalytics = async (id: number) => {
+  await navigateTo(`/formAnalytics/${id}`);
+};
+
 const props = defineProps<movie>();
 </script>
 
@@ -35,10 +39,12 @@ const props = defineProps<movie>();
         <div class="state_tag"><p class="state_succeeded">分析済み</p></div>
         <div class="score_tag">
           <div class="score_text">スコア</div>
-          <div class="score_value">{{ props.total_score }}</div>
+          <div class="score_value">
+            {{ props.total_score ? Math.round(props.total_score * 100) : null }}
+          </div>
         </div>
       </div>
-      <button class="link">分析を見る</button>
+      <div class="link" @click="toAnalytics(props.id)">分析を見る</div>
     </div>
     <div class="tags" v-else>
       <div class="state_tag"><p class="state_unanalyzed">未分析</p></div>
