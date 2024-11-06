@@ -20,7 +20,7 @@
       </div>
     </div>
     <ScoreDisplay v-if="activeTab === 0" :value="<monthDetail[]>data?.logs" />
-    <MovieDisplay v-else />
+    <MovieDisplay v-else :values="<movieList[]>data?.movies" />
   </div>
 </template>
 
@@ -30,7 +30,6 @@ import MovieDisplay from '~/components/scoreDisplay/movieList.vue';
 import { useHeadVarStore } from '~/src/store/headVar.js';
 import { usePageStore } from '~/src/store/currentPage';
 import type { Database } from '~/types/database.types';
-import { SupabaseClient } from '@supabase/supabase-js';
 
 const headVarStore = useHeadVarStore();
 headVarStore.title = 'スコア記録';
@@ -71,6 +70,17 @@ interface monthDetail {
   Y: number;
   M: number;
   monthDatas: roundDetail[];
+}
+
+interface movieList {
+  Y: number;
+  M: number;
+  monthDatas: {
+    id: number;
+    date: Date;
+    status: number;
+    total_score: number | null;
+  }[];
 }
 
 async function fetchLog() {
@@ -169,7 +179,7 @@ const fetchMovies = async () => {
   if (error) throw error;
 
   const moviesArray = <
-    { id: number; date: Date; status: number; total_score: number }[]
+    { id: number; date: Date; status: number; total_score: number | null }[]
   >[];
 
   data.forEach((item) => {
@@ -190,22 +200,13 @@ const fetchMovies = async () => {
   console.log(data);
   console.log(moviesArray);
 
-  const moviesData: {
-    Y: number;
-    M: number;
-    monthDatas: {
-      id: number;
-      date: Date;
-      status: number;
-      total_score: number;
-    }[];
-  }[] = [];
+  const moviesData: movieList[] = [];
   let tmpDate: Date = moviesArray[0].date;
   let tmpDatas: {
     id: number;
     date: Date;
     status: number;
-    total_score: number;
+    total_score: number | null;
   }[] = [];
   moviesArray.forEach((item) => {
     const itemDate = item.date;
@@ -230,7 +231,7 @@ const fetchMovies = async () => {
     monthDatas: tmpDatas,
   });
   console.log(moviesData);
-  return [];
+  return moviesData;
 };
 
 const fetchData = async () => {
