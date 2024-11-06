@@ -37,10 +37,15 @@
         </tbody>
       </table>
     </div>
-    <div v-show="isScoreTableVisible" class="analytics_link">
-      <a href="~/../formAnalytics">
-        <div class="text">フォームの分析を見る ></div>
-      </a>
+    <div class="links">
+      <div v-show="isScoreTableVisible">
+        <div class="text_edit">スコアを編集</div>
+      </div>
+      <div v-show="isScoreTableVisible">
+        <a href="~/../formAnalytics">
+          <div class="text_Analytics">フォームの分析を見る ></div>
+        </a>
+      </div>
     </div>
   </div>
 </template>
@@ -205,7 +210,7 @@ const props = defineProps<scoreDetas>();
   transform: rotate(180deg);
 }
 
-.analytics_link {
+.links {
   display: inline-flex;
   padding: 5px 10px;
   align-items: flex-start;
@@ -213,10 +218,21 @@ const props = defineProps<scoreDetas>();
   position: absolute;
   right: 0pt;
   bottom: 0pt;
+  width:fit-content;
+  gap:20px
 }
 
-.analytics_link .text {
+.text_Analytics {
   color: #007be5;
+  font-family: Inter;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}
+
+.text_edit {
+  color:#E45D5D;
   font-family: Inter;
   font-size: 14px;
   font-style: normal;
