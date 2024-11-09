@@ -1,11 +1,13 @@
 <template>
-  <div class="modal" @click.self="toggleModal">
-    <div class="card">
-    <span class="closeModal" @click="toggleModal">×</span>
-      <p class="title">スワイプ操作</p>
-      <p>スワイプして画面を切り替えられます</p> 
+  <Teleport to="body">
+    <div class="modal" @click.self="toggleModal">
+      <div class="card">
+      <span class="closeModal" @click="toggleModal">×</span>
+        <p class="title">スワイプ操作</p>
+        <p>スワイプして画面を切り替えられます</p> 
+      </div>
     </div>
-  </div>
+  </Teleport>
 </template>
 
 <script setup lang="ts">
@@ -21,7 +23,7 @@ const toggleModal = () => modalStore.toggleModal('');
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, .7);
+  background: rgba(0, 0, 0, .07);
   display: flex;
   justify-content: center;
   align-items: center;
