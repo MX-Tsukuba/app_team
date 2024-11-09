@@ -43,9 +43,12 @@ import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend)
 
 const labels=ref<string[]>([]);
-let datasets=ref<number[]>([]);
+let weight=ref<number[]>([]);
 let height=ref<number[]>([]);
 let flexibility=ref<number[]>([]);
+let todayData=ref<number[]>([]);
+let isTodayActive=ref<boolean>(false);
+const datasets = ref<number[]>([]);
 
 const chartData = computed(() => ({
   labels: labels.value,
@@ -65,6 +68,13 @@ const chartOptions = {
 const supabase = useSupabaseClient<Database>();
 let today=new Date();
 const isLoading = ref<boolean>(true);
+let isDisplay=ref<number>(0);
+
+watchEffect(() => {
+  datasets.value = isDisplay.value === 0 ? weight.value :
+                   isDisplay.value === 1 ? height.value :
+                   isDisplay.value === 2 ? flexibility.value : [];
+});
 
 const formatDateToString = (date: Date): string => {
   const year = date.getFullYear()
@@ -85,13 +95,13 @@ const selectData =async ()=>{
   }else{
     console.log("データの取得に成功しました",body_inputs);
     isLoading.value=false;
-    datasets.value=[0,0,0,0,0,0,0];
+    weight.value=[0,0,0,0,0,0,0];
     height.value=[0,0,0,0,0,0,0];
     flexibility.value=[0,0,0,0,0,0,0];
     body_inputs.forEach(record => {
         const dayIndex = weekDates.indexOf(record.date)
         if (dayIndex !== -1) {
-                datasets.value[dayIndex] = record.weight
+                weight.value[dayIndex] = record.weight
                 height.value[dayIndex] = record.height
                 flexibility.value[dayIndex] = record.flexibility
         }
@@ -125,8 +135,22 @@ const changeWeeks=(i:number)=>{
     selectData();
 }
 
+
+
+const selectTodayData = ()=>{
+  const dayOfWeek =today.getDay();//日曜日=0,土曜日=6
+  const diff=(dayOfWeek +6) % 7;
+  if(weight.value[dayOfWeek]!=0 && height.value[dayOfWeek]!=0 && flexibility.value[dayOfWeek]!=0 ){
+    todayData.value.push(weight.value[dayOfWeek]);
+    todayData.value.push(height.value[dayOfWeek]);
+    todayData.value.push(flexibility.value[dayOfWeek]);
+    isTodayActive.value=true;
+  }
+}
+
 onMounted(() => {
       selectData();
+      selectTodayData();
     })
 </script>
 
