@@ -1,35 +1,35 @@
 <script setup lang="ts">
-import { useHeadVarStore } from '~/src/store/headVar.js'
+import { useHeadVarStore } from '~/src/store/headVar.js';
 import { usePageStore } from '~/src/store/currentPage';
 import type { Database } from '~/types/database.types';
 import { useModalStore } from '~/src/store/modal';
-import Information from "~/components/scoreInput/information.vue";
-import StartRecord from '~/components/scoreInput/ConfirmStartRecord.vue';
 import CameraImg from '~/assets/img/camera.png';
 import CameraTransparentImg from '~/assets/img/cameraTransparent.png';
+//swiperで必要
+import { register } from 'swiper/element/bundle';
+import { InputCard, StartRecord } from '~/components/scoreInput';
+register();
 
-const headVarStore = useHeadVarStore()
-headVarStore.title = 'スコア入力'
+const headVarStore = useHeadVarStore();
+// headVarStore.title = `${golfPlaceName.value}`;宣言前に代入しているため後ろへ移動@ツジ
 const pageStore = usePageStore();
-
-const videoPlayer = ref<HTMLVideoElement | null>(null);
-const videoUrl = ref<string | null>(null);
-const route = useRoute();
-const supabase = useSupabaseClient<Database>();
-//モーダル関係
+const modalStore = useModalStore();
 const isShowModal = computed(() => modalStore.isShowModal);
 const modalName = computed(() => modalStore.modalName);
 const toggleModal = (name:string) => modalStore.toggleModal(name);
+const supabase = useSupabaseClient<Database>();
+const videoPlayer = ref<HTMLVideoElement | null>(null);
+const videoUrl = ref<string | null>(null);
+const route = useRoute();
 
-//この３つのデータは他から受け取る必要あり。
 let roundId =ref<number>(Number(route.params.id));
 const golfPlaceName = ref<string | undefined>('つくばゴルフ場');
-// const golfPlaceId = ref<number>(1);
 let isLoading=ref<boolean>(true);
+const currentHoleIndex=ref<number>(2);
 
 const buttonMessage = ref<string>('登録')
 headVarStore.title = `${golfPlaceName.value}`;
-const modalStore = useModalStore();
+
 
 class playData {
   holeNumber?: number;
@@ -91,7 +91,7 @@ const selectData =async()=> {
 
 //ホール選択（クリック）とパー表示
 // const currentHole = ref<number>(3);
-const currentHoleIndex=ref<number>(2);
+// const currentHoleIndex=ref<number>(2);
 // const fetchPar= async (hole: number) => {
 //   const { data, error } = await supabase
 //     .from('m_holes')
