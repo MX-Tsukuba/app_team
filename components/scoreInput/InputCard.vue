@@ -5,7 +5,7 @@ import { Information } from '~/components/scoreInput';
 const supabase = useSupabaseClient<Database>();
 interface Props {
   roundId: number;
-  currentHole: number;
+  currentHoleIndex: number;
   isShowModal: boolean;
   modalName: string;
   toggleModal: (name: string) => void;
