@@ -200,8 +200,8 @@ const fetchMovies = async () => {
     else if (dateA === dateB) return 0;
     else return 1;
   });
-  console.log(data);
-  console.log(moviesArray);
+  //console.log(data);
+  //console.log(moviesArray);
 
   const moviesData: movieList[] = [];
   let tmpDate: Date = moviesArray[0].date;
@@ -233,7 +233,7 @@ const fetchMovies = async () => {
     M: tmpDate.getMonth() + 1,
     monthDatas: tmpDatas,
   });
-  console.log(moviesData);
+  //console.log(moviesData);
   return moviesData;
 };
 

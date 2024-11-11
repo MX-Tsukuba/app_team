@@ -210,7 +210,7 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "t_holes_movie_id_fkey"
+            foreignKeyName: "t_holes_movie_id_fkey1"
             columns: ["movie_id"]
             isOneToOne: false
             referencedRelation: "t_movies"

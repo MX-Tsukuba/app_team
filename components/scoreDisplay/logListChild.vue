@@ -20,6 +20,9 @@
       <div class="place_tag">
         <div class="place_text">📍{{ props.golfPlaceName }}</div>
       </div>
+      <div class="no_Value_tag" v-show="someHoleIsNull">
+        <div class="isNull_text">！未入力</div>
+      </div>
     </div>
     <div class="score_table" v-show="isScoreTableVisible">
       <table>
@@ -43,9 +46,9 @@
           スコアを編集
         </div>
       </div>
-      <div v-show="isScoreTableVisible">
+      <!-- <div v-show="isScoreTableVisible">
         <div class="text_Analytics">フォームの分析を見る ></div>
-      </div>
+      </div> -->
     </div>
   </div>
 </template>
@@ -55,6 +58,7 @@ import LogListTableRow from './logListTableRow.vue';
 import LogListArrow from './logListArrow.vue';
 import { useRouter } from 'vue-router';
 
+const someHoleIsNull = ref<boolean>(false);
 const router = useRouter();
 
 const moveEditPage = async (id: number) => {
@@ -66,6 +70,7 @@ function getHoleDetails(i: number) {
   if (detail) {
     return detail;
   } else {
+    someHoleIsNull.value = true;
     return {
       holeNo: i,
       par: null,
@@ -97,10 +102,12 @@ interface scoreDetas {
 }
 
 const calculateScore = (holedetails: holeDetail[]) => {
+  //console.log(holedetails);
   let result = 0;
   holedetails.forEach((element) => {
     if (element.result) result += element.result;
   });
+  //console.log(result);
   return result;
 };
 
@@ -192,6 +199,26 @@ const props = defineProps<scoreDetas>();
 
 .place_text {
   color: #007be5;
+  font-family: Inter;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}
+
+.no_Value_tag{
+  display: flex;
+  height: 24px;
+  justify-content: center;
+  align-items: center;
+  padding-left: 10px;
+  padding-right: 10px;
+  border-radius: 18px;
+  background: #ebebeb;
+}
+
+.isNull_text{
+  color: #E45D5D;
   font-family: Inter;
   font-size: 14px;
   font-style: normal;
