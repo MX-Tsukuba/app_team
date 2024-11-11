@@ -46,8 +46,14 @@ const props = defineProps<movie>();
       </div>
       <div class="link" @click="toAnalytics(props.id)">分析を見る</div>
     </div>
-    <div class="tags" v-else>
+    <div class="tags" v-else-if="props.status == 0">
       <div class="state_tag"><p class="state_unanalyzed">未分析</p></div>
+    </div>
+    <div class="tags" v-else-if="props.status == 1">
+      <div class="state_tag"><p class="state_analyzing">解析中</p></div>
+    </div>
+    <div class="tags" v-else>
+      <div class="state_tag"><p class="state_error">エラー</p></div>
     </div>
   </div>
 </template>
@@ -134,6 +140,24 @@ const props = defineProps<movie>();
 }
 
 .state_unanalyzed{
+  color: #000000;
+  font-family: Inter;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}
+
+.state_analyzing{
+  color:#118740;
+  font-family: Inter;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}
+
+.state_error{
   color: #E45D5D;
   font-family: Inter;
   font-size: 14px;
