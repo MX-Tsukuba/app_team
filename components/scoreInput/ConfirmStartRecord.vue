@@ -18,7 +18,8 @@ const toggleModal = () => modalStore.toggleModal('');
 const router = useRouter();
 onMounted(() => {
   setTimeout(() => {
-    router.push('/camera');
+    router.push({path: '/camera', query: {param: 'scoreInput'}});
+    console.log('scoreInput')
     toggleModal();
   }, 2000);
 });
