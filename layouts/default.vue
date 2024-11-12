@@ -1,6 +1,7 @@
 <template>
     <Header/>
     <div class="backGround">
+        <NuxtSnackbar/>
         <slot/>
     </div>
     <Footer/>
