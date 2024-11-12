@@ -25,7 +25,7 @@ const route = useRoute();
 let roundId =ref<number>(Number(route.params.id));
 const golfPlaceName = ref<string | undefined>('つくばゴルフ場');
 let isLoading=ref<boolean>(true);
-const currentHoleIndex=ref<number>(2);
+const currentHoleIndex=ref<number>(0);
 const swiperCards = ref();
 
 const buttonMessage = ref<string>('登録')
@@ -122,31 +122,9 @@ const updateCurrentHole = (holeId:number) =>{
   if (swiperCards.value) {
     swiperCards.value.swiper.slideTo(holeId - 1);
   }
+  console.log(currentHoleIndex.value,"currentHoleIndex");
 };
 
-//データ挿入
-//currentHoleではなくindexで選択するようにする+insertしたデータがすでにDBにある場合updateになるように変更@辻
-// const addPlayData = async () => {
-//   // playData.holeNumber = currentHole.value;
-//   const { error } = await supabase
-//   .from('t_holes')
-//   .insert({
-//     "hole_number": playDataArr.value[currentHoleIndex.value].holeNumber,
-//     "round_id": roundId.value,
-//     "putts_number": playDataArr.value[currentHoleIndex.value].puttsNumber,
-//     "score_number": playDataArr.value[currentHoleIndex.value].scoreNumber,
-//   });
-//   if (error) {
-//     console.error('データの追加に失敗しました',error);
-//   } else {
-//   if(currentHoleIndex.value === 17){
-//     await navigateTo('/scoreDisplay')//useRouterを用いたい@辻
-//   }else{
-//     currentHoleIndex.value++;
-//   }
-//     return true;
-//   }
-// };
 
 //ホール選択（スライド）
 interface holeObj {
@@ -158,7 +136,7 @@ interface holeObj {
   }
 };
 const items:holeObj[] = reactive([]);
-for (let i = 0; i <= 17; i++) {//indexに合わせて1から17に変更@辻
+for (let i = 0; i < 18; i++) {//indexに合わせて1から17に変更@辻
   const singleObject = {
     id: i,
     card: {
@@ -167,12 +145,16 @@ for (let i = 0; i <= 17; i++) {//indexに合わせて1から17に変更@辻
       isSmall: false,
     }
   };
-  if (i === 2) {
+  if (i === 0) {
     singleObject.card.isLarge = true;
-  } else if (i === 1 || i === 3) {
+  } else if (i === 1 ) {//|| i === 3
     singleObject.card.isMedium = true;
-  } else if (i === 0 || i === 4) {
+  } else if (i ===2) {// 0 || i === 4
     singleObject.card.isSmall = true;
+  }else{
+    singleObject.card.isLarge=false;
+    singleObject.card.isMedium=false;
+    singleObject.card.isSmall=true;
   }
   items.push(singleObject)
 };
@@ -181,9 +163,11 @@ const incrementCurrentHole = (newHole:number) => {
 };
 const onSlideChange = () => {
   if (swiperCards.value) {
-    const newIndex = swiperCards.value.swiper.activeIndex;
-    updateCurrentHole(newIndex + 1);
+    // const newIndex = swiperCards.value.swiper.activeIndex;
+    // updateCurrentHole(newIndex + 1);
+    swiperCards.value.swiper.activeIndex=currentHoleIndex.value;
   }
+  console.log("onSlideChange",swiperCards.value.swiper.activeIndex);
 };
 
 //スワイプで中心に来たカードのindexをcurrentHoleとして表示の変更をする
@@ -200,7 +184,11 @@ watch(currentHoleIndex, () => items.forEach(item => {
     item.card.isLarge = false;
     item.card.isMedium = false;
     item.card.isSmall = true;
-  } 
+  }else{
+    item.card.isLarge = false;
+    item.card.isMedium = false;
+    item.card.isSmall = true;
+  }
   if(currentHoleIndex.value === 17)buttonMessage.value = '完了'
   else buttonMessage.value = '登録'
 }))
@@ -236,7 +224,7 @@ onMounted(()=>{
 
     <swiper-container class="selectHole" slides-per-view="auto" centered-slides="true" space-between="5" free-mode="true"
     watch-slides-progress="true">
-      <swiper-slide v-for="(item, index) in items" :key="index" class="eachHole" @click="updateCurrentHole(item.id)" :class="{'holeCardLarge': item.card.isLarge, 'holeCardMedium': item.card.isMedium, 'holeCardSmall': item.card.isSmall}">{{ item.id }}H</swiper-slide>    
+      <swiper-slide v-for="(item, index) in items" :key="index" class="eachHole" @click="updateCurrentHole(item.id)" :class="{'holeCardLarge': item.card.isLarge, 'holeCardMedium': item.card.isMedium, 'holeCardSmall': item.card.isSmall}">{{ item.id+1 }}H</swiper-slide>    
     </swiper-container>
 
     <swiper-container ref="swiperCards" class='inputCards' slides-per-view="1" centered-slides="true" thumbs-swiper=".selectHole" @slideChange="onSlideChange">
