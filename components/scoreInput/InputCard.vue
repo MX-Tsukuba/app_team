@@ -23,7 +23,7 @@ const playData = reactive({
 
 //データ挿入
 const addPlayData = async () => {
-  playData.holeNumber = props.currentHole;
+  playData.holeNumber = props.currentHoleIndex;
   const { error } = await supabase.from('t_holes').insert({
     "created_at": undefined,
     "hole_number": playData.holeNumber,
@@ -35,10 +35,10 @@ const addPlayData = async () => {
   if (error) {
     alert(error.message);
   } else {
-  if(props.currentHole === 18){
+  if(props.currentHoleIndex === 18){
     await navigateTo('./scoreDisplay')
   }else{
-    emit('updateCurrentHole', props.currentHole + 1);
+    emit('updateCurrentHole', props.currentHoleIndex + 1);
     playData.scoreNumber = 0;
     playData.puttsNumber = 0;
     playData.holeNumber = 0
@@ -46,7 +46,7 @@ const addPlayData = async () => {
     return true;
   }
 };
-watch(() => props.currentHole, (newHole) => {
+watch(() => props.currentHoleIndex, (newHole) => {
   emit('incrementCurrentHole', newHole);
 });
 </script>
