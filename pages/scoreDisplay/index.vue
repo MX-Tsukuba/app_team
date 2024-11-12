@@ -57,7 +57,8 @@ interface holeDetails {
   par: number;
   result: number;
   putts: number;
-  form_Score: number;
+  form_Score: number | null;
+  //form_Score: number;
 }
 
 interface roundDetail {
@@ -88,29 +89,21 @@ async function fetchLog() {
   const monthDetails = Array<monthDetail>();
   try {
     //TODO: 特定のユーザのデータゴルフデータを全て取得、ユーザの識別についてはローレベルセキュリティで実行する。
-    const { data: roundDatas, error } = await supabase
+    const { data: roundData, error } = await supabase
       .from('t_rounds')
       .select(
-        'id, date, t_holes(hole_number, score_number, putts_number), m_golfplaces(golf_place_name, m_holes(hole_number, par_number))'
+        'id, date, t_holes(hole_number, score_number, putts_number, t_movies(result)), m_golfplaces(golf_place_name, m_holes(hole_number, par_number))'
       )
       .eq('user_id', 1);
     if (error) {
       console.error('Error fetching data from t_round table:', error);
     } else {
-      //console.log(roundDatas);
-      roundDatas.sort((a, b) => {
-        const dateA = new Date(a.date);
-        const dateB = new Date(b.date);
-        if (dateA > dateB) return -1;
-        else if (dateA === dateB) return 0;
-        else return 1;
-      });
-      //console.log(roundDatas);
+      //console.log(JSON.stringify(roundData), null, 2); //解析結果の取得ができていることを確認済み
 
       //TODO: 一度データをpropsに渡せる形に直す。
       //できれば以下の実装を省略していきなりpropsに渡せる形にする＆月ごとに分けたい。
       const tmpDetails: roundDetail[] = [];
-      roundDatas.forEach((item) => {
+      roundData.forEach((item) => {
         if (item.m_golfplaces !== null)
           item.m_golfplaces.m_holes.sort(
             (a, b) => a.hole_number - b.hole_number
@@ -122,12 +115,19 @@ async function fetchLog() {
           const tmpMHoles = item.m_golfplaces?.m_holes.find((value) => {
             return value.hole_number == item1.hole_number;
           });
+          let form_Score: number | null = null;
+          //let form_Score = 100;
+          if (item1.t_movies) {
+            form_Score = Math.round(
+              (item1.t_movies.result?.total_score as number) * 100
+            );
+          }
           tmpHoleDetails.push({
             holeNo: item1.hole_number,
             par: tmpMHoles ? tmpMHoles.par_number : -1,
             result: item1.score_number,
             putts: item1.putts_number,
-            form_Score: 100,
+            form_Score: form_Score,
           });
         });
         tmpDetails.push({
@@ -155,7 +155,13 @@ async function fetchLog() {
           monthDetails.push({
             Y: tmpDate.getFullYear(),
             M: tmpDate.getMonth() + 1,
-            monthDatas: tmpDatas,
+            monthDatas: tmpDatas.sort((a, b) => {
+              const dateA = new Date(a.date);
+              const dateB = new Date(b.date);
+              if (dateA > dateB) return -1;
+              else if (dateA === dateB) return 0;
+              else return 1;
+            }),
           });
           tmpDatas = [item];
           tmpDate = item.date;
@@ -164,9 +170,25 @@ async function fetchLog() {
       monthDetails.push({
         Y: tmpDate.getFullYear(),
         M: tmpDate.getMonth() + 1,
-        monthDatas: tmpDatas,
+        monthDatas: tmpDatas.sort((a, b) => {
+          const dateA = new Date(a.date);
+          const dateB = new Date(b.date);
+          if (dateA > dateB) return -1;
+          else if (dateA === dateB) return 0;
+          else return 1;
+        }),
       });
       //console.log(monthDetails);
+
+      monthDetails.sort((a, b) => {
+        if (a.Y > b.Y) return -1;
+        else if (a.Y < b.Y) return 1;
+        else {
+          if (a.M > b.M) return -1;
+          else return 1;
+        }
+      });
+
       return monthDetails;
     }
   } catch (e) {
