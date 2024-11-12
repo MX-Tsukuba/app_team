@@ -19,8 +19,8 @@
         <div class="indicator" :style="indicatorStyle"></div>
       </div>
     </div>
-    <ScoreDisplay v-if="activeTab === 0" :value="<monthDetail[]>data?.logs" />
-    <MovieDisplay v-else />
+    <ScoreDisplay v-if="activeTab === 0" :value="data ? data.logs : []" />
+    <MovieDisplay v-else :values="data ? data.movies : []" />
   </div>
 </template>
 
@@ -30,7 +30,6 @@ import MovieDisplay from '~/components/scoreDisplay/movieList.vue';
 import { useHeadVarStore } from '~/src/store/headVar.js';
 import { usePageStore } from '~/src/store/currentPage';
 import type { Database } from '~/types/database.types';
-import { SupabaseClient } from '@supabase/supabase-js';
 
 const headVarStore = useHeadVarStore();
 headVarStore.title = 'スコア記録';
@@ -64,6 +63,7 @@ interface holeDetails {
 interface roundDetail {
   date: Date;
   golfPlaceName: string;
+  roundId: number;
   holeDetails: holeDetails[];
 }
 
@@ -73,6 +73,17 @@ interface monthDetail {
   monthDatas: roundDetail[];
 }
 
+interface movieList {
+  Y: number;
+  M: number;
+  monthDatas: {
+    id: number;
+    date: Date;
+    status: number;
+    total_score: number | null;
+  }[];
+}
+
 async function fetchLog() {
   const monthDetails = Array<monthDetail>();
   try {
@@ -80,7 +91,7 @@ async function fetchLog() {
     const { data: roundDatas, error } = await supabase
       .from('t_rounds')
       .select(
-        'date, t_holes(hole_number, score_number, putts_number), m_golfplaces(golf_place_name, m_holes(hole_number, par_number))'
+        'id, date, t_holes(hole_number, score_number, putts_number), m_golfplaces(golf_place_name, m_holes(hole_number, par_number))'
       )
       .eq('user_id', 1);
     if (error) {
@@ -124,6 +135,7 @@ async function fetchLog() {
           golfPlaceName: item.m_golfplaces
             ? item.m_golfplaces.golf_place_name
             : '情報がありません',
+          roundId: item.id,
           holeDetails: tmpHoleDetails,
         });
       });
@@ -169,7 +181,7 @@ const fetchMovies = async () => {
   if (error) throw error;
 
   const moviesArray = <
-    { id: number; date: Date; status: number; total_score: number }[]
+    { id: number; date: Date; status: number; total_score: number | null }[]
   >[];
 
   data.forEach((item) => {
@@ -177,7 +189,8 @@ const fetchMovies = async () => {
       id: item.id,
       date: new Date(item.created_at.slice(0, 10)),
       status: item.status,
-      total_score: 100,
+      total_score: item.result ? (item.result.total_score as number) : null, //時間ないので型解決を諦めます。
+      //total_score: 0,
     });
   });
   moviesArray.sort((a, b) => {
@@ -190,22 +203,13 @@ const fetchMovies = async () => {
   console.log(data);
   console.log(moviesArray);
 
-  const moviesData: {
-    Y: number;
-    M: number;
-    monthDatas: {
-      id: number;
-      date: Date;
-      status: number;
-      total_score: number;
-    }[];
-  }[] = [];
+  const moviesData: movieList[] = [];
   let tmpDate: Date = moviesArray[0].date;
   let tmpDatas: {
     id: number;
     date: Date;
     status: number;
-    total_score: number;
+    total_score: number | null;
   }[] = [];
   moviesArray.forEach((item) => {
     const itemDate = item.date;
@@ -230,13 +234,13 @@ const fetchMovies = async () => {
     monthDatas: tmpDatas,
   });
   console.log(moviesData);
-  return [];
+  return moviesData;
 };
 
 const fetchData = async () => {
   const Logs = await fetchLog();
   const Movies = await fetchMovies();
-  return { logs: Logs, movies: Movies };
+  return { logs: Logs ? Logs : [], movies: Movies ? Movies : [] };
 };
 
 const { data } = useAsyncData(() => fetchData());

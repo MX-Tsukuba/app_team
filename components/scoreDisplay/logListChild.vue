@@ -37,10 +37,15 @@
         </tbody>
       </table>
     </div>
-    <div v-show="isScoreTableVisible" class="analytics_link">
-      <a href="~/../formAnalytics">
-        <div class="text">フォームの分析を見る ></div>
-      </a>
+    <div class="links">
+      <div v-show="isScoreTableVisible">
+        <div class="text_edit" @click="moveEditPage(props.roundId)">
+          スコアを編集
+        </div>
+      </div>
+      <div v-show="isScoreTableVisible">
+        <div class="text_Analytics">フォームの分析を見る ></div>
+      </div>
     </div>
   </div>
 </template>
@@ -48,6 +53,13 @@
 <script setup lang="ts">
 import LogListTableRow from './logListTableRow.vue';
 import LogListArrow from './logListArrow.vue';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+
+const moveEditPage = async (id: number) => {
+  await navigateTo(`/scoreInput/${id}`);
+};
 
 function getHoleDetails(i: number) {
   const detail = props.holedetails.find((item) => item.holeNo === i);
@@ -80,6 +92,7 @@ interface holeDetail {
 interface scoreDetas {
   date: Date;
   golfPlaceName: string;
+  roundId: number;
   holedetails: holeDetail[];
 }
 
@@ -205,7 +218,7 @@ const props = defineProps<scoreDetas>();
   transform: rotate(180deg);
 }
 
-.analytics_link {
+.links {
   display: inline-flex;
   padding: 5px 10px;
   align-items: flex-start;
@@ -213,10 +226,21 @@ const props = defineProps<scoreDetas>();
   position: absolute;
   right: 0pt;
   bottom: 0pt;
+  width:fit-content;
+  gap:20px
 }
 
-.analytics_link .text {
+.text_Analytics {
   color: #007be5;
+  font-family: Inter;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}
+
+.text_edit {
+  color:#E45D5D;
   font-family: Inter;
   font-size: 14px;
   font-style: normal;

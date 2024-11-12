@@ -1,19 +1,50 @@
 <script setup lang="ts">
 const value = ref<boolean>(true);
+
+interface movie {
+  id: number;
+  date: Date;
+  status: number;
+  total_score: number | null;
+}
+
+function calculateDays(date: Date) {
+  const item = [
+    '日曜日',
+    '月曜日',
+    '火曜日',
+    '水曜日',
+    '木曜日',
+    '金曜日',
+    '土曜日',
+  ];
+  return item[date.getDay()];
+}
+
+const toAnalytics = async (id: number) => {
+  await navigateTo(`/formAnalytics/${id}`);
+};
+
+const props = defineProps<movie>();
 </script>
 
 <template>
   <div class="card_whole">
-    <div class="date">10月20日 日曜日</div>
-    <div class="tags" v-if="value">
+    <div class="date">
+      {{ props.date.getMonth() + 1 }}月{{ props.date.getDate() }}日
+      {{ calculateDays(props.date) }}
+    </div>
+    <div class="tags" v-if="props.status == 2">
       <div style="display: flex; gap: 11px">
         <div class="state_tag"><p class="state_succeeded">分析済み</p></div>
         <div class="score_tag">
           <div class="score_text">スコア</div>
-          <div class="score_value">90</div>
+          <div class="score_value">
+            {{ props.total_score ? Math.round(props.total_score * 100) : null }}
+          </div>
         </div>
       </div>
-      <button class="link">分析を見る</button>
+      <div class="link" @click="toAnalytics(props.id)">分析を見る</div>
     </div>
     <div class="tags" v-else>
       <div class="state_tag"><p class="state_unanalyzed">未分析</p></div>
