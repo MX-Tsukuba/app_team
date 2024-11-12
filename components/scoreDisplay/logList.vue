@@ -21,7 +21,8 @@ interface holeDetails {
   par: number;
   result: number;
   putts: number;
-  form_Score: number;
+  form_Score: number | null;
+  //form_Score: number;
 }
 
 interface roundDetail {
