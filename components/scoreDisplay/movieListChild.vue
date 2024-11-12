@@ -44,7 +44,7 @@ const props = defineProps<movie>();
           </div>
         </div>
       </div>
-      <div class="link" @click="toAnalytics(props.id)">分析を見る</div>
+      <button class="link" @click="toAnalytics(props.id)">分析を見る</button>
     </div>
     <div class="tags" v-else-if="props.status == 0">
       <div class="state_tag"><p class="state_unanalyzed">未分析</p></div>

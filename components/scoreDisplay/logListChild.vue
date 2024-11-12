@@ -42,9 +42,9 @@
     </div>
     <div class="links">
       <div v-show="isScoreTableVisible">
-        <div class="text_edit" @click="moveEditPage(props.roundId)">
+        <button class="text_edit" @click="moveEditPage(props.roundId)">
           スコアを編集
-        </div>
+        </button>
       </div>
       <!-- <div v-show="isScoreTableVisible">
         <div class="text_Analytics">フォームの分析を見る ></div>
