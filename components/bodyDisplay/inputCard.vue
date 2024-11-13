@@ -15,6 +15,7 @@ const props=defineProps<{
     input:number
     unit:string
 }>()
+// console.log(props.input,"inputの中身を表示");
 </script>
 
 <style scoped >

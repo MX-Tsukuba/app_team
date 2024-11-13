@@ -66,7 +66,7 @@ const labels=ref<string[]>([]);
 let weight=ref<number[]>([]);
 let height=ref<number[]>([]);
 let flexibility=ref<number[]>([]);
-let todayData=ref<number[]>([]);
+let todayData=ref<number[]>([0,0,0]);
 let isTodayActive=ref<boolean>(false);
 const datasets = ref<number[]>([]);
 const tabLabels = ['体重', '身長', '柔軟性'];
@@ -162,21 +162,30 @@ const selectTab = (index: number) => {
 };
 
 const selectTodayData = ()=>{
-  const dayOfWeek =today.getDay();//日曜日=0,土曜日=6
-  const diff=(dayOfWeek +6) % 7;
-  if(weight.value[dayOfWeek]!=0 && height.value[dayOfWeek]!=0 && flexibility.value[dayOfWeek]!=0 ){
-    todayData.value.push(weight.value[dayOfWeek]);
-    todayData.value.push(height.value[dayOfWeek]);
-    todayData.value.push(flexibility.value[dayOfWeek]);
-    isTodayActive.value=true;
-    console.log("今日のデータを取得",todayData);
-  }else{
-    console.log("今日のデータの取得に失敗しました");
+  const todayDateStr = formatDateToString(today);
+  const todayIndex = weekDates.indexOf(todayDateStr);
+  if (todayIndex !== -1) {
+    const weightValue = weight.value[todayIndex];
+    const heightValue = height.value[todayIndex];
+    const flexibilityValue = flexibility.value[todayIndex];
+    console.log("weight,height,flexibility",weightValue,heightValue,flexibilityValue);
+    if (weightValue !== 0 || heightValue !== 0) {
+      // todayData.value = [weightValue, heightValue, flexibilityValue];
+      todayData.value[0]=weightValue;
+      todayData.value[1]=heightValue;
+      todayData.value[2]=flexibilityValue;
+      isTodayActive.value = true;
+      console.log("今日のデータを取得", todayData.value);
+    } else {
+      console.log("今日のデータが不足しています");
+    }
+  } else {
+    console.log("今日の日付が weekDates に存在しません");
   }
 }
 
-onMounted(() => {
-      selectData();
+onMounted(async() => {
+      await selectData();
       selectTodayData();
     })
 </script>

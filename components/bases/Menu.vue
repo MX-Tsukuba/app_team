@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { defineProps } from 'vue';
 const isActive = ref(false);
 const props = defineProps<{
   isOpen: Boolean;
