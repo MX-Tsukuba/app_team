@@ -20,6 +20,9 @@
       <div class="place_tag">
         <div class="place_text">📍{{ props.golfPlaceName }}</div>
       </div>
+      <div class="no_Value_tag" v-show="someHoleIsNull">
+        <div class="isNull_text">！未入力</div>
+      </div>
     </div>
     <div class="score_table" v-show="isScoreTableVisible">
       <table>
@@ -37,10 +40,15 @@
         </tbody>
       </table>
     </div>
-    <div v-show="isScoreTableVisible" class="analytics_link">
-      <a href="~/../formAnalytics">
-        <div class="text">フォームの分析を見る ></div>
-      </a>
+    <div class="links">
+      <div v-show="isScoreTableVisible">
+        <button class="text_edit" @click="moveEditPage(props.roundId)">
+          スコアを編集
+        </button>
+      </div>
+      <!-- <div v-show="isScoreTableVisible">
+        <div class="text_Analytics">フォームの分析を見る ></div>
+      </div> -->
     </div>
   </div>
 </template>
@@ -48,12 +56,21 @@
 <script setup lang="ts">
 import LogListTableRow from './logListTableRow.vue';
 import LogListArrow from './logListArrow.vue';
+import { useRouter } from 'vue-router';
+
+const someHoleIsNull = ref<boolean>(false);
+const router = useRouter();
+
+const moveEditPage = async (id: number) => {
+  await navigateTo(`/scoreInput/${id}`);
+};
 
 function getHoleDetails(i: number) {
   const detail = props.holedetails.find((item) => item.holeNo === i);
   if (detail) {
     return detail;
   } else {
+    someHoleIsNull.value = true;
     return {
       holeNo: i,
       par: null,
@@ -74,20 +91,24 @@ interface holeDetail {
   par: number;
   result: number;
   putts: number;
-  form_Score: number;
+  form_Score: number | null;
+  //form_Score: number;
 }
 
 interface scoreDetas {
   date: Date;
   golfPlaceName: string;
+  roundId: number;
   holedetails: holeDetail[];
 }
 
 const calculateScore = (holedetails: holeDetail[]) => {
+  //console.log(holedetails);
   let result = 0;
   holedetails.forEach((element) => {
     if (element.result) result += element.result;
   });
+  //console.log(result);
   return result;
 };
 
@@ -186,6 +207,26 @@ const props = defineProps<scoreDetas>();
   line-height: normal;
 }
 
+.no_Value_tag{
+  display: flex;
+  height: 24px;
+  justify-content: center;
+  align-items: center;
+  padding-left: 10px;
+  padding-right: 10px;
+  border-radius: 18px;
+  background: #ebebeb;
+}
+
+.isNull_text{
+  color: #E45D5D;
+  font-family: Inter;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}
+
 .button_fram {
   display: flex;
   padding: 6px 9px;
@@ -205,7 +246,7 @@ const props = defineProps<scoreDetas>();
   transform: rotate(180deg);
 }
 
-.analytics_link {
+.links {
   display: inline-flex;
   padding: 5px 10px;
   align-items: flex-start;
@@ -213,10 +254,21 @@ const props = defineProps<scoreDetas>();
   position: absolute;
   right: 0pt;
   bottom: 0pt;
+  width:fit-content;
+  gap:20px
 }
 
-.analytics_link .text {
+.text_Analytics {
   color: #007be5;
+  font-family: Inter;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}
+
+.text_edit {
+  color:#E45D5D;
   font-family: Inter;
   font-size: 14px;
   font-style: normal;

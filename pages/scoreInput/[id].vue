@@ -32,6 +32,7 @@ const buttonMessage = ref<string>('登録')
 headVarStore.title = `${golfPlaceName.value}`;
 
 
+
 class playData {
   holeNumber?: number;
   scoreNumber?: number;
@@ -92,7 +93,6 @@ const selectData =async()=> {
 
 //ホール選択（クリック）とパー表示
 // const currentHole = ref<number>(3);
-// const currentHoleIndex=ref<number>(2);
 // const fetchPar= async (hole: number) => {
 //   const { data, error } = await supabase
 //     .from('m_holes')
@@ -126,6 +126,7 @@ const updateCurrentHole = (holeId:number) =>{
 };
 
 
+
 //ホール選択（スライド）
 interface holeObj {
   id: number,
@@ -137,6 +138,7 @@ interface holeObj {
 };
 const items:holeObj[] = reactive([]);
 for (let i = 0; i < 18; i++) {//indexに合わせて1から17に変更@辻
+
   const singleObject = {
     id: i,
     card: {
@@ -171,6 +173,7 @@ const onSlideChange = () => {
 };
 
 //スワイプで中心に来たカードのindexをcurrentHoleとして表示の変更をする
+
 watch(currentHoleIndex, () => items.forEach(item => {
   if (item.id === currentHoleIndex.value) {
     item.card.isLarge = true;
@@ -233,6 +236,7 @@ onMounted(()=>{
         <InputCard :roundId :currentHoleIndex :isShowModal :modalName :toggleModal :videoPlayer :videoUrl :buttonMessage  @updateCurrentHole="updateCurrentHole" @incrementCurrentHole="incrementCurrentHole"/>
       </swiper-slide>
     </swiper-container>
+
 
     <div class="circleBtn" @click="toggleModal('confirm')" :class="{'inActive': videoUrl}">
       <img :src="videoUrl ? CameraTransparentImg : CameraImg" width="48">
@@ -297,6 +301,7 @@ box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, .5);
   align-items: center;
   justify-self: center;
   align-self: end;
+
   border-radius: 5px;
   border: 1px solid #007BE5;
   box-sizing: border-box;
@@ -329,6 +334,6 @@ box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, .5);
 }  
 .cardContainer{  
   display: flex;
-  justify-content: center;
+  justify-content: center
 }
 </style>

@@ -1,11 +1,12 @@
 <template>
-  <div class="sub_container" v-for="item in data">
+  <div class="sub_container" v-for="item in props.value">
     <div class="month">{{ item.Y }}年{{ item.M }}月</div>
     <div class="subsub_container">
       <logListChild
         v-for="item1 in item.monthDatas"
         :date="item1.date"
         :golfPlaceName="item1.golfPlaceName"
+        :roundId="item1.roundId"
         :holedetails="item1.holeDetails"
       />
     </div>
@@ -23,12 +24,14 @@ interface holeDetails {
   par: number;
   result: number;
   putts: number;
-  form_Score: number;
+  form_Score: number | null;
+  //form_Score: number;
 }
 
 interface roundDetail {
   date: Date;
   golfPlaceName: string;
+  roundId: number;
   holeDetails: holeDetails[];
 }
 
@@ -130,8 +133,7 @@ async function getScore() {
     console.error('Unexpected Error', e);
   }
 }
-
-const { data } = useAsyncData(() => getScore());
+const props = defineProps<datas>();
 </script>
 
 <style scoped>

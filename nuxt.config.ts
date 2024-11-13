@@ -2,7 +2,12 @@
 export default defineNuxtConfig({
   devtools: { enabled: true },
 
-  modules: [`@nuxtjs/supabase`, '@pinia/nuxt'],
+  modules: [`@nuxtjs/supabase`, '@pinia/nuxt','nuxt-snackbar',],
+  snackbar: {
+    position: 'top-right',
+    duration: 3000,
+    color: 'success',
+  },
 
   app: {
     head: {
