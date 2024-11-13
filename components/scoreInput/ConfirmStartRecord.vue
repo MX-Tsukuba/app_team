@@ -16,7 +16,6 @@ import { useModalStore } from '~/src/store/modal';
 const modalStore = useModalStore();
 const toggleModal = () => modalStore.toggleModal('');
 const router = useRouter();
-const props = defineProps();
 onMounted(() => {
   setTimeout(() => {
     router.push('/camera');
