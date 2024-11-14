@@ -120,7 +120,7 @@ const setting=()=>{
 const updateCurrentHole = (holeId:number) =>{
   currentHoleIndex.value = holeId;
   if (swiperCards.value) {
-    swiperCards.value.swiper.slideTo(holeId - 1);
+    swiperCards.value.swiper.slideTo(holeId);
   }
   console.log(currentHoleIndex.value,"currentHoleIndex");
 };
@@ -165,9 +165,8 @@ const incrementCurrentHole = (newHole:number) => {
 };
 const onSlideChange = () => {
   if (swiperCards.value) {
-    // const newIndex = swiperCards.value.swiper.activeIndex;
-    // updateCurrentHole(newIndex + 1);
-    swiperCards.value.swiper.activeIndex=currentHoleIndex.value;
+    const newIndex = swiperCards.value.swiper.activeIndex;
+    currentHoleIndex.value = newIndex;
   }
   console.log("onSlideChange",swiperCards.value.swiper.activeIndex);
 };
