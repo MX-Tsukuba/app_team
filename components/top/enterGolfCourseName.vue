@@ -11,7 +11,7 @@
           <option :value="v" v-for="(v,i) in golf_place_Name" :key="i" >{{ v }}</option>
         </select>
       </ClientOnly>
-      <div @click="ToScoreInput()" class="bButton">登録</div>
+      <div @click="toScoreInput()" class="bButton">登録</div>
     </div>
   </div>
 </template>
@@ -77,11 +77,11 @@ const insertRounds =async ()=>{
     }
 }
 
-const ToScoreInput =async () => {
+const toScoreInput =async () => {
   await insertRounds();
   toggleModal();
   console.log("ページ遷移先のid",round_id.value);
-  router.push(`/scoreInput/${round_id.value}`);
+  router.push({path:`/scoreInput/${round_id.value}`,query:{param:'scoreInput'}});
   // router.push(`/scoreInput/${round_id.value}`);
 };
 

@@ -16,9 +16,14 @@ import { useModalStore } from '~/src/store/modal';
 const modalStore = useModalStore();
 const toggleModal = () => modalStore.toggleModal('');
 const router = useRouter();
+const route = useRoute();
+let roundId =ref<number>(Number(route.params.id));
+
 onMounted(() => {
   setTimeout(() => {
-    router.push('/camera');
+    roundId.value=Number(route.params.id);
+    console.log(roundId.value);
+    router.push({path:'/camera', query: {id: roundId.value, param:'scoreInput'}});
     toggleModal();
   }, 2000);
 });

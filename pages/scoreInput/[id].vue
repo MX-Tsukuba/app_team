@@ -21,6 +21,7 @@ const isShowModal = computed(() => modalStore.isShowModal);
 const modalName = computed(() => modalStore.modalName);
 const toggleModal = (name:string) => modalStore.toggleModal(name);
 
+const currentHoleIndex=ref<number>(0);
 //この３つのデータは他から受け取る必要あり。
 let roundId =ref<number>(Number(route.params.id));
 const golfPlaceName = ref<string | undefined>('つくばゴルフ場');
@@ -91,7 +92,6 @@ const selectData =async()=> {
 
 //ホール選択（クリック）とパー表示
 // const currentHole = ref<number>(3);
-const currentHoleIndex=ref<number>(2);
 // const fetchPar= async (hole: number) => {
 //   const { data, error } = await supabase
 //     .from('m_holes')
@@ -118,6 +118,7 @@ const setting=()=>{
 
 const updateCurrentHole = (holeId:number) =>{//holeの変更に応じてIndexを変更する
   currentHoleIndex.value = holeId;
+  console.log("holeId",holeId)
 };
 
 //データ挿入
