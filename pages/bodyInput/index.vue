@@ -51,6 +51,7 @@ const insertBody=async ()=>{
   console.error('Error inserting data:', error);
   } else {
   console.log('Data inserted successfully');
+  await navigateTo('./bodyDisplay');
   }
 }
 
