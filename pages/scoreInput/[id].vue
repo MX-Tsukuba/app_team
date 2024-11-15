@@ -3,6 +3,7 @@ import { useHeadVarStore } from '~/src/store/headVar.js'
 import { usePageStore } from '~/src/store/currentPage';
 import type { Database } from '~/types/database.types';
 import { useModalStore } from '~/src/store/modal';
+import { useScoreStore } from '~/src/store/scoreInput';
 import Information from "~/components/scoreInput/information.vue";
 import StartRecord from '~/components/scoreInput/ConfirmStartRecord.vue';
 import CameraImg from '~/assets/img/camera.png';
@@ -11,7 +12,7 @@ import CameraTransparentImg from '~/assets/img/cameraTransparent.png';
 const headVarStore = useHeadVarStore()
 headVarStore.title = 'スコア入力'
 const pageStore = usePageStore();
-
+const scoreStore = useScoreStore();
 const videoPlayer = ref<HTMLVideoElement | null>(null);
 const videoUrl = ref<string | null>(null);
 const route = useRoute();
@@ -21,7 +22,7 @@ const isShowModal = computed(() => modalStore.isShowModal);
 const modalName = computed(() => modalStore.modalName);
 const toggleModal = (name:string) => modalStore.toggleModal(name);
 
-const currentHoleIndex=ref<number>(0);
+const currentHoleIndex=ref<number>(0);//0のままだからupdateCurrentHoleを呼び出すところとか、値の操作について調べる
 //この３つのデータは他から受け取る必要あり。
 let roundId =ref<number>(Number(route.params.id));
 const golfPlaceName = ref<string | undefined>('つくばゴルフ場');
@@ -118,6 +119,7 @@ const setting=()=>{
 
 const updateCurrentHole = (holeId:number) =>{//holeの変更に応じてIndexを変更する
   currentHoleIndex.value = holeId;
+  scoreStore.setCurrentHoleIndex(holeId);
   console.log("holeId",holeId)
 };
 
@@ -222,6 +224,7 @@ watch(currentHoleIndex, () => items.forEach(item => {
 const videoInsert = async()=>{
   //pageStore.setCurrentPage('score');
   videoUrl.value = route.query.video as string;
+  scoreStore.setVideoUrl(videoUrl.value);
   await nextTick();
   if (videoPlayer.value && videoUrl.value) {
     videoPlayer.value.src = videoUrl.value;
@@ -277,7 +280,8 @@ onMounted(()=>{
       </div>
       <button @click="addPlayData" class="bButton">{{ buttonMessage }}</button>
     <div class="circleBtn" @click="toggleModal('confirm')" :class="{'inActive': videoUrl}">
-      <img :src="videoUrl ? CameraTransparentImg : CameraImg" width="48">
+      <!-- <img :src="videoUrl ? CameraTransparentImg : CameraImg" width="48"> -->
+      <isRecorded/>
     </div>
     <StartRecord v-if="isShowModal && modalName === 'confirm' && !videoUrl"/>
     </div>
