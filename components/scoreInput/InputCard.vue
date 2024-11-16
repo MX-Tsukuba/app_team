@@ -1,11 +1,20 @@
 <script setup lang="ts">
 import type { Database } from '~/types/database.types';
 import { Information } from '~/components/scoreInput';
-
+import { useInputStateStore } from '~/src/store';
+const inputStateStore = useInputStateStore();
 const supabase = useSupabaseClient<Database>();
+type dbPlayData = {
+  holeNumber?: number;
+  scoreNumber?: number;
+  puttsNumber?: number;
+  isSelect:boolean
+}
 interface Props {
+  itemIndex: number;
   roundId: number;
   currentHoleIndex: number;
+  playDataArr: dbPlayData[];
   isShowModal: boolean;
   modalName: string;
   toggleModal: (name: string) => void;
@@ -13,41 +22,41 @@ interface Props {
   videoUrl: string | null;
   buttonMessage: string;
 };
+
 const props = defineProps<Props>();
 const emit = defineEmits(['updateCurrentHole', 'incrementCurrentHole']);
 const playData = reactive({
-  holeNumber: 0,
-  scoreNumber: 0,
-  puttsNumber: 0,
+  holeNumber: props.currentHoleIndex + 1,
+  puttsNumber: props.playDataArr[props.itemIndex]?.puttsNumber || 0,
+  scoreNumber: props.playDataArr[props.itemIndex]?.scoreNumber || 0,
 });
-
 //データ挿入
 const addPlayData = async () => {
-  playData.holeNumber = props.currentHoleIndex;
+  console.log('inputCard_currentHoleIndex', props.currentHoleIndex);
+  console.log('playData', playData);
   const { error } = await supabase.from('t_holes').insert({
-    "created_at": undefined,
     "hole_number": playData.holeNumber,
     "round_id": props.roundId,
     "putts_number": playData.puttsNumber,
     "score_number": playData.scoreNumber,
-    "updated_at": undefined,
   });
   if (error) {
     alert(error.message);
   } else {
   if(props.currentHoleIndex === 18){
+    inputStateStore.isInterrupted = false;
+    inputStateStore.roundId = null;
     await navigateTo('./scoreDisplay')
   }else{
     emit('updateCurrentHole', props.currentHoleIndex + 1);
-    playData.scoreNumber = 0;
-    playData.puttsNumber = 0;
-    playData.holeNumber = 0
   }
     return true;
   }
 };
 watch(() => props.currentHoleIndex, (newHole) => {
-  emit('incrementCurrentHole', newHole);
+  playData.holeNumber = newHole + 1;
+  playData.puttsNumber = props.playDataArr[props.itemIndex]?.puttsNumber || 0;
+  playData.scoreNumber = props.playDataArr[props.itemIndex]?.scoreNumber || 0;
 });
 </script>
 

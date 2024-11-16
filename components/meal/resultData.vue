@@ -14,7 +14,7 @@ const props=defineProps<{
 
 </script>
 
-<style>
+<style scoped>
 .data{
     display: flex;
     padding: 9px 165px 0px 12px;

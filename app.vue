@@ -7,6 +7,7 @@
 <style>
 body{
   margin: 0px;
+  color: #333;
 }
 p, ul, li, a{
   margin: 0;
@@ -49,6 +50,18 @@ button{
   border-radius: 20px;
   color: #FFF;
   background: #007be5;
+  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, .25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.rButton {
+  width: 200px;
+  height: 40px;
+  border-radius: 20px;
+  font-size: 16px;
+  color: #FFF;
+  background: #E45D5D;
   box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, .25);
   display: flex;
   align-items: center;
