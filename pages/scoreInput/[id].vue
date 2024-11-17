@@ -9,7 +9,7 @@ import CameraImg from '~/assets/img/camera.png';
 import CameraTransparentImg from '~/assets/img/cameraTransparent.png';
 //swiperで必要
 import { register } from 'swiper/element/bundle';
-import { InputCard, StartRecord } from '~/components/scoreInput';
+import { InputCard, StartRecord, IsRecorded } from '~/components/scoreInput';
 register();
 
 const headVarStore = useHeadVarStore();
@@ -34,7 +34,7 @@ const swiperCards = ref();
 
 const buttonMessage = ref<string>('登録')
 headVarStore.title = `${golfPlaceName.value}`;
-
+const isRecordedArray = ref();
 
 
 class playData {
@@ -201,7 +201,7 @@ watch(currentHoleIndex, () => items.forEach(item => {
   else buttonMessage.value = '登録'
 }))
 const videoInsert = async()=>{
-  videoUrl.value = route.query.video as string;
+  videoUrl.value = route.query.video as string;//currentHoleに関するvideoになっている
   scoreStore.setVideoUrl(videoUrl.value);
   await nextTick();
   if (videoPlayer.value && videoUrl.value) {
@@ -244,10 +244,7 @@ onMounted(()=>{
     </swiper-container>
 
 
-    <div class="circleBtn" @click="toggleModal('confirm')" :class="{'inActive': videoUrl}">
-      <!-- <img :src="videoUrl ? CameraTransparentImg : CameraImg" width="48"> -->
-      <isRecorded/>
-    </div>
+    <IsRecorded @click="toggleModal('confirm')"/>
     <StartRecord v-if="isShowModal && modalName === 'confirm' && !videoUrl"/>
   </section>
 </template>
