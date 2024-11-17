@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { usePageStore, useHeadVarStore, useInputStateStore, useModalStore } from '~/src/store';
+import { usePageStore, useHeadVarStore, useInputStateStore, useModalStore, useScoreStore } from '~/src/store';
 import type { Database } from '~/types/database.types';
 import CameraImg from '~/assets/img/camera.png';
 import CameraTransparentImg from '~/assets/img/cameraTransparent.png';

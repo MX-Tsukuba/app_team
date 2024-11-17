@@ -97,7 +97,7 @@ const ToScoreInput = async () => {
   }
   toggleModal();
   console.log("ページ遷移先のid",round_id.value);
-  router.push(`/scoreInput/${round_id.value}`);
+  router.push({path:`/scoreInput/${round_id.value}`,query:{param:'scoreInput'}});
 };
 
 onMounted(() => {
