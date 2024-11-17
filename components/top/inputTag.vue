@@ -1,12 +1,12 @@
 <template>
-    <div class="inputTag">
-        <img :src="images" width="40">
-        <div class="innerInputTag">
-          <p class="tagTitle">{{ tagTitle }}</p>
-          <p class="tagDescription">{{ tagDescription }}</p>
-        </div>
-        <NuxtLink :to="link" ><img src="~assets/img/right.png" class="goButton" @click="onclick('top')"></NuxtLink>
-      </div> 
+    <NuxtLink  :to="link" class="inputTag" @click="onclick('top')">
+      <img :src="images" width="40">
+      <div class="innerInputTag">
+        <p class="tagTitle">{{ tagTitle }}</p>
+        <p class="tagDescription">{{ tagDescription }}</p>
+      </div>
+      <img src="~assets/img/right.png" class="goButton">
+    </NuxtLink>
 </template>
 
 <script setup lang="ts">

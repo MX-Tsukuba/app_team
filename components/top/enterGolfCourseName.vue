@@ -11,14 +11,24 @@
           <option :value="v" v-for="(v,i) in golf_place_Name" :key="i" >{{ v }}</option>
         </select>
       </ClientOnly>
-      <div @click="toScoreInput()" class="bButton">登録</div>
+      <div class="buttonContainer">
+        <div @click="ToScoreInput()" class="bButton">登録</div>
+        <div v-if="inputStateStore.isInterrupted" class="interruptedArea">
+          <div class="border">
+            <hr/>
+            <span class="textOr">or</span>
+          </div>        
+          <p @click="ToScoreInput()" class="rButton">入力を再開</p>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { useModalStore } from '~/src/store/modal';
+import { useInputStateStore, useModalStore } from '~/src/store';
 import type { Database } from '~/types/database.types';
+const inputStateStore = useInputStateStore();
 const modalStore = useModalStore();
 const toggleModal = () => modalStore.toggleModal('');
 
@@ -31,20 +41,20 @@ const formatDateToString = (date: Date): string => {
   const day = String(date.getDate()).padStart(2, '0')
   return `${year}-${month}-${day}`
 }
-let selectedName=ref<string>("");
-let golf_place_Index=ref<number>(0);
-let golf_place_Name:string[]=[];
-let golf_place_Id:number[]=[];
-let isLoading=ref<boolean>(true);
+let selectedName = ref<string>("");
+let golf_place_Index = ref<number>(0);
+let golf_place_Name:string[] = [];
+let golf_place_Id:number[] = [];
+let isLoading = ref<boolean>(true);
 const rounds_data = {
   user_id:1,
   date:formatDateToString(new Date()),
   golf_place_id:0,
   round_number:1,
 }
-let round_id=ref<number>(0);
-const selectData =async()=>{
-  const {data:m_golfplaces,error:selectError} =await supabase
+let round_id = ref<number>(0);
+const selectData = async() => {
+  const {data:m_golfplaces,error:selectError} = await supabase
   .from('m_golfplaces')
   .select('*')
   .order('golf_place_name',{ascending:true});
@@ -59,13 +69,13 @@ const selectData =async()=>{
   }
 }
 
-const changeIndex=()=>{
+const changeIndex = () => {
   golf_place_Index.value=golf_place_Name.findIndex(str=>str===selectedName.value);
   rounds_data.golf_place_id=golf_place_Id[golf_place_Index.value];
 }
-const insertRounds =async ()=>{
+const insertRounds = async() => {
   changeIndex();
-  const {data:returnData,error:insertError} =await supabase
+  const {data:returnData,error:insertError} = await supabase
     .from('t_rounds')
     .insert(rounds_data)
     .select();
@@ -77,15 +87,20 @@ const insertRounds =async ()=>{
     }
 }
 
-const toScoreInput =async () => {
-  await insertRounds();
+const ToScoreInput = async () => {
+  if (!inputStateStore.isInterrupted) {
+    await insertRounds();
+  } else if (inputStateStore.roundId) {
+    round_id.value = inputStateStore.roundId;
+  } else {
+    console.error('roundIdがありません');
+  }
   toggleModal();
   console.log("ページ遷移先のid",round_id.value);
-  router.push({path:`/scoreInput/${round_id.value}`,query:{param:'scoreInput'}});
-  // router.push(`/scoreInput/${round_id.value}`);
+  router.push(`/scoreInput/${round_id.value}`);
 };
 
-onMounted(()=>{
+onMounted(() => {
   selectData();
 }
 );
@@ -126,5 +141,31 @@ onMounted(()=>{
 .title{
   font-size: 24px;
   font-weight: bold;
+}
+.buttonContainer{
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+.interruptedArea{
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.border{
+  width: 100%;
+  position: relative;
+}
+.textOr{
+  line-height: 1;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #fff;
+  padding: 0 16px;
 }
 </style>

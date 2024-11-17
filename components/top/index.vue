@@ -7,7 +7,7 @@
     <div class="inputTags">
       <inputTag  v-for="(v,i) in inputAll" :key="i" :images="inputAll[i].images" :tag-title="inputAll[i].tagTitle" :tag-description="inputAll[i].tagDescription" :link="inputAll[i].link" :onclick="inputAll[i].onclick" ></inputTag>
     </div>
-    <button @click="toCamera()" class="circleBtn"><img src="~assets/img/camera.png" width="48"></button>
+    <NuxtLink to="../camera"  class="circleBtn"><img src="~assets/img/camera.png" width="48"></NuxtLink>
   </section>
 </template>
 
@@ -19,13 +19,11 @@ import { useModalStore } from '~/src/store/modal';
 import enterGolfCourseName from './enterGolfCourseName.vue';
 
 const headVarStore = useHeadVarStore();
-headVarStore.title = 'Home';
+headVarStore.title = 'Motion-X';
 const modalStore = useModalStore();
 const isShowModal = computed(() => modalStore.isShowModal);
 const modalName = computed(() => modalStore.modalName);
 const toggleModal = (name:string) => modalStore.toggleModal(name);
-const router = useRouter();
-
 
 onMounted(async ()=>{
   const foodInput=await import('@/assets/img/foodInput.png')
@@ -60,10 +58,6 @@ const inputAll =ref([
     onclick:toggleModal
   }
 ])
-
-const toCamera = () => {
-  router.push({path:'/camera', query:{param:'top'}})
-}    
 </script>
 
 <style scoped>
