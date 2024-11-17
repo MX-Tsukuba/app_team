@@ -26,7 +26,7 @@ onMounted(() => {
   setTimeout(() => {
     roundId.value=Number(route.params.id);
     console.log("roundId",roundId,"currentHoleIndex",currentHoleIndex.value);
-    router.push({path:'/camera', query: {id: roundId.value, param:'scoreInput', holeId:currentHoleIndex.value}});
+    router.push({path:'/camera', query: {id: roundId.value, param:'scoreInput', holeIndex:currentHoleIndex.value}});
     toggleModal();
   }, 2000);
 });

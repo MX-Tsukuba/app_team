@@ -27,7 +27,7 @@ selectDataを参考にすればスコア編集にも対応できる
 */
     
 const updateIsRecordedArray = () => {
-    if(videoUrl.value !== null && returnHoleIndex.value !== 0){
+    if(videoUrl.value !== null && returnHoleIndex.value !== undefined){
         isRecordedArray.value[returnHoleIndex.value] = videoUrl.value;
         console.log("isRecordedArray",isRecordedArray.value);
     }

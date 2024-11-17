@@ -16,6 +16,7 @@ const param = route.query.param || 'null'
 console.log(param)
 const roundId = route.query.id || 'null'
 const movieId = ref<number>(0)
+const currentHoleIndex = route.query.holeIndex || 'null'
 
 const modalStore = useModalStore();
 const isShowModal = computed(() => modalStore.isShowModal);
@@ -26,8 +27,6 @@ const recordedBlob = ref<Blob | null>(null);
 const selectedFile = ref<File | null>(null);
 
 const supabase = useSupabaseClient();
-
-
 
 //Function Definition
 const startCamera = async () => {
@@ -117,10 +116,10 @@ const upLoadSupabaseStorage = async (video: Blob | File) => {
         .getPublicUrl(fileName)
       const publicUrl = publicUrlData.publicUrl
       if (param === 'top') {
-        router.push({ path: `/formAnalytics/${movieId.value}`, query: { video: publicUrl } })
+        router.push({ path: `/formAnalytics/${movieId.value}`, query: { video: publicUrl }})
         console.log("url is",publicUrl)
       } else if (param === 'scoreInput') {
-        router.push({ path: `/scoreInput/${roundId}`, query: { video: publicUrl } })
+        router.push({ path: `/scoreInput/${roundId}`, query: { video: publicUrl, returnHoleIndex: currentHoleIndex }})
         console.log("url is",publicUrl)
       } else {
         console.error("リダイレクト先が見つかりません");
