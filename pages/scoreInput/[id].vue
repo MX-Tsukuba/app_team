@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { usePageStore, useHeadVarStore, useInputStateStore, useModalStore } from '~/src/store';
+import { usePageStore, useHeadVarStore, useInputStateStore, useModalStore, useScoreStore } from '~/src/store';
+
+
 import type { Database } from '~/types/database.types';
 import CameraImg from '~/assets/img/camera.png';
 import CameraTransparentImg from '~/assets/img/cameraTransparent.png';
@@ -11,6 +13,8 @@ register();
 const headVarStore = useHeadVarStore();
 headVarStore.backButtonText = '一時保存';
 const pageStore = usePageStore();
+const scoreStore = useScoreStore();
+
 const modalStore = useModalStore();
 const inputStateStore = useInputStateStore();
 const isShowModal = computed(() => modalStore.isShowModal);
@@ -119,6 +123,8 @@ const setting=()=>{
 
 const updateCurrentHole = (holeId:number) =>{
   currentHoleIndex.value = holeId;
+  scoreStore.setCurrentHoleIndex(holeId);
+  console.log("holeId",holeId)
   if (swiperCards.value) {
     swiperCards.value.swiper.slideTo(holeId);
   }
@@ -196,6 +202,7 @@ watch(currentHoleIndex, () => items.forEach(item => {
 }))
 const videoInsert = async()=>{
   videoUrl.value = route.query.video as string;
+  scoreStore.setVideoUrl(videoUrl.value);
   await nextTick();
   if (videoPlayer.value && videoUrl.value) {
     videoPlayer.value.src = videoUrl.value;
@@ -243,7 +250,8 @@ onMounted(()=>{
 
 
     <div class="circleBtn" @click="toggleModal('confirm')" :class="{'inActive': videoUrl}">
-      <img :src="videoUrl ? CameraTransparentImg : CameraImg" width="48">
+      <!-- <img :src="videoUrl ? CameraTransparentImg : CameraImg" width="48"> -->
+      <isRecorded/>
     </div>
     <StartRecord v-if="isShowModal && modalName === 'confirm' && !videoUrl"/>
   </section>
