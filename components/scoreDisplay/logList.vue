@@ -6,6 +6,7 @@
         v-for="item1 in item.monthDatas"
         :date="item1.date"
         :golfPlaceName="item1.golfPlaceName"
+        :roundId="item1.roundId"
         :holedetails="item1.holeDetails"
       />
     </div>
@@ -20,12 +21,14 @@ interface holeDetails {
   par: number;
   result: number;
   putts: number;
-  form_Score: number;
+  form_Score: number | null;
+  //form_Score: number;
 }
 
 interface roundDetail {
   date: Date;
   golfPlaceName: string;
+  roundId: number;
   holeDetails: holeDetails[];
 }
 

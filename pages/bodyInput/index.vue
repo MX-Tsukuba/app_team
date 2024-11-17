@@ -2,8 +2,8 @@
 import changeDate from '~/components/meal/changeDate.vue';
 import { onMounted } from 'vue'
 import { useHeadVarStore } from '~/src/store/headVar.js'
+import  FlexibilityModal  from '~/components/scoreInput/FlexibilityModal.vue'
 import { usePageStore } from '~/src/store/currentPage';
-
 
 const headVarStore = useHeadVarStore()
 headVarStore.title = '身体情報入力'
@@ -51,6 +51,7 @@ const insertBody=async ()=>{
   console.error('Error inserting data:', error);
   } else {
   console.log('Data inserted successfully');
+  await navigateTo('./bodyDisplay');
   }
 }
 
@@ -58,6 +59,11 @@ let bodyWeight=ref(0);
 let bodyHeight=ref(0);
 let flexibility=ref(0);
 
+const isModalOpen = ref(false);
+
+const showModal = () => {
+  isModalOpen.value = true;
+};
 
 </script>
 
@@ -85,12 +91,13 @@ let flexibility=ref(0);
           </div>
         </div>
         <div class="inputCard">
-          <div class="inputName">柔軟性</div>
+          <div >柔軟性<span class="help-icon" @click="showModal">?</span></div>
           <div class="inputBody">
-            <input class="Binput"placeholder="数値を入力(任意)"></input>
+            <input class="Binput" placeholder="数値を入力(任意)" v-model="flexibility"></input>
             <p>cm</p>
           </div>
         </div>
+        <FlexibilityModal v-model:isOpen="isModalOpen" />
       </div>
       <button class="BaddBtn" @click="insertBody">
         <div class="addName">追加</div>
@@ -207,5 +214,12 @@ p{
   font-style: normal;
   font-weight: 400;
   line-height: normal;
+}
+
+.help-icon {
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 18px;
+  margin-left: 8px;
 }
 </style>

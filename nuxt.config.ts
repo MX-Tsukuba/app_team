@@ -2,7 +2,12 @@
 export default defineNuxtConfig({
   devtools: { enabled: true },
 
-  modules: [`@nuxtjs/supabase`, '@pinia/nuxt'],
+  modules: [`@nuxtjs/supabase`, '@pinia/nuxt','nuxt-snackbar',],
+  snackbar: {
+    position: 'top-right',
+    duration: 3000,
+    color: 'success',
+  },
 
   app: {
     head: {
@@ -12,6 +17,12 @@ export default defineNuxtConfig({
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
       ],
       link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.png' }],
+    },
+  },
+
+  vue: {
+    compilerOptions: {
+      isCustomElement: (tag) => /^(swiper|swiper-slide|swiper-container)$/.test(tag),
     },
   },
 

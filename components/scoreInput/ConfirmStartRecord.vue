@@ -13,12 +13,20 @@
 
 <script setup lang="ts">
 import { useModalStore } from '~/src/store/modal';
+import { useScoreStore } from '~/src/store/scoreInput';
 const modalStore = useModalStore();
+const scoreStore = useScoreStore();
 const toggleModal = () => modalStore.toggleModal('');
 const router = useRouter();
+const route = useRoute();
+let roundId =ref<number>(Number(route.params.id));
+const currentHoleIndex = computed(() => scoreStore.currentHoleIndex);
+
 onMounted(() => {
   setTimeout(() => {
-    router.push('/camera');
+    roundId.value=Number(route.params.id);
+    console.log("roundId",roundId,"currentHoleIndex",currentHoleIndex.value);
+    router.push({path:'/camera', query: {id: roundId.value, param:'scoreInput', holeIndex:currentHoleIndex.value}});
     toggleModal();
   }, 2000);
 });

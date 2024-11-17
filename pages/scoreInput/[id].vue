@@ -1,35 +1,41 @@
 <script setup lang="ts">
-import { useHeadVarStore } from '~/src/store/headVar.js'
+import { useHeadVarStore } from '~/src/store/headVar.js';
 import { usePageStore } from '~/src/store/currentPage';
-import type { Database } from '~/types/database.types';
 import { useModalStore } from '~/src/store/modal';
-import Information from "~/components/scoreInput/information.vue";
-import StartRecord from '~/components/scoreInput/ConfirmStartRecord.vue';
+import { useScoreStore } from '~/src/store/scoreInput';
+
+import type { Database } from '~/types/database.types';
 import CameraImg from '~/assets/img/camera.png';
 import CameraTransparentImg from '~/assets/img/cameraTransparent.png';
+//swiperで必要
+import { register } from 'swiper/element/bundle';
+import { InputCard, StartRecord, IsRecorded } from '~/components/scoreInput';
+register();
 
-const headVarStore = useHeadVarStore()
-headVarStore.title = 'スコア入力'
+const headVarStore = useHeadVarStore();
+// headVarStore.title = `${golfPlaceName.value}`;宣言前に代入しているため後ろへ移動@ツジ
 const pageStore = usePageStore();
+const scoreStore = useScoreStore();
 
-const videoPlayer = ref<HTMLVideoElement | null>(null);
-const videoUrl = ref<string | null>(null);
-const route = useRoute();
-const supabase = useSupabaseClient<Database>();
-//モーダル関係
+const modalStore = useModalStore();
 const isShowModal = computed(() => modalStore.isShowModal);
 const modalName = computed(() => modalStore.modalName);
 const toggleModal = (name:string) => modalStore.toggleModal(name);
+const supabase = useSupabaseClient<Database>();
+const videoPlayer = ref<HTMLVideoElement | null>(null);
+const videoUrl = ref<string | null>(null);
+const route = useRoute();
 
-//この３つのデータは他から受け取る必要あり。
 let roundId =ref<number>(Number(route.params.id));
 const golfPlaceName = ref<string | undefined>('つくばゴルフ場');
-// const golfPlaceId = ref<number>(1);
 let isLoading=ref<boolean>(true);
+const currentHoleIndex=ref<number>(0);
+const swiperCards = ref();
 
 const buttonMessage = ref<string>('登録')
 headVarStore.title = `${golfPlaceName.value}`;
-const modalStore = useModalStore();
+const isRecordedArray = ref();
+
 
 class playData {
   holeNumber?: number;
@@ -91,7 +97,6 @@ const selectData =async()=> {
 
 //ホール選択（クリック）とパー表示
 // const currentHole = ref<number>(3);
-const currentHoleIndex=ref<number>(2);
 // const fetchPar= async (hole: number) => {
 //   const { data, error } = await supabase
 //     .from('m_holes')
@@ -116,33 +121,17 @@ const setting=()=>{
 
 // const {data}  = await useAsyncData(()=>fetchPar(currentHole.value), {watch: [currentHole]});
 
-const updateCurrentHole = (holeId:number) =>{//holeの変更に応じてIndexを変更する
+const updateCurrentHole = (holeId:number) =>{
   currentHoleIndex.value = holeId;
+  scoreStore.setCurrentHoleIndex(holeId);
+  console.log("holeId",holeId)
+  if (swiperCards.value) {
+    swiperCards.value.swiper.slideTo(holeId);
+  }
+  console.log(currentHoleIndex.value,"currentHoleIndex");
 };
 
-//データ挿入
-//currentHoleではなくindexで選択するようにする+insertしたデータがすでにDBにある場合updateになるように変更@辻
-const addPlayData = async () => {
-  // playData.holeNumber = currentHole.value;
-  const { error } = await supabase
-  .from('t_holes')
-  .insert({
-    "hole_number": playDataArr.value[currentHoleIndex.value].holeNumber,
-    "round_id": roundId.value,
-    "putts_number": playDataArr.value[currentHoleIndex.value].puttsNumber,
-    "score_number": playDataArr.value[currentHoleIndex.value].scoreNumber,
-  });
-  if (error) {
-    console.error('データの追加に失敗しました',error);
-  } else {
-  if(currentHoleIndex.value === 17){
-    await navigateTo('/scoreDisplay')//useRouterを用いたい@辻
-  }else{
-    currentHoleIndex.value++;
-  }
-    return true;
-  }
-};
+
 
 //ホール選択（スライド）
 interface holeObj {
@@ -154,7 +143,8 @@ interface holeObj {
   }
 };
 const items:holeObj[] = reactive([]);
-for (let i = 0; i <= 17; i++) {//indexに合わせて1から17に変更@辻
+for (let i = 0; i < 18; i++) {//indexに合わせて1から17に変更@辻
+
   const singleObject = {
     id: i,
     card: {
@@ -163,43 +153,32 @@ for (let i = 0; i <= 17; i++) {//indexに合わせて1から17に変更@辻
       isSmall: false,
     }
   };
-  if (i === 2) {
+  if (i === 0) {
     singleObject.card.isLarge = true;
-  } else if (i === 1 || i === 3) {
+  } else if (i === 1 ) {//|| i === 3
     singleObject.card.isMedium = true;
-  } else if (i === 0 || i === 4) {
+  } else if (i ===2) {// 0 || i === 4
     singleObject.card.isSmall = true;
+  }else{
+    singleObject.card.isLarge=false;
+    singleObject.card.isMedium=false;
+    singleObject.card.isSmall=true;
   }
   items.push(singleObject)
 };
+const incrementCurrentHole = (newHole:number) => {
+  currentHoleIndex.value = newHole;
+};
+const onSlideChange = () => {
+  if (swiperCards.value) {
+    const newIndex = swiperCards.value.swiper.activeIndex;
+    currentHoleIndex.value = newIndex;
+  }
+  console.log("onSlideChange",swiperCards.value.swiper.activeIndex);
+};
 
-const moveLeft = () =>{
-  currentHoleIndex.value -= 1;
-  if (currentHoleIndex.value < 0) {
-    currentHoleIndex.value = 0;
-  }
-}
-const moveRight = () =>{
-  currentHoleIndex.value += 1;
-  if (currentHoleIndex.value > 17) {
-    currentHoleIndex.value = 17;
-  }
-}
-const isItemVisible = computed(() => {
-  let start;
-  let end;
-  if(currentHoleIndex.value > 14){
-    start = 13;
-  }else{
-    start = Math.max(0, currentHoleIndex.value - 2)
-  };
-  if(currentHoleIndex.value < 2){
-    end = 4;
-  }else{
-    end = Math.min(items.length, currentHoleIndex.value + 2);
-  };
-  return { start, end };
-})
+//スワイプで中心に来たカードのindexをcurrentHoleとして表示の変更をする
+
 watch(currentHoleIndex, () => items.forEach(item => {
   if (item.id === currentHoleIndex.value) {
     item.card.isLarge = true;
@@ -213,14 +192,17 @@ watch(currentHoleIndex, () => items.forEach(item => {
     item.card.isLarge = false;
     item.card.isMedium = false;
     item.card.isSmall = true;
-  } 
+  }else{
+    item.card.isLarge = false;
+    item.card.isMedium = false;
+    item.card.isSmall = true;
+  }
   if(currentHoleIndex.value === 17)buttonMessage.value = '完了'
   else buttonMessage.value = '登録'
 }))
-
 const videoInsert = async()=>{
-  //pageStore.setCurrentPage('score');
-  videoUrl.value = route.query.video as string;
+  videoUrl.value = route.query.video as string;//currentHoleに関するvideoになっている
+  scoreStore.setVideoUrl(videoUrl.value);
   await nextTick();
   if (videoPlayer.value && videoUrl.value) {
     videoPlayer.value.src = videoUrl.value;
@@ -229,7 +211,10 @@ const videoInsert = async()=>{
 
 onMounted(()=>{
     pageStore.setCurrentPage('score');
-    videoInsert()
+    videoInsert();
+    if(swiperCards.value){
+      swiperCards.value.swiper.on('slideChange', onSlideChange);
+    }
     setting();
     selectData();
   });
@@ -245,45 +230,29 @@ onMounted(()=>{
       </div>
       <hr class="displayLine"/>
     </div>
-    <ul class="selectHole">
-      <li  v-for="(item, index) in items" :key="index" class="eachHole" v-show="index >= isItemVisible.start && index <= isItemVisible.end" @click="updateCurrentHole(item.id)" :class="{'holeCardLarge': item.card.isLarge, 'holeCardMedium': item.card.isMedium, 'holeCardSmall': item.card.isSmall}">{{ item.id+1 }}H</li>
-    <button @click="moveLeft()" class="leftButton">left</button>
-    <button @click="moveRight()" class="rightButton">right</button>
-    </ul>
 
-    <div class="inputData">
-      <img src="~assets/img/information.png" alt="information" class="information" @click="toggleModal('info')">
-      <Information v-if="isShowModal && modalName === 'info'"/>
-      <div class="scorePuttsBox">
-        <div>
-          <p class="scorePuttsTitle">スコア</p>
-          <div>
-            <input type="number" pattern="\d*" class="scorePuttsData" v-model="playDataArr[currentHoleIndex].scoreNumber" v-if="!isLoading">
-            <input type="number" pattern="\d*" class="scorePuttsData" value="0" v-else>
-          </div>
-        </div>
-        <div>
-          <p class="scorePuttsTitle">パット数</p>
-          <div>
-            <input type="number" pattern="\d*" class="scorePuttsData" v-model="playDataArr[currentHoleIndex].puttsNumber" v-if="!isLoading">
-            <input type="number" pattern="\d*" class="scorePuttsData" value="0" v-else>
-          </div>
-        </div>
-      </div>
-      <video v-if="videoUrl" ref="videoPlayer" controls class="videoArea"></video>
-      <div v-else class="videoArea">
-        <p>フォームを撮影すると、ここに動画が表示されます。</p>
-      </div>
-      <button @click="addPlayData" class="bButton">{{ buttonMessage }}</button>
-    <div class="circleBtn" @click="toggleModal('confirm')" :class="{'inActive': videoUrl}">
-      <img :src="videoUrl ? CameraTransparentImg : CameraImg" width="48">
-    </div>
+    <swiper-container class="selectHole" slides-per-view="auto" centered-slides="true" space-between="5" free-mode="true"
+    watch-slides-progress="true">
+      <swiper-slide v-for="(item, index) in items" :key="index" class="eachHole" @click="updateCurrentHole(item.id)" :class="{'holeCardLarge': item.card.isLarge, 'holeCardMedium': item.card.isMedium, 'holeCardSmall': item.card.isSmall}">{{ item.id+1 }}H</swiper-slide>    
+    </swiper-container>
+
+    <swiper-container ref="swiperCards" class='inputCards' slides-per-view="1" centered-slides="true" thumbs-swiper=".selectHole" @slideChange="onSlideChange">
+      <swiper-slide v-for="(item) in items" :key="item" class="cardContainer">
+        <!-- {{ item.id }} -->
+        <InputCard :roundId :currentHoleIndex :isShowModal :modalName :toggleModal :videoPlayer :videoUrl :buttonMessage  @updateCurrentHole="updateCurrentHole" @incrementCurrentHole="incrementCurrentHole"/>
+      </swiper-slide>
+    </swiper-container>
+
+
+    <IsRecorded @click="toggleModal('confirm')"/>
     <StartRecord v-if="isShowModal && modalName === 'confirm' && !videoUrl"/>
-    </div>
   </section>
 </template>
 
 <style scoped>
+element.style{
+  margin: 0;
+}
 .scoreInputWhole{
   display: flex;
   flex-direction: column;
@@ -327,13 +296,16 @@ box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, .5);
   justify-content: center;
   align-items: end;
   gap: 10px;
-  position: relative;
 }
 
 .eachHole{
+  margin: 5px;
   display: flex;
   justify-content: center;
   align-items: center;
+  justify-self: center;
+  align-self: end;
+
   border-radius: 5px;
   border: 1px solid #007BE5;
   box-sizing: border-box;
@@ -360,89 +332,12 @@ box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, .5);
   height: 40px;
   /* overflow: hidden; */
 }
-.leftButton{
-  width: 48px;
-height: 48px;
-font-size: 16px;
-text-align: center;
-vertical-align: middle;
-border: 1px solid black;
-border-radius: 24px;
-background: #FFF;
-position: absolute;
-left: 24px;
-bottom: 0px;
-box-shadow: 2px 2px 16px 0px rgba(0, 0, 0, 0.25);
-cursor: pointer;
-}
-.rightButton{
-  width: 48px;
-height: 48px;
-font-size: 16px;
-text-align: center;
-vertical-align: middle;
-border: 1px solid black;
-border-radius: 24px;
-background: #FFF;
-position: absolute;
-right: 24px;
-bottom: 0px;
-box-shadow: 2px 2px 16px 0px rgba(0, 0, 0, 0.25);
-cursor: pointer;
-}
-.inputData{
+.inputCards{
+  width: 95vw;
+  z-index: 0;
+}  
+.cardContainer{  
   display: flex;
-  width: 390px;
-  padding: 40px 0px;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 40px;
-  flex-wrap: wrap;
-  position: relative;
-  border-radius: 16px;
-  background: #FFF;
-  box-shadow: 0px 0px 16px 0px rgba(0, 0, 0, 0.10);
-}
-.information{
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  cursor: pointer;
-}
-.scorePuttsBox{
-  display: flex;
-justify-content: center;
-align-items: center;
-gap: 64px;
-}
-.scorePuttsTitle{
-  text-align: center; 
-}
-.scorePuttsData{
-  display: flex;
-width: 100px;
-height: 40px;
-padding: 0px 6px;
-justify-content: flex-end;
-align-items: center;
-gap: 23px;
-border-radius: 8px;
-border: 1px solid #000;
-background: rgba(51, 51, 51, 0.03);
-}
-.videoArea{
-  width: 300px;
-  height: 150px;
-  font-size: 12px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-.addBtn{
-  justify-content: center;
-}
-.circleBtn.inActive{
-  background-color: rgb(225 225 225 /.7);
+  justify-content: center
 }
 </style>

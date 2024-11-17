@@ -1,12 +1,34 @@
 <script setup lang="ts">
 import MovieListChild from './movieListChild.vue';
+
+interface movieList {
+  Y: number;
+  M: number;
+  monthDatas: {
+    id: number;
+    date: Date;
+    status: number;
+    total_score: number | null;
+  }[];
+}
+
+interface data {
+  values: movieList[];
+}
+const props = defineProps<data>();
 </script>
 
 <template>
-  <div class="sub_container">
-    <div class="month">2024年10月</div>
+  <div class="sub_container" v-for="d in props.values">
+    <div class="month">{{ d.Y }}年{{ d.M }}月</div>
     <div class="subsub_container">
-      <MovieListChild />
+      <MovieListChild
+        v-for="movie in d.monthDatas"
+        :id="movie.id"
+        :date="movie.date"
+        :status="movie.status"
+        :total_score="movie.total_score"
+      />
     </div>
   </div>
 </template>

@@ -1,5 +1,14 @@
 <template>
   <div class="homebody">
+    <div class="tab-container">
+      <button
+        v-for="(label, index) in tabLabels"
+        :key="index"
+        :class="['buttonClass',{ 'active': isDisplay === index }]"
+        @click="selectTab(index)"
+      >{{ label }}</button>
+    </div>
+
     <div class="gragh">
       <div class="graghChart" v-if="isLoading">データを読み込んでいます</div>
       <div class="graghChart" v-if="!isLoading">
@@ -18,6 +27,16 @@
         </button>
     </div>
   </div>
+  <div v-if="!isLoading">
+    <ClientOnly>
+      <div class="resultCard">
+        <div class="resultTitle">現在の身体情報</div>
+        <div class="inputDetails">
+          <inputCard v-for="(v,i) in tabLabels" :key="i" :input="todayData[i]" :input-name="v" :unit="todayUnits[i]" />
+        </div>
+      </div>
+    </ClientOnly>
+  </div>
 </div>
 
 </template>
@@ -28,6 +47,7 @@ import { useHeadVarStore } from '~/src/store/headVar.js'
 import { usePageStore } from '~/src/store/currentPage';
 import type { Database } from '~/types/database.types.ts';
 import { Line } from 'vue-chartjs';
+import inputCard from '~/components/bodyDisplay/inputCard.vue';
 
 
 const headVarStore = useHeadVarStore()
@@ -43,9 +63,14 @@ import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend)
 
 const labels=ref<string[]>([]);
-let datasets=ref<number[]>([]);
+let weight=ref<number[]>([]);
 let height=ref<number[]>([]);
 let flexibility=ref<number[]>([]);
+let todayData=ref<number[]>([0,0,0]);
+let isTodayActive=ref<boolean>(false);
+const datasets = ref<number[]>([]);
+const tabLabels = ['体重', '身長', '柔軟性'];
+const todayUnits=['kg','cm','cm'];
 
 const chartData = computed(() => ({
   labels: labels.value,
@@ -65,6 +90,13 @@ const chartOptions = {
 const supabase = useSupabaseClient<Database>();
 let today=new Date();
 const isLoading = ref<boolean>(true);
+let isDisplay=ref<number>(0);
+
+watchEffect(() => {
+  datasets.value = isDisplay.value === 0 ? weight.value :
+                   isDisplay.value === 1 ? height.value :
+                   isDisplay.value === 2 ? flexibility.value : [];
+});
 
 const formatDateToString = (date: Date): string => {
   const year = date.getFullYear()
@@ -85,13 +117,13 @@ const selectData =async ()=>{
   }else{
     console.log("データの取得に成功しました",body_inputs);
     isLoading.value=false;
-    datasets.value=[0,0,0,0,0,0,0];
+    weight.value=[0,0,0,0,0,0,0];
     height.value=[0,0,0,0,0,0,0];
     flexibility.value=[0,0,0,0,0,0,0];
     body_inputs.forEach(record => {
         const dayIndex = weekDates.indexOf(record.date)
         if (dayIndex !== -1) {
-                datasets.value[dayIndex] = record.weight
+                weight.value[dayIndex] = record.weight
                 height.value[dayIndex] = record.height
                 flexibility.value[dayIndex] = record.flexibility
         }
@@ -125,8 +157,36 @@ const changeWeeks=(i:number)=>{
     selectData();
 }
 
-onMounted(() => {
-      selectData();
+const selectTab = (index: number) => {
+  isDisplay.value = index;
+};
+
+const selectTodayData = ()=>{
+  const todayDateStr = formatDateToString(today);
+  const todayIndex = weekDates.indexOf(todayDateStr);
+  if (todayIndex !== -1) {
+    const weightValue = weight.value[todayIndex];
+    const heightValue = height.value[todayIndex];
+    const flexibilityValue = flexibility.value[todayIndex];
+    console.log("weight,height,flexibility",weightValue,heightValue,flexibilityValue);
+    if (weightValue !== 0 || heightValue !== 0) {
+      // todayData.value = [weightValue, heightValue, flexibilityValue];
+      todayData.value[0]=weightValue;
+      todayData.value[1]=heightValue;
+      todayData.value[2]=flexibilityValue;
+      isTodayActive.value = true;
+      console.log("今日のデータを取得", todayData.value);
+    } else {
+      console.log("今日のデータが不足しています");
+    }
+  } else {
+    console.log("今日の日付が weekDates に存在しません");
+  }
+}
+
+onMounted(async() => {
+      await selectData();
+      selectTodayData();
     })
 </script>
 
@@ -137,11 +197,43 @@ onMounted(() => {
     flex-direction: column;
     align-items: center;
 }
+.tab-container{
+  display: flex;
+  flex-direction: row;
+  width: 264px;
+height: 32px;
+flex-shrink: 0;
+border-radius: 9px;
+background: #DADADB;
+  font-size: 12px;
+  margin: 20px 0;
+}
+.buttonClass{
+  display: flex;
+  flex-direction: row;
+width: 80px;
+padding: 7px 22px;
+justify-content: center;
+align-items: center;
+gap: 10px;
+
+opacity: 0.6;
+}
+.active{
+/* height: 28px; */
+/* flex-shrink: 0; */
+
+border-radius: 7px;
+border: 1px solid rgba(0, 0, 0, 0.04);
+background: #FFF;
+box-shadow: 0px 3px 8px 0px rgba(0, 0, 0, 0.12), 0px 3px 1px 0px rgba(0, 0, 0, 0.04);
+}
 .gragh{
     display: flex;
     width: 360px;
     flex-direction: column;
     align-items: center;
+    margin-bottom: 20px;
 
     border-radius: 20px;
     background: #FFF;
@@ -177,5 +269,32 @@ onMounted(() => {
     color: #777;
     font-family: Inter;
     font-size: 15px;
+}
+.resultCard{
+  display: inline-flex;
+padding: 15.78px 47px 73px 47px;
+flex-direction: column;
+align-items: center;
+gap: 7.22px;
+
+background: #FFF;
+box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.25);
+}
+.inputDetails{
+  display: flex;
+flex-direction: column;
+align-items: flex-start;
+gap: 20px;
+align-self: stretch;
+}
+.resultTitle{
+  display: flex;
+align-items: center;
+text-align: center;
+width: 150px;
+height: 28px;
+border-bottom: 2px solid #509A58;
+color: #509A58;
+font-size: 16px;
 }
 </style>
