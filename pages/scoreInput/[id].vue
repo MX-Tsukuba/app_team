@@ -5,12 +5,13 @@ import CameraImg from '~/assets/img/camera.png';
 import CameraTransparentImg from '~/assets/img/cameraTransparent.png';
 //swiperで必要
 import { register } from 'swiper/element/bundle';
-import { InputCard, StartRecord } from '~/components/scoreInput';
+import { InputCard, StartRecord, IsRecorded } from '~/components/scoreInput';
 register();
 
 const headVarStore = useHeadVarStore();
 headVarStore.backButtonText = '一時保存';
 const pageStore = usePageStore();
+const scoreStore = useScoreStore();
 const modalStore = useModalStore();
 const inputStateStore = useInputStateStore();
 const isShowModal = computed(() => modalStore.isShowModal);
@@ -119,6 +120,8 @@ const setting=()=>{
 
 const updateCurrentHole = (holeId:number) =>{
   currentHoleIndex.value = holeId;
+  scoreStore.setCurrentHoleIndex(holeId);
+  console.log("holeId",holeId);
   if (swiperCards.value) {
     swiperCards.value.swiper.slideTo(holeId);
   }
@@ -242,9 +245,7 @@ onMounted(()=>{
     </swiper-container>
 
 
-    <div class="circleBtn" @click="toggleModal('confirm')" :class="{'inActive': videoUrl}">
-      <img :src="videoUrl ? CameraTransparentImg : CameraImg" width="48">
-    </div>
+      <IsRecorded @click="toggleModal('confirm')"/>
     <StartRecord v-if="isShowModal && modalName === 'confirm' && !videoUrl"/>
   </section>
 </template>
