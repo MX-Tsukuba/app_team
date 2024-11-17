@@ -90,9 +90,6 @@ const insertRounds = async() => {
 const ToScoreInput = async () => {
   if (!inputStateStore.isInterrupted) {
     await insertRounds();
-    toggleModal();
-    console.log("ページ遷移先のid",round_id.value);
-    router.push({path:`/scoreInput/${round_id.value}`,query:{param:'scoreInput'}});
   } else if (inputStateStore.roundId) {
     round_id.value = inputStateStore.roundId;
   } else {
@@ -100,7 +97,7 @@ const ToScoreInput = async () => {
   }
   toggleModal();
   console.log("ページ遷移先のid",round_id.value);
-  router.push(`/scoreInput/${round_id.value}`);
+  router.push({path:`/scoreInput/${round_id.value}`,query:{param:'scoreInput'}});
 };
 
 onMounted(() => {
