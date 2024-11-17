@@ -1,23 +1,18 @@
 <script setup lang="ts">
-import { useHeadVarStore } from '~/src/store/headVar.js';
-import { usePageStore } from '~/src/store/currentPage';
-import { useModalStore } from '~/src/store/modal';
-import { useScoreStore } from '~/src/store/scoreInput';
-
+import { usePageStore, useHeadVarStore, useInputStateStore, useModalStore } from '~/src/store';
 import type { Database } from '~/types/database.types';
 import CameraImg from '~/assets/img/camera.png';
 import CameraTransparentImg from '~/assets/img/cameraTransparent.png';
 //swiperで必要
 import { register } from 'swiper/element/bundle';
-import { InputCard, StartRecord, IsRecorded } from '~/components/scoreInput';
+import { InputCard, StartRecord } from '~/components/scoreInput';
 register();
 
 const headVarStore = useHeadVarStore();
-// headVarStore.title = `${golfPlaceName.value}`;宣言前に代入しているため後ろへ移動@ツジ
+headVarStore.backButtonText = '一時保存';
 const pageStore = usePageStore();
-const scoreStore = useScoreStore();
-
 const modalStore = useModalStore();
+const inputStateStore = useInputStateStore();
 const isShowModal = computed(() => modalStore.isShowModal);
 const modalName = computed(() => modalStore.modalName);
 const toggleModal = (name:string) => modalStore.toggleModal(name);
@@ -34,7 +29,7 @@ const swiperCards = ref();
 
 const buttonMessage = ref<string>('登録')
 headVarStore.title = `${golfPlaceName.value}`;
-const isRecordedArray = ref();
+
 
 
 class playData {
@@ -72,6 +67,7 @@ const selectData =async()=> {
   .from('t_rounds')
   .select('t_holes(hole_number, score_number, putts_number), m_golfplaces(golf_place_name, m_holes(hole_number, par_number))')
   .eq('id',roundId.value)
+  console.log('selectData',data);
   if(roundError){
     console.error('roundの取得に失敗しました',roundError.message)
     return null;
@@ -123,8 +119,6 @@ const setting=()=>{
 
 const updateCurrentHole = (holeId:number) =>{
   currentHoleIndex.value = holeId;
-  scoreStore.setCurrentHoleIndex(holeId);
-  console.log("holeId",holeId)
   if (swiperCards.value) {
     swiperCards.value.swiper.slideTo(holeId);
   }
@@ -201,8 +195,7 @@ watch(currentHoleIndex, () => items.forEach(item => {
   else buttonMessage.value = '登録'
 }))
 const videoInsert = async()=>{
-  videoUrl.value = route.query.video as string;//currentHoleに関するvideoになっている
-  scoreStore.setVideoUrl(videoUrl.value);
+  videoUrl.value = route.query.video as string;
   await nextTick();
   if (videoPlayer.value && videoUrl.value) {
     videoPlayer.value.src = videoUrl.value;
@@ -217,6 +210,11 @@ onMounted(()=>{
     }
     setting();
     selectData();
+  });
+  onUnmounted(()=> {
+    headVarStore.backButtonText = '';
+    inputStateStore.isInterrupted = true;
+    inputStateStore.roundId = roundId.value;
   });
 </script>
 
@@ -239,12 +237,14 @@ onMounted(()=>{
     <swiper-container ref="swiperCards" class='inputCards' slides-per-view="1" centered-slides="true" thumbs-swiper=".selectHole" @slideChange="onSlideChange">
       <swiper-slide v-for="(item) in items" :key="item" class="cardContainer">
         <!-- {{ item.id }} -->
-        <InputCard :roundId :currentHoleIndex :isShowModal :modalName :toggleModal :videoPlayer :videoUrl :buttonMessage  @updateCurrentHole="updateCurrentHole" @incrementCurrentHole="incrementCurrentHole"/>
+        <InputCard :itemIndex="item.id" :roundId :currentHoleIndex :playDataArr :isShowModal :modalName :toggleModal :videoPlayer :videoUrl :buttonMessage  @updateCurrentHole="updateCurrentHole" @incrementCurrentHole="incrementCurrentHole"/>
       </swiper-slide>
     </swiper-container>
 
 
-    <IsRecorded @click="toggleModal('confirm')"/>
+    <div class="circleBtn" @click="toggleModal('confirm')" :class="{'inActive': videoUrl}">
+      <img :src="videoUrl ? CameraTransparentImg : CameraImg" width="48">
+    </div>
     <StartRecord v-if="isShowModal && modalName === 'confirm' && !videoUrl"/>
   </section>
 </template>
