@@ -1,8 +1,8 @@
 <template>
   <div id="top-card">
     <div id="header-container">
-      <p>2024/07/23(火)</p>
-      <select id="holes-select" name="holes">
+      <p>{{date}}</p>
+      <select v-if="isActive===true" id="holes-select" name="holes">
         <option value="1">1</option>
         <option value="2">2</option>
         <option value="3">3</option>
@@ -13,7 +13,7 @@
     <div id="title-container">
       <p>フォームスコア</p>
       <div id="total-score-value">
-        <span>100</span>
+        <span>{{score}}</span>
         <p>/100</p>
       </div>
     </div>
@@ -29,6 +29,16 @@
     </div>
   </div>
 </template>
+
+<script setup lang="ts" >
+const props=defineProps<{
+    date:string,
+    score:number,
+    isActive:boolean
+}>()
+//追加で動画のURLと、他のホール選択の配列を使う
+
+</script>
 
 <style scoped>
 #top-card {

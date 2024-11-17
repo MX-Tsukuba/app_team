@@ -18,14 +18,7 @@
     <div class="content">
       <div v-if="selectedTab === 'score'">
         <div class="scoreItemContainer">
-          <p>right_elbow_shoulder_score: 40点</p>
-          <p>sway_score: 40点</p>
-          <p>cog_score: 40点</p>
-          <p>forward_posture_score: 40点</p>
-          <p>address_parallel_score: 40点</p>
-          <p>head_stable_score: 40点</p>
-          <p>axis_inclination_score: 40点</p>
-          <p>twisting_score: 40点</p>
+          <Bar :data="chartData" :options="chartOptions" ></Bar>
         </div>
       </div>
       <div v-if="selectedTab === 'detail'">
@@ -41,14 +34,57 @@
   </div>
 </template>
 
-<script>
-export default {
-  data() {
-    return {
-      selectedTab: 'score',
-    };
+<script setup lang="ts">
+const selectedTab = ref<string>('score');
+
+// const props=defineProps<{
+//     inputName:string
+//     input:number
+//     unit:string
+// }>()
+
+import {
+  Chart as ChartJS,
+  BarElement,
+  CategoryScale,
+  LinearScale,
+  Tooltip,
+  Legend,
+  Title,
+} from 'chart.js';
+import { Bar } from 'vue-chartjs';
+
+ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend, Title);
+
+// グラフのデータ
+const chartData = {
+  labels: ['January'],
+  datasets: [
+    {
+      label: 'Dataset 1',
+      data: [65],
+      backgroundColor: 'rgba(75, 192, 192, 0.2)',
+      borderColor: 'rgba(75, 192, 192, 1)',
+      borderWidth: 1,
+    },
+  ],
+};
+
+// グラフのオプション設定
+const chartOptions = {
+  indexAxis: 'y' as const, // ここで 'as const' を追加
+  responsive: true,
+  plugins: {
+    legend: {
+      position: 'top' as const,
+    },
+    title: {
+      display: true,
+      text: 'Sample Horizontal Bar Chart',
+    },
   },
 };
+
 </script>
 
 <style scoped>
