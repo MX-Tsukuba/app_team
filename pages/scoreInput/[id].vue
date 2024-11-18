@@ -121,11 +121,11 @@ const setting=()=>{
 const updateCurrentHole = (holeId:number) =>{
   currentHoleIndex.value = holeId;
   scoreStore.setCurrentHoleIndex(holeId);
-  console.log("holeId",holeId);
+  console.log(`[In scoreInput.vue] holeId:${holeId}`);
   if (swiperCards.value) {
     swiperCards.value.swiper.slideTo(holeId);
   }
-  console.log(currentHoleIndex.value,"currentHoleIndex");
+  console.log(`[In scoreInput.vue] currentHoleIndex:${currentHoleIndex.value}`);
 };
 
 

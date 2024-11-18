@@ -13,7 +13,7 @@ const router = useRouter()
 const route = useRoute()
 
 const param = route.query.param || 'null'
-console.log(param)
+console.log(`[In camera.vue] param:${param}`)
 const roundId = route.query.id || 'null'
 const movieId = ref<number>(0)
 const modalStore = useModalStore();
@@ -104,11 +104,11 @@ const upLoadSupabaseStorage = async (video: Blob | File) => {
         )
         .select();
       if (dbError) {
-        console.log('データベースへの挿入に失敗しました:', dbError);
+        console.log(`データベースへの挿入に失敗しました dbError:${dbError}`);
       } else {
-        console.log('動画情報が t_movies に挿入されました', dbData);
+        console.log(`動画情報が t_movies に挿入されました dbData:${dbData}`);
         movieId.value = dbData[0].id
-        console.log("movieId is",movieId.value)
+        console.log(`[In camera.vue] movieId.value:${movieId.value}`)
       }
 
       const { data: publicUrlData } = supabase
@@ -121,14 +121,14 @@ const upLoadSupabaseStorage = async (video: Blob | File) => {
           path: `/formAnalytics/${movieId.value}`, 
           query: { video: publicUrl }
         })
-        console.log("url is",publicUrl)
+        console.log(`[In camera.vue] publicUrl:${publicUrl}`)
       } else if (param === 'scoreInput') {
         router.push({ 
           path: `/scoreInput/${roundId}`
         })
         scoreStore.setVideoUrl(publicUrl);
         scoreStore.updateIsRecordedArray(currentHoleIndex.value, publicUrl);
-        console.log("isRecordedArray",scoreStore.isRecordedArray);
+        console.log(`[In camera.vue] isRecordedArray:${scoreStore.isRecordedArray}`);
       } else {
         console.error("リダイレクト先が見つかりません");
         return;

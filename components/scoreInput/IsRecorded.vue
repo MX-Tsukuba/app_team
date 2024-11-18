@@ -10,8 +10,7 @@ const scoreStore = useScoreStore();
 const videoUrl = computed(() => scoreStore.videoUrl);
 const currentHoleIndex = computed(() => scoreStore.currentHoleIndex);
 const isRecordedArray = computed(() => scoreStore.isRecordedArray);//毎回初期化されてるかも pardataarrayを参考にしよう
-console.log("isRecordedArray",isRecordedArray.value);
-console.log("currentHoleIndex",currentHoleIndex.value);
+console.log(`[In IsRecorded.vue] isRecordedArray:${isRecordedArray.value}, currentHoleIndex:${currentHoleIndex.value}`);
 //ここまで
 
 //動画が入っているかどうかの配列をつくる

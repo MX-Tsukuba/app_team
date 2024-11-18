@@ -96,7 +96,7 @@ const ToScoreInput = async () => {
     console.error('roundIdがありません');
   }
   toggleModal();
-  console.log("ページ遷移先のid",round_id.value);
+  console.log(`[In enterGolfCourseName.vue] ページ遷移先のround_id:${round_id.value}`);
   router.push({path:`/scoreInput/${round_id.value}`,query:{param:'scoreInput'}});
 };
 
