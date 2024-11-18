@@ -89,6 +89,10 @@ const upLoadSupabaseStorage = async (video: Blob | File) => {
     if (error) {
       console.log('ファイルのアップロードに失敗しました:',error);
     } else {
+      //topからはこれでもいい
+      //scoreInputからはt_relationsにも挿入する必要あり
+      //ここで、round_id,hole_number,movie_idをクエリパラメータなりpiniaなりに入れる
+        //hole_numberはインクリメント必要
       const currentDate = new Date().toISOString().split('T')[0];
       const {data:dbData, error : dbError } = await supabase
         .from('t_movies')
@@ -118,8 +122,7 @@ const upLoadSupabaseStorage = async (video: Blob | File) => {
       const publicUrl = publicUrlData.publicUrl
       if (param === 'top') {
         router.push({ 
-          path: `/formAnalytics/${movieId.value}`, 
-          query: { video: publicUrl }
+          path: `/formAnalytics/${movieId.value}`
         })
         console.log(`[In camera.vue] publicUrl:${publicUrl}`)
       } else if (param === 'scoreInput') {
