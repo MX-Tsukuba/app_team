@@ -2,7 +2,7 @@
 definePageMeta({
   layout: false,
 });
-import { useModalStore } from '~/src/store/modal';
+import { useModalStore, useScoreStore } from '~/src/store';
 
 const video = ref<HTMLVideoElement | null>(null)
 const videoSrc = ref<string | null>(null)
@@ -16,12 +16,13 @@ const param = route.query.param || 'null'
 console.log(param)
 const roundId = route.query.id || 'null'
 const movieId = ref<number>(0)
-const currentHoleIndex = route.query.holeIndex || 'null'
-
 const modalStore = useModalStore();
+const scoreStore = useScoreStore();
 const isShowModal = computed(() => modalStore.isShowModal);
 const modalName = computed(() => modalStore.modalName);
 const toggleModal = (name:string) => modalStore.toggleModal(name);
+const currentHoleIndex = computed(() => scoreStore.currentHoleIndex);
+
 
 const recordedBlob = ref<Blob | null>(null);
 const selectedFile = ref<File | null>(null);
@@ -116,11 +117,18 @@ const upLoadSupabaseStorage = async (video: Blob | File) => {
         .getPublicUrl(fileName)
       const publicUrl = publicUrlData.publicUrl
       if (param === 'top') {
-        router.push({ path: `/formAnalytics/${movieId.value}`, query: { video: publicUrl }})
+        router.push({ 
+          path: `/formAnalytics/${movieId.value}`, 
+          query: { video: publicUrl }
+        })
         console.log("url is",publicUrl)
       } else if (param === 'scoreInput') {
-        router.push({ path: `/scoreInput/${roundId}`, query: { video: publicUrl, returnHoleIndex: currentHoleIndex }})
-        console.log("url is",publicUrl)
+        router.push({ 
+          path: `/scoreInput/${roundId}`
+        })
+        scoreStore.setVideoUrl(publicUrl);
+        scoreStore.updateIsRecordedArray(currentHoleIndex.value, publicUrl);
+        console.log("isRecordedArray",scoreStore.isRecordedArray);
       } else {
         console.error("リダイレクト先が見つかりません");
         return;

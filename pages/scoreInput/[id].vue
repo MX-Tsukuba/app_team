@@ -198,7 +198,7 @@ watch(currentHoleIndex, () => items.forEach(item => {
   else buttonMessage.value = '登録'
 }))
 const videoInsert = async()=>{
-  videoUrl.value = route.query.video as string;
+  videoUrl.value = scoreStore.getCurrentHoleVideoUrl();
   await nextTick();
   if (videoPlayer.value && videoUrl.value) {
     videoPlayer.value.src = videoUrl.value;
@@ -246,7 +246,7 @@ onMounted(()=>{
 
 
       <IsRecorded @click="toggleModal('confirm')"/>
-    <StartRecord v-if="isShowModal && modalName === 'confirm' && !videoUrl"/>
+    <StartRecord v-if="isShowModal && modalName === 'confirm' && !currentHoleVideoUrl"/>
   </section>
 </template>
 

@@ -12,8 +12,7 @@
 </template>
 
 <script setup lang="ts">
-import { useModalStore } from '~/src/store/modal';
-import { useScoreStore } from '~/src/store/scoreInput';
+import { useModalStore, useScoreStore } from '~/src/store';
 const modalStore = useModalStore();
 const scoreStore = useScoreStore();
 const toggleModal = () => modalStore.toggleModal('');
@@ -26,7 +25,18 @@ onMounted(() => {
   setTimeout(() => {
     roundId.value=Number(route.params.id);
     console.log("roundId",roundId,"currentHoleIndex",currentHoleIndex.value);
-    router.push({path:'/camera', query: {id: roundId.value, param:'scoreInput', holeIndex:currentHoleIndex.value}});
+    if (scoreStore.getCurrentHoleVideoUrl()) {
+      alert('このホールは既に動画が登録されています');
+      toggleModal();
+      return;
+    }
+    router.push({
+      path:'/camera',
+      query: {
+        id: roundId.value, 
+        param:'scoreInput'
+      }
+    });
     toggleModal();
   }, 2000);
 });

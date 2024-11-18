@@ -9,13 +9,12 @@ const scoreStore = useScoreStore();
 //ここを取得する
 const videoUrl = computed(() => scoreStore.videoUrl);
 const currentHoleIndex = computed(() => scoreStore.currentHoleIndex);
+const isRecordedArray = computed(() => scoreStore.isRecordedArray);//毎回初期化されてるかも pardataarrayを参考にしよう
+console.log("isRecordedArray",isRecordedArray.value);
 console.log("currentHoleIndex",currentHoleIndex.value);
-const returnHoleIndex = ref<number>(Number(route.query.returnHoleIndex)) || 0;
-console.log("returnHoleIndex",returnHoleIndex.value);
 //ここまで
 
 //動画が入っているかどうかの配列をつくる
-const isRecordedArray=ref<string[]>(new Array(18).fill(null));//毎回初期化されてるかも pardataarrayを参考にしよう
 //  piniaで状態管理しようとするとスコア編集のときに不都合が生じるのでナシ
 /*
 score編集を想定せず、あくまで通常のデータ挿入フローを想定
@@ -25,23 +24,22 @@ score編集を想定せず、あくまで通常のデータ挿入フローを想
 selectDataを参考にすればスコア編集にも対応できる
     むしろselectDataに操作を追加しないとスコア編集において煩雑な操作になりかねないため、今一度selectDataを見る
 */
-    
-const updateIsRecordedArray = () => {
-    if(videoUrl.value !== null && returnHoleIndex !== undefined){
-        isRecordedArray.value[returnHoleIndex.value] = videoUrl.value;
-        console.log("isRecordedArray",isRecordedArray.value);
-    }
-}
+const isCurrentHoleRecorded = computed(() => {
+    return isRecordedArray.value[currentHoleIndex.value] !== null;
+});
 
-onUpdated(() => {
-    updateIsRecordedArray();
-    console.log("videoUrl",videoUrl);
-})
+// watchを使用して、videoUrlの変更を監視
+// watch(videoUrl, (newValue) => {
+//     if (newValue !== null && returnHoleIndex.value !== undefined) {
+//         scoreStore.updateIsRecordedArray(returnHoleIndex.value, newValue);
+//         console.log("isRecordedArray", isRecordedArray.value);
+//     }
+// });
 
 </script>
 <template>    
-    <div class="circleBtn" :class="{'inActive': videoUrl}">
-        <img :src="videoUrl ? CameraTransparentImg : CameraImg" width="48">
+    <div class="circleBtn" :class="{'inActive': isCurrentHoleRecorded}">
+        <img :src="isCurrentHoleRecorded ? CameraTransparentImg : CameraImg" width="48">
     </div>
 </template>
 <style scoped>
