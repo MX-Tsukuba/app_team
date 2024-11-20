@@ -1,5 +1,11 @@
 describe('template spec', () => {
-  it('passes', () => {
-    cy.visit('https://example.cypress.io')
+  const baseUrl = 'https://localhost:3000/';
+  before(() => {
+    cy.visit(baseUrl)
+    cy.visit(baseUrl+'top/')
+  })
+  
+  it('login', () => {
+    
   })
 })
