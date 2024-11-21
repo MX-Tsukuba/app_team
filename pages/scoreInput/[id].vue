@@ -246,7 +246,7 @@ onMounted(()=>{
 
 
       <IsRecorded @click="toggleModal('confirm')"/>
-    <StartRecord v-if="isShowModal && modalName === 'confirm' && !currentHoleVideoUrl"/>
+    <StartRecord v-if="isShowModal && modalName === 'confirm' && !scoreStore.getCurrentHoleVideoUrl()"/>
   </section>
 </template>
 

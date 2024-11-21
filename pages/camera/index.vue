@@ -104,8 +104,7 @@ const upLoadSupabaseStorage = async (video: Blob | File) => {
             user_id: user.id,
             date: currentDate
           }
-        ]
-        )
+        ])
         .select();
       if (dbError) {
         console.log(`データベースへの挿入に失敗しました dbError:${dbError}`);
@@ -121,12 +120,13 @@ const upLoadSupabaseStorage = async (video: Blob | File) => {
         .getPublicUrl(fileName)
       const publicUrl = publicUrlData.publicUrl
       if (param === 'top') {
-        router.push({ 
+        router.push({
           path: `/formAnalytics/${movieId.value}`
         })
         console.log(`[In camera.vue] publicUrl:${publicUrl}`)
       } else if (param === 'scoreInput') {
-        router.push({ 
+        //ここにt_relationsに挿入する処理を追加
+        router.push({
           path: `/scoreInput/${roundId}`
         })
         scoreStore.setVideoUrl(publicUrl);
