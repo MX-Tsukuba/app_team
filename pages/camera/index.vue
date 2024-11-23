@@ -126,6 +126,17 @@ const upLoadSupabaseStorage = async (video: Blob | File) => {
         console.log(`[In camera.vue] publicUrl:${publicUrl}`)
       } else if (param === 'scoreInput') {
         //ここにt_relationsに挿入する処理を追加
+        const {data:dbData, error : dbError } = await supabase
+          .from('t_relations')
+          .insert([
+            {
+              created_at: new Date(),
+              updated_at: new Date(),
+              round_id: roundId,
+              hole_number: currentHoleIndex.value + 1,
+              movie_id: movieId.value
+            }
+          ])
         router.push({
           path: `/scoreInput/${roundId}`
         })

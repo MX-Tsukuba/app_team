@@ -36,7 +36,7 @@ const isCurrentHoleRecorded = computed(() => {
 // });
 
 </script>
-<template>    
+<template>
     <div class="circleBtn" :class="{'inActive': isCurrentHoleRecorded}">
         <img :src="isCurrentHoleRecorded ? CameraTransparentImg : CameraImg" width="48">
     </div>
