@@ -92,7 +92,7 @@ async function fetchLog() {
     const { data: roundData, error } = await supabase
       .from('t_rounds')
       .select(
-        'id, date, t_holes(hole_number, score_number, putts_number, t_movies(result)), m_golfplaces(golf_place_name, m_holes(hole_number, par_number))'
+        'id, date, t_holes(hole_number, score_number, putts_number), m_golfplaces(golf_place_name, m_holes(hole_number, par_number))'
       )
       .eq('user_id', 1);
     if (error) {
@@ -117,11 +117,11 @@ async function fetchLog() {
           });
           let form_Score: number | null = null;
           //let form_Score = 100;
-          if (item1.t_movies) {
-            form_Score = Math.round(
-              (item1.t_movies.result?.total_score as number) * 100
-            );
-          }
+          // if (item1.t_movies) {
+          //   form_Score = Math.round(
+          //     (item1.t_movies.result?.total_score as number) * 100
+          //   );
+          // }
           tmpHoleDetails.push({
             holeNo: item1.hole_number,
             par: tmpMHoles ? tmpMHoles.par_number : -1,
