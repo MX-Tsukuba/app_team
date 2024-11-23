@@ -18,15 +18,37 @@
     <div class="content">
       <div v-if="selectedTab === 'score'">
         <div class="scoreItemContainer">
-          <Bar :data="chartData" :options="chartOptions" ></Bar>
+          <div class="progress" v-for="(v,i) in props.movieAnalyzeArr" :key="i">
+            <div class="name">{{v.name}}</div>
+            <div class="progressContainer">
+              <el-progress :percentage="v.score" :status="v.score <= 1 ? 'exception' : undefined"
+                :color="v.color"
+                :stroke-width="15"
+                :format="() => `${v.score}`"
+                :show-text="true"
+                text-color="inherit" font-size="16px" width="250px"></el-progress>
+              <p class="scoreleft">/100</p>
+            </div>
+          </div> 
         </div>
       </div>
       <div v-if="selectedTab === 'detail'">
         <div class="detailContainer">
-          <p class="title">詳細情報</p>
-          <div class="info">
-            <p class="time">動画撮影日時：yyyy/mm/dd 12:00</p>
-            <p class="place">場所：○○ゴルフクラブ</p>
+          <div class="score_table" v-show="isActive===true">
+            <table>
+              <thead>
+                <tr>
+                  <th>ホール</th>
+                  <th>パー</th>
+                  <th>スコア</th>
+                  <th>パッド</th>
+                  <th>フォーム</th>
+                </tr>
+              </thead>
+              <tbody class="t_body">
+                <logListTableRow v-for="i in 18" v-bind="playDataArr[i]" />
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
@@ -35,55 +57,25 @@
 </template>
 
 <script setup lang="ts">
+import logListTableRow from '../scoreDisplay/logListTableRow.vue';
 const selectedTab = ref<string>('score');
 
-// const props=defineProps<{
-//     inputName:string
-//     input:number
-//     unit:string
-// }>()
+const props=defineProps<{
+  playDataArr:{
+  holeNo: number;
+  par: number | null;
+  result: number | null;
+  putts: number | null;
+  form_Score: number | null;
+}[]
+  movieAnalyzeArr:{score:number,name:string,color:string}[]
+  isActive:boolean
+}>()
 
-import {
-  Chart as ChartJS,
-  BarElement,
-  CategoryScale,
-  LinearScale,
-  Tooltip,
-  Legend,
-  Title,
-} from 'chart.js';
-import { Bar } from 'vue-chartjs';
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend, Title);
 
-// グラフのデータ
-const chartData = {
-  labels: ['January'],
-  datasets: [
-    {
-      label: 'Dataset 1',
-      data: [65],
-      backgroundColor: 'rgba(75, 192, 192, 0.2)',
-      borderColor: 'rgba(75, 192, 192, 1)',
-      borderWidth: 1,
-    },
-  ],
-};
 
-// グラフのオプション設定
-const chartOptions = {
-  indexAxis: 'y' as const, // ここで 'as const' を追加
-  responsive: true,
-  plugins: {
-    legend: {
-      position: 'top' as const,
-    },
-    title: {
-      display: true,
-      text: 'Sample Horizontal Bar Chart',
-    },
-  },
-};
+
 
 </script>
 
@@ -147,14 +139,54 @@ pre {
     gap: 40px;
 }
 
-.detailContainer.info {
-    display: flex;
-    flex-direction: column;
-}
+
 
 .scoreItemContainer {
     display: flex;
     flex-direction: column;
-    gap: 1px;
+    gap: 10px;
+}
+:deep(.el-progress__text) {
+  color: inherit !important; 
+}
+.scoreItemContainer.name{
+  color: #333;
+font-family: Inter;
+font-size: 16px;
+font-style: normal;
+font-weight: 400;
+line-height: normal;
+}
+.scoreItemContainer.progress{
+  display: flex;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+gap: 5px;
+align-self: stretch;
+}
+.scoreItemContainer.scoreleft{
+  color: #333;
+font-family: Inter;
+font-size: 12px;
+font-style: normal;
+font-weight: 400;
+line-height: normal;
+}
+.progressContainer{
+  display: flex;
+justify-content: center;
+align-items: center;
+gap: 10px;
+}
+.score_table {
+  align-items: center;
+
+  margin: auto;
+  margin-bottom: 10px;
+  text-align: center;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 </style>
