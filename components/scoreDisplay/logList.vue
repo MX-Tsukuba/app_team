@@ -19,8 +19,8 @@ import logListChild from './logListChild.vue';
 interface holeDetails {
   holeNo: number;
   par: number;
-  result: number;
-  putts: number;
+  result: number | null;
+  putts: number | null;
   form_Score: number | null;
   //form_Score: number;
 }

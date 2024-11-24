@@ -55,8 +55,8 @@ const supabase = useSupabaseClient<Database>();
 interface holeDetails {
   holeNo: number;
   par: number;
-  result: number;
-  putts: number;
+  result: number | null;
+  putts: number | null;
   form_Score: number | null;
   //form_Score: number;
 }
@@ -111,17 +111,33 @@ async function fetchLog() {
         item.t_holes.sort((a, b) => a.hole_number - b.hole_number);
 
         const tmpHoleDetails: holeDetails[] = [];
+        // item.m_golfplaces?.m_holes.forEach((item1) => {
+        //   const tmpTHoles = item.t_holes.find((value) => {
+        //     return (item1.hole_number = value.hole_number);
+        //   });
+        //   if (tmpTHoles) {
+        //     tmpHoleDetails.push({
+        //       holeNo: item1.hole_number,
+        //       par: item1.par_number,
+        //       result: tmpTHoles.score_number,
+        //       putts: tmpTHoles.putts_number,
+        //       form_Score: null,
+        //     });
+        //   } else {
+        //     tmpHoleDetails.push({
+        //       holeNo: item1.hole_number,
+        //       par: item1.par_number,
+        //       result: null,
+        //       putts: null,
+        //       form_Score: null,
+        //     });
+        //   }
+        // });
         item.t_holes.forEach((item1) => {
           const tmpMHoles = item.m_golfplaces?.m_holes.find((value) => {
             return value.hole_number == item1.hole_number;
           });
           let form_Score: number | null = null;
-          //let form_Score = 100;
-          // if (item1.t_movies) {
-          //   form_Score = Math.round(
-          //     (item1.t_movies.result?.total_score as number) * 100
-          //   );
-          // }
           tmpHoleDetails.push({
             holeNo: item1.hole_number,
             par: tmpMHoles ? tmpMHoles.par_number : -1,
@@ -211,8 +227,7 @@ const fetchMovies = async () => {
       id: item.id,
       date: new Date(item.created_at.slice(0, 10)),
       status: item.status,
-      total_score: item.result ? (item.result.total_score as number) : null, //時間ないので型解決を諦めます。
-      //total_score: 0,
+      total_score: item.result ? (item.result.total_score as number) : -1, //時間がないので型解決を諦めます。デフォルト値を-1にします。
     });
   });
   moviesArray.sort((a, b) => {
@@ -260,8 +275,55 @@ const fetchMovies = async () => {
 };
 
 const fetchData = async () => {
+  const { data: relations, error } = await supabase
+    .from('t_relations')
+    .select('*');
+
+  if (error) throw error;
+  //else console.log(relations);
+
   const Logs = await fetchLog();
   const Movies = await fetchMovies();
+
+  if (Logs) {
+    relations.forEach((relation) => {
+      Logs.forEach((log) => {
+        // 該当する monthData を検索
+        const monthData = log.monthDatas.find(
+          (data) => data.roundId === relation.round_id
+        );
+        if (!monthData) return;
+
+        // 該当する holeDetail を検索
+        const holeDetail = monthData.holeDetails.find(
+          (detail) => detail.holeNo === relation.hole_number
+        );
+        if (!holeDetail) return;
+
+        // Movies が存在する場合
+        if (Movies) {
+          // 該当する movie を検索
+          const movie = Movies.find((m1) =>
+            m1.monthDatas.some((m2) => m2.id === relation.movie_id)
+          );
+
+          if (movie) {
+            const movieData = movie.monthDatas.find(
+              (m2) => m2.id === relation.movie_id
+            );
+            if (movieData) {
+              holeDetail.form_Score = movieData.total_score
+                ? Math.round(movieData.total_score * 100)
+                : null;
+            }
+          }
+        }
+      });
+    });
+  }
+
+  if (Movies) {
+  }
   return { logs: Logs ? Logs : [], movies: Movies ? Movies : [] };
 };
 

@@ -89,8 +89,8 @@ const toggleScoreTable = () => {
 interface holeDetail {
   holeNo: number;
   par: number;
-  result: number;
-  putts: number;
+  result: number | null;
+  putts: number | null;
   form_Score: number | null;
   //form_Score: number;
 }
