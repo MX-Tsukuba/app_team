@@ -82,6 +82,7 @@ interface movieList {
     date: Date;
     status: number;
     total_score: number | null;
+    roundId: number | null;
   }[];
 }
 
@@ -219,7 +220,13 @@ const fetchMovies = async () => {
   if (error) throw error;
 
   const moviesArray = <
-    { id: number; date: Date; status: number; total_score: number | null }[]
+    {
+      id: number;
+      date: Date;
+      status: number;
+      total_score: number | null;
+      roundId: number | null;
+    }[]
   >[];
 
   data.forEach((item) => {
@@ -228,6 +235,7 @@ const fetchMovies = async () => {
       date: new Date(item.created_at.slice(0, 10)),
       status: item.status,
       total_score: item.result ? (item.result.total_score as number) : -1, //時間がないので型解決を諦めます。デフォルト値を-1にします。
+      roundId: null,
     });
   });
   moviesArray.sort((a, b) => {
@@ -247,6 +255,7 @@ const fetchMovies = async () => {
     date: Date;
     status: number;
     total_score: number | null;
+    roundId: number | null;
   }[] = [];
   moviesArray.forEach((item) => {
     const itemDate = item.date;
@@ -323,6 +332,15 @@ const fetchData = async () => {
   }
 
   if (Movies) {
+    relations.forEach((relation) => {
+      Movies.forEach((item) => {
+        item.monthDatas.forEach((item1) => {
+          if (item1.id === relation.movie_id) {
+            item1.roundId = relation.relation_id;
+          }
+        });
+      });
+    });
   }
   return { logs: Logs ? Logs : [], movies: Movies ? Movies : [] };
 };

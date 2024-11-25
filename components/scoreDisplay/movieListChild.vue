@@ -1,11 +1,14 @@
 <script setup lang="ts">
+import { useRouter } from 'vue-router';
 const value = ref<boolean>(true);
+//const router = useRouter();
 
 interface movie {
   id: number;
   date: Date;
   status: number;
   total_score: number | null;
+  roundId: number | null;
 }
 
 function calculateDays(date: Date) {
@@ -21,8 +24,23 @@ function calculateDays(date: Date) {
   return item[date.getDay()];
 }
 
-const toAnalytics = async (id: number) => {
-  await navigateTo(`/formAnalytics/${id}`);
+// const toAnalytics = async (id: number) => {
+
+//   await navigateTo(`/formAnalytics/${id}`);
+// };
+const router = [{ name: 'toAnalytics', path: `/formAnalytics/:id` }];
+
+const toAnalytics = (movieId: number, roundId: number | null) => {
+  const isActive = !!roundId; // roundId が truthy なら true, それ以外なら false
+
+  router.push({
+    name: 'toAnalytics',
+    params: { id: movieId }, // 動的セグメント ":id" に対応するパラメータ
+    query: {
+      roundId, // roundId の値をそのまま設定
+      isActive, // true または false を設定
+    },
+  });
 };
 
 const props = defineProps<movie>();
@@ -44,7 +62,9 @@ const props = defineProps<movie>();
           </div>
         </div>
       </div>
-      <button class="link" @click="toAnalytics(props.id)">分析を見る</button>
+      <button class="link" @click="toAnalytics(props.id, props.roundId)">
+        分析を見る
+      </button>
     </div>
     <div class="tags" v-else-if="props.status == 0">
       <div class="state_tag"><p class="state_unanalyzed">未分析</p></div>
