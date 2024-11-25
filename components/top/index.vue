@@ -19,7 +19,7 @@ import { useModalStore } from '~/src/store/modal';
 import enterGolfCourseName from './enterGolfCourseName.vue';
 
 const headVarStore = useHeadVarStore();
-headVarStore.title = 'Home';
+headVarStore.title = 'Motion-X';
 const modalStore = useModalStore();
 const isShowModal = computed(() => modalStore.isShowModal);
 const modalName = computed(() => modalStore.modalName);
