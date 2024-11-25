@@ -9,6 +9,7 @@ interface movieList {
     date: Date;
     status: number;
     total_score: number | null;
+    roundId: number | null;
   }[];
 }
 
@@ -28,6 +29,7 @@ const props = defineProps<data>();
         :date="movie.date"
         :status="movie.status"
         :total_score="movie.total_score"
+        :roundId="movie.roundId"
       />
     </div>
   </div>
