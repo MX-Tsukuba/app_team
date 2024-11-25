@@ -24,12 +24,6 @@ function calculateDays(date: Date) {
   return item[date.getDay()];
 }
 
-// const toAnalytics = async (id: number) => {
-
-//   await navigateTo(`/formAnalytics/${id}`);
-// };
-//const router = [{ name: 'toAnalytics', path: `/formAnalytics/:id` }];
-
 const toAnalytics = (movieId: number, roundId: number | null) => {
   const isActive: boolean = roundId ? true : false; // roundId が truthy なら true, それ以外なら false
 

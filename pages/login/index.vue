@@ -2,6 +2,8 @@
 // import {signInWithOAuth} from '~/composables/useSupabaseClient';
 definePageMeta({ layout: false })
 const supabase = useSupabaseClient()
+const email = ref<string>("");
+const password= ref<string>("");
 
 const signInWithGoogle = async () => {
   const { error } = await supabase.auth.signInWithOAuth({
@@ -13,16 +15,24 @@ const signInWithGoogle = async () => {
   if (error) console.log(error)
 }
 //実装途中
-async function signInWithEmail() {
-  const { data, error } = await supabase.auth.signInWithOtp({
-    email: 'example@email.com',
-    options: {
-      // set this to false if you do not want the user to be automatically signed up
-      shouldCreateUser: false,
-      emailRedirectTo: 'https://localhost:3000/login/confirm', // ここを絶対パスにしたら成功する
-    },
-  })
-  if (error) console.log(error)
+// async function signInWithEmail() {
+//   const { data, error } = await supabase.auth.signInWithOtp({
+//     email: 'example@email.com',
+//     options: {
+//       // set this to false if you do not want the user to be automatically signed up
+//       shouldCreateUser: false,
+//       emailRedirectTo: 'https://localhost:3000/login/confirm', // ここを絶対パスにしたら成功する
+//     },
+//   })
+//   if (error) console.log(error)
+// }
+
+const signInWithEmail = async(email:string, password:string)=>{
+  const {data, error} = await supabase.auth.signUp({email: email, password:password});
+  if(error)throw error;
+  console.log(email);
+  console.log(password);
+  alert("登録完了メールを確認してください");
 }
 </script>
 
@@ -33,10 +43,10 @@ async function signInWithEmail() {
       <div class="mailLogin">
         <div class="mailInput">
           //実装途中
-          <input class="inputBox" type="text" placeholder="メールアドレスを入力"></input>
-          <input class="inputBox" type="text" placeholder="パスワードを入力"></input>
+          <input class="inputBox" type="text" placeholder="メールアドレスを入力" v-model="email"></input>
+          <input class="inputBox" type="text" placeholder="パスワードを入力"v-model="password"></input>
         </div>
-        <button class="mailLoginButton">ログイン</button>
+        <button class="mailLoginButton" @click="signInWithEmail(email, password)">サインアップ</button>
       </div>
       <div class="or">
         <hr class="or-lines">
