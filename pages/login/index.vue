@@ -1,9 +1,17 @@
 <script setup lang="ts">
 // import {signInWithOAuth} from '~/composables/useSupabaseClient';
+import { useRouter } from 'vue-router';
 definePageMeta({ layout: false })
 const supabase = useSupabaseClient()
 const email = ref<string>("");
 const password= ref<string>("");
+const signInFlag = ref<boolean>(true);
+const router =useRouter();
+const showPassword = ref(false);
+
+const togglePasswordVisibility = () => {
+  showPassword.value = !showPassword.value;
+};
 
 const signInWithGoogle = async () => {
   const { error } = await supabase.auth.signInWithOAuth({
@@ -27,12 +35,25 @@ const signInWithGoogle = async () => {
 //   if (error) console.log(error)
 // }
 
-const signInWithEmail = async(email:string, password:string)=>{
+const signUpWithEmail = async(email:string, password:string)=>{
   const {data, error} = await supabase.auth.signUp({email: email, password:password});
   if(error)throw error;
   console.log(email);
   console.log(password);
   alert("登録完了メールを確認してください");
+}
+
+const signInWithEmail = async(email:string, password:string)=>{
+  const {data, error} = await supabase.auth.signInWithPassword({email, password});
+  if(error)throw error;
+  console.log("ログイン");
+  router.push({path: "/"});
+  
+}
+
+const changeFlag = ()=>{
+  console.log("clicked")
+  signInFlag.value = !signInFlag.value
 }
 </script>
 
@@ -42,11 +63,14 @@ const signInWithEmail = async(email:string, password:string)=>{
     <div class="loginButtons">
       <div class="mailLogin">
         <div class="mailInput">
-          //実装途中
           <input class="inputBox" type="text" placeholder="メールアドレスを入力" v-model="email"></input>
-          <input class="inputBox" type="text" placeholder="パスワードを入力"v-model="password"></input>
+          <input class="inputBox" :type="showPassword ? 'text' : 'password'" placeholder="パスワードを入力"v-model="password"></input><button type="button" @click="togglePasswordVisibility">
+            {{ showPassword ? '非表示' : '表示' }}</button>
         </div>
-        <button class="mailLoginButton" @click="signInWithEmail(email, password)">サインアップ</button>
+        <button class="mailLoginButton" @click="signInWithEmail(email, password)" v-if="signInFlag">ログイン</button>
+        <button class="mailLoginButton" @click="signUpWithEmail(email, password)" v-else>サインアップ</button>
+        <button class="changeButton" @click="changeFlag()" v-if="signInFlag">アカウントをお持ちでない方はこちら サインアップ</button>
+        <button class="changeButton" @click="changeFlag()" v-else>既にアカウントをお持ちの方はこちら ログイン</button>
       </div>
       <div class="or">
         <hr class="or-lines">
@@ -79,7 +103,7 @@ const signInWithEmail = async(email:string, password:string)=>{
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 110px;
+  gap: 80px;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.30) 0.05%, rgba(254, 254, 254, 0.50) 50.29%, #777 99.93%);
   box-sizing: border-box;
 }
@@ -103,7 +127,7 @@ const signInWithEmail = async(email:string, password:string)=>{
 
 .mailLogin {
   display: flex;
-  height: 160px;
+  /* height: 160px; */
   flex-direction: column;
   justify-content: center;
   align-items: center;
@@ -156,7 +180,7 @@ const signInWithEmail = async(email:string, password:string)=>{
 .or {
   display: flex;
   height: 40px;
-  padding: 16px 10px 10px 10px;
+  /* padding: 16px 10px 10px 10px; */
   justify-content: center;
   align-items: center;
   gap: 10px;
@@ -282,4 +306,9 @@ const signInWithEmail = async(email:string, password:string)=>{
   opacity: 8%;
 }
 
+.changeButton{
+  display: flex;
+  height: fit-content;
+  background-color: #FFF;
+}
 </style>
