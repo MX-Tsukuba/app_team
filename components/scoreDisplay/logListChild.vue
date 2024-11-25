@@ -61,8 +61,8 @@ import { useRouter } from 'vue-router';
 const someHoleIsNull = ref<boolean>(false);
 const router = useRouter();
 
-const moveEditPage = async (id: number) => {
-  await navigateTo(`/scoreInput/${id}`);
+const moveEditPage = (id: number) => {
+  router.push(`/scoreInput/${id}`);
 };
 
 function getHoleDetails(i: number) {
