@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
 const value = ref<boolean>(true);
-//const router = useRouter();
+const router = useRouter();
 
 interface movie {
   id: number;
@@ -28,17 +28,16 @@ function calculateDays(date: Date) {
 
 //   await navigateTo(`/formAnalytics/${id}`);
 // };
-const router = [{ name: 'toAnalytics', path: `/formAnalytics/:id` }];
+//const router = [{ name: 'toAnalytics', path: `/formAnalytics/:id` }];
 
 const toAnalytics = (movieId: number, roundId: number | null) => {
-  const isActive = !!roundId; // roundId が truthy なら true, それ以外なら false
+  const isActive: boolean = roundId ? true : false; // roundId が truthy なら true, それ以外なら false
 
   router.push({
-    name: 'toAnalytics',
-    params: { id: movieId }, // 動的セグメント ":id" に対応するパラメータ
+    path: `/formAnalytics/${movieId}`,
     query: {
-      roundId, // roundId の値をそのまま設定
-      isActive, // true または false を設定
+      roundId: roundId, // roundId の値をそのまま設定
+      isActive: isActive, // true または false を設定
     },
   });
 };
