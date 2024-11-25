@@ -99,8 +99,6 @@ const upLoadSupabaseStorage = async (video: Blob | File) => {
         .insert([
           {
             movie_name: fileName,
-            created_at: new Date(),
-            updated_at: new Date(),
             user_id: user.id,
             date: currentDate
           }
@@ -121,7 +119,7 @@ const upLoadSupabaseStorage = async (video: Blob | File) => {
       const publicUrl = publicUrlData.publicUrl
       if (param === 'top') {
         router.push({
-          path: `/formAnalytics/${movieId.value}`
+          path: `/scoreDisplay`,
         })
         console.log(`[In camera.vue] publicUrl:${publicUrl}`)
       } else if (param === 'scoreInput') {
@@ -130,8 +128,6 @@ const upLoadSupabaseStorage = async (video: Blob | File) => {
           .from('t_relations')
           .insert([
             {
-              created_at: new Date(),
-              updated_at: new Date(),
               round_id: roundId,
               hole_number: currentHoleIndex.value + 1,
               movie_id: movieId.value

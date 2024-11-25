@@ -66,7 +66,7 @@ const ParDataArr=ref<ParData[]>([]);
 const selectData =async()=> {
   const {data,error:roundError}=await supabase
   .from('t_rounds')
-  .select('t_holes(hole_number, score_number, putts_number), m_golfplaces(golf_place_name, m_holes(hole_number, par_number))')
+  .select('t_holes(hole_number, score_number, putts_number), m_golfplaces(golf_place_name, m_holes(hole_number, par_number)), t_relations(hole_number, movie_id, t_movies(movie_name))')
   .eq('id',roundId.value)
   console.log('selectData',data);
   if(roundError){
@@ -78,34 +78,31 @@ const selectData =async()=> {
     for(let i=0;i<18;i++){
       ParDataArr.value.push(new ParData(data[0].m_golfplaces?.m_holes[i].hole_number,data[0].m_golfplaces?.m_holes[i].par_number));
       data[0].t_holes.forEach(item=>{
-      if(item.hole_number===i+1){//ホール数とindexで1の差があるので調整
-        playDataArr.value[i].holeNumber=item.hole_number;
-        playDataArr.value[i].scoreNumber=item.score_number;
-        playDataArr.value[i].puttsNumber=item.putts_number;
-        playDataArr.value[i].isSelect=true;
-      }
-    });
+        if(item.hole_number===i+1){//ホール数とindexで1の差があるので調整
+          playDataArr.value[i].holeNumber=item.hole_number;
+          playDataArr.value[i].scoreNumber=item.score_number;
+          playDataArr.value[i].puttsNumber=item.putts_number;
+          playDataArr.value[i].isSelect=true;
+        }
+      });
+      data[0].t_relations.forEach(item=>{
+        if(item.hole_number === i + 1){
+          const fileName = item.t_movies.movie_name;
+          const { data: publicUrlData } = supabase
+          .storage
+          .from('Movie')
+          .getPublicUrl(fileName)
+      const publicUrl = publicUrlData.publicUrl
+          scoreStore.updateIsRecordedArray(i, publicUrl);
+        }
+      });
     }
+    console.log('t_relations', data)
     console.log('ParDataArr',ParDataArr.value);
     console.log('playDataArr',playDataArr.value);
     isLoading.value=false;
   }
 }
-
-//ホール選択（クリック）とパー表示
-// const currentHole = ref<number>(3);
-// const fetchPar= async (hole: number) => {
-//   const { data, error } = await supabase
-//     .from('m_holes')
-//     .select('par_number')
-//     .eq('golfplaces_id', golfPlaceId);
-//   if (error) {
-//     console.error('Error fetching data:', error);
-//     return null;
-//   } else {
-//     return data;
-//   }
-// };
 
 const setting=()=>{
   roundId.value=Number(route.params.id);
