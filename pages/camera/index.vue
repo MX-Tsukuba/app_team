@@ -2,115 +2,116 @@
 definePageMeta({
   layout: false,
 });
-import { ref, onMounted, onBeforeUnmount } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { useRouter } from 'vue-router';
 import { useSupabaseClient } from '#imports';
 import { useModalStore } from '~/src/store/modal';
 // import { SupabaseClient } from '@supabase/supabase-js';
 
-const video = ref<HTMLVideoElement | null>(null)
-const videoSrc = ref<string | null>(null)
-const mediaRecorder = ref<MediaRecorder | null>(null)
-const recordedChunks: Blob[] = []
-const isRecording = ref(false)
-const router = useRouter()
+const video = ref<HTMLVideoElement | null>(null);
+const videoSrc = ref<string | null>(null);
+const mediaRecorder = ref<MediaRecorder | null>(null);
+const recordedChunks: Blob[] = [];
+const isRecording = ref(false);
+const router = useRouter();
 
 const modalStore = useModalStore();
 const isShowModal = computed(() => modalStore.isShowModal);
 const modalName = computed(() => modalStore.modalName);
-const toggleModal = (name:string) => modalStore.toggleModal(name);
+const toggleModal = (name: string) => modalStore.toggleModal(name);
 
 const recordedBlob = ref<Blob | null>(null);
 const selectedFile = ref<File | null>(null);
 
 const supabaseClient = useSupabaseClient();
 
-
 //Function Definition
 const startCamera = async () => {
   if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { exact: 'environment' }}
-     })
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { exact: 'environment' } },
+      });
       if (video.value) {
-        video.value.srcObject = stream
+        video.value.srcObject = stream;
       }
     } catch (error) {
-      console.error("カメラの起動に失敗しました:", error)
+      console.error('カメラの起動に失敗しました:', error);
     }
   }
-}
+};
 const startRecording = () => {
   if (video.value && video.value.srcObject) {
-    const stream = video.value.srcObject as MediaStream
-    mediaRecorder.value = new MediaRecorder(stream)
+    const stream = video.value.srcObject as MediaStream;
+    mediaRecorder.value = new MediaRecorder(stream);
     mediaRecorder.value.ondataavailable = (event) => {
       if (event.data.size > 0) {
-        recordedChunks.push(event.data)
+        recordedChunks.push(event.data);
       }
-    }
+    };
     mediaRecorder.value.onstop = () => {
-      recordedBlob.value = new Blob(recordedChunks, { type: 'video/mp4' })
-      videoSrc.value = URL.createObjectURL(recordedBlob.value)
-      recordedChunks.length = 0
-    }
-    mediaRecorder.value.start()
-    isRecording.value = true
+      recordedBlob.value = new Blob(recordedChunks, { type: 'video/mp4' });
+      videoSrc.value = URL.createObjectURL(recordedBlob.value);
+      recordedChunks.length = 0;
+    };
+    mediaRecorder.value.start();
+    isRecording.value = true;
   }
-}
+};
 const stopRecording = () => {
   if (mediaRecorder.value && isRecording.value) {
-    mediaRecorder.value.stop()
-    isRecording.value = false
-    toggleModal('confirmModal')
+    mediaRecorder.value.stop();
+    isRecording.value = false;
+    toggleModal('confirmModal');
   }
-}
+};
 
 const upLoadSupabaseStorage = async (video: Blob | File) => {
-  try{
-    const user = await supabaseClient.auth.getSession()
-    .then(({data: {session}}) => {
-      if (!session) return null;
-      return supabaseClient.auth.getUser()
-        .then(({data: { user }}) => user)
-    })
-    if(!user){
+  try {
+    const user = await supabaseClient.auth
+      .getSession()
+      .then(({ data: { session } }) => {
+        if (!session) return null;
+        return supabaseClient.auth.getUser().then(({ data: { user } }) => user);
+      });
+    if (!user) {
       console.error('ユーザIDが取得できません');
       return;
     }
-    const fileName: string = videoSrc.value ? videoSrc.value.split('/').pop()?.split('.')[0] ?? 'test/test.mp4' : 'test/test.mp4'
-    const { data, error } = await useSupabaseClient().storage.from('Movie').upload(fileName, video)
+    const fileName: string = videoSrc.value
+      ? videoSrc.value.split('/').pop()?.split('.')[0] ?? 'test/test.mp4'
+      : 'test/test.mp4';
+    const { data, error } = await useSupabaseClient()
+      .storage.from('Movie')
+      .upload(fileName, video);
     if (error) {
-      console.log('ファイルのアップロードに失敗しました:',error);
-    }else{
-
-    const currentDate = new Date().toISOString().split('T')[0];
-    const { error : dbError } = await supabaseClient
-      .from('t_movies')
-      .insert([
+      console.log('ファイルのアップロードに失敗しました:', error);
+    } else {
+      const currentDate = new Date().toISOString().split('T')[0];
+      const { error: dbError } = await supabaseClient.from('t_movies').insert([
         {
           movie_name: fileName,
           created_at: new Date(),
           updated_at: new Date(),
           user_id: user.id,
-          date: currentDate
-        }
+          date: currentDate,
+        },
       ]);
-    if (dbError) {
-      console.log('データベースへの挿入に失敗しました:', dbError);
-    } else {
-      console.log('動画情報が t_movies に挿入されました');
+      if (dbError) {
+        console.log('データベースへの挿入に失敗しました:', dbError);
+      } else {
+        console.log('動画情報が t_movies に挿入されました');
+      }
+      const { data: publicUrlData } = useSupabaseClient()
+        .storage.from('Movie')
+        .getPublicUrl(fileName);
+      const publicUrl = publicUrlData.publicUrl;
+      router.push({ path: './scoreInput', query: { video: publicUrl } }); //router.pushはここを参考にする
     }
-    const { data: publicUrlData } = useSupabaseClient().storage.from('Movie').getPublicUrl(fileName)
-    const publicUrl = publicUrlData.publicUrl
-    router.push({ path: './scoreInput', query: { video: publicUrl }})//router.pushはここを参考にする
-    }
-  }
-  catch (err) {
+  } catch (err) {
     console.error('エラーが発生しました:', err);
   }
-
-}
+};
 const confirmVideo = async () => {
   if (recordedBlob.value) {
     await upLoadSupabaseStorage(recordedBlob.value);
@@ -118,40 +119,40 @@ const confirmVideo = async () => {
   } else if (selectedFile.value) {
     await upLoadSupabaseStorage(selectedFile.value);
     toggleModal('confirmModal');
-  }else{
+  } else {
     console.error('録画データがありません');
   }
-}
+};
 //Function Execution
 const toggleRecording = () => {
   if (isRecording.value) {
-    stopRecording()
+    stopRecording();
   } else {
-    startRecording()
+    startRecording();
   }
-}
-const onFileChange = (event: Event) =>{
+};
+const onFileChange = (event: Event) => {
   const input = event.target as HTMLInputElement;
-  if(input.files && input.files[0]){
+  if (input.files && input.files[0]) {
     const file = input.files[0];
     videoSrc.value = URL.createObjectURL(file);
     //upLoadSupabaseStorage(file)
     selectedFile.value = file;
-    toggleModal('confirmModal')
+    toggleModal('confirmModal');
   }
-}
+};
 
 //Lifecycle Hooks
 onMounted(() => {
-  startCamera()
-})
+  startCamera();
+});
 onBeforeUnmount(() => {
   if (video.value && video.value.srcObject) {
-    const stream = video.value.srcObject as MediaStream
-    const tracks = stream.getTracks()
-    tracks.forEach(track => track.stop())
+    const stream = video.value.srcObject as MediaStream;
+    const tracks = stream.getTracks();
+    tracks.forEach((track) => track.stop());
   }
-})
+});
 </script>
 
 <template>
@@ -160,24 +161,37 @@ onBeforeUnmount(() => {
       <div class="card">
         <p class="title">この動画を使用しますか？</p>
         <div class="buttons">
-          <button @click="toggleModal('confirmModal')" class="cancelButton">キャンセル</button>
-          <Nuxt-link @click="confirmVideo" to="../scoreInput" class="confirmButton">確認</Nuxt-link>
+          <button @click="toggleModal('confirmModal')" class="cancelButton">
+            キャンセル
+          </button>
+          <Nuxt-link
+            @click="confirmVideo"
+            to="../scoreInput"
+            class="confirmButton"
+            >確認</Nuxt-link
+          >
         </div>
       </div>
     </div>
-    
-    <img src="~/assets/img/backWhite.png" alt="Left" class="backButton" @click="$router.go(-1)">
+
+    <img
+      src="~/assets/img/backWhite.png"
+      alt="Left"
+      class="backButton"
+      @click="$router.go(-1)"
+    />
     <video ref="video" autoplay playsinline></video>
     <div class="upBtnBox">
       <label class="upLoadLabel">
         動画を選択
-        <input type = "file" accept = "video/*" @change="onFileChange"/>
+        <input type="file" accept="video/*" @change="onFileChange" />
       </label>
-      <button @click="toggleRecording()" class="recordingButton"><div :class="isRecording ? 'stopBtn' : 'startBtn'"></div></button>
+      <button @click="toggleRecording()" class="recordingButton">
+        <div :class="isRecording ? 'stopBtn' : 'startBtn'"></div>
+      </button>
     </div>
   </div>
 </template>
-
 
 <style scoped>
 .whole{
