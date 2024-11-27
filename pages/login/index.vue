@@ -7,7 +7,8 @@ const email = ref<string>('');
 const password = ref<string>('');
 const signInFlag = ref<boolean>(true);
 const router = useRouter();
-const showPassword = ref(false);
+const showPassword = ref<boolean>(false);
+const sentEmail = ref<boolean>(false);
 
 const togglePasswordVisibility = () => {
   showPassword.value = !showPassword.value;
@@ -31,7 +32,8 @@ const signUpWithEmail = async (email: string, password: string) => {
   if (error) throw error;
   console.log(email);
   console.log(password);
-  alert('登録完了メールを確認してください');
+  // alert('登録完了メールを確認してください');
+  sentEmail.value = true;
 };
 
 const signInWithEmail = async (email: string, password: string) => {
@@ -53,7 +55,7 @@ const changeFlag = () => {
 <template>
   <div class="loginPage">
     <img class="logo" src="~/assets/img/logo.png" />
-    <div class="loginButtons">
+    <div class="loginButtons" v-if="!sentEmail">
       <div class="mailLogin">
         <div class="mailInput">
           <input
@@ -160,6 +162,12 @@ const changeFlag = () => {
           <span style="display: none">Googleで続行</span>
         </div>
       </button>
+    </div>
+    <div v-else="sentEmail" class="afterSendingEmail">
+      <p>
+        {{ email }}
+        <br />宛てに登録完了メールを送信しました<br />登録完了メールを確認してください
+      </p>
     </div>
   </div>
 </template>
@@ -425,5 +433,10 @@ const changeFlag = () => {
 .passwordVisibleButton{
   margin-left: 10px;
   margin-right: 10px;
+}
+
+.afterSendingEmail{
+  text-align: center;
+  font-size: 20px;
 }
 </style>
