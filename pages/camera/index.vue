@@ -6,7 +6,6 @@ import { useModalStore, useScoreStore } from '~/src/store';
 import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { useRouter } from 'vue-router';
 import { useSupabaseClient } from '#imports';
-import { useModalStore } from '~/src/store/modal';
 // import { SupabaseClient } from '@supabase/supabase-js';
 
 const video = ref<HTMLVideoElement | null>(null)
@@ -147,8 +146,8 @@ const upLoadSupabaseStorage = async (video: Blob | File) => {
           path: `/scoreInput/${roundId}`
         })
         scoreStore.setVideoUrl(publicUrl);
-        scoreStore.updateIsRecordedArray(currentHoleIndex.value, publicUrl);
-        console.log(`[In camera.vue] isRecordedArray:${scoreStore.isRecordedArray}`);
+        scoreStore.updateVideoUrlArray(currentHoleIndex.value, publicUrl);
+        console.log(`[In camera.vue] videoUrlArray:${scoreStore.videoUrlArray}`);
       } else {
         console.error("リダイレクト先が見つかりません");
         return;

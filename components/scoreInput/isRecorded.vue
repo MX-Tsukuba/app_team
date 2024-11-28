@@ -9,13 +9,11 @@ const scoreStore = useScoreStore();
 //ここを取得する
 const videoUrl = computed(() => scoreStore.videoUrl);
 const currentHoleIndex = computed(() => scoreStore.currentHoleIndex);
-const isRecordedArray = computed(() => scoreStore.isRecordedArray);
-console.log(`[In IsRecorded.vue] isRecordedArray:${isRecordedArray.value}, currentHoleIndex:${currentHoleIndex.value}`);
+const videoUrlArray = computed(() => scoreStore.videoUrlArray);
+console.log(`[In IsRecorded.vue] videoUrlArray:${videoUrlArray.value}, currentHoleIndex:${currentHoleIndex.value}`);
 
-const isCurrentHoleRecorded = computed(() => {
-    return isRecordedArray.value[currentHoleIndex.value] !== null;
-});
-
+const isCurrentHoleRecorded = computed(() => scoreStore.isCurrentHoleRecorded());
+console.log(`[In IsRecorded.vue] isCurrentHoleRecorded:${isCurrentHoleRecorded.value}`);
 </script>
 <template>
     <div class="circleBtn" :class="{'inActive': isCurrentHoleRecorded}">

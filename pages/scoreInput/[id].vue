@@ -93,13 +93,14 @@ const selectData =async()=> {
           .from('Movie')
           .getPublicUrl(fileName)
       const publicUrl = publicUrlData.publicUrl
-          scoreStore.updateIsRecordedArray(i, publicUrl);
+          scoreStore.updateVideoUrlArray(i, publicUrl);
         }
       });
     }
     console.log('t_relations', data)
     console.log('ParDataArr',ParDataArr.value);
     console.log('playDataArr',playDataArr.value);
+    console.log('videoUrlArray',scoreStore.videoUrlArray);
     isLoading.value=false;
   }
 }
@@ -110,6 +111,7 @@ const setting=()=>{
   playDataArr.value=new Array(18).fill({});
   for(let i=0;i<18;i++){
     playDataArr.value[i]=new playData(0,0,0);
+    scoreStore.updateVideoUrlArray(i, null);
   }
 }
 
@@ -118,11 +120,9 @@ const setting=()=>{
 const updateCurrentHole = (holeId:number) =>{
   currentHoleIndex.value = holeId;
   scoreStore.setCurrentHoleIndex(holeId);
-  console.log(`[In scoreInput.vue] holeId:${holeId}`);
   if (swiperCards.value) {
     swiperCards.value.swiper.slideTo(holeId);
   }
-  console.log(`[In scoreInput.vue] currentHoleIndex:${currentHoleIndex.value}`);
 };
 
 
@@ -242,7 +242,8 @@ onMounted(()=>{
     </swiper-container>
 
 
-      <IsRecorded @click="toggleModal('confirm')"/>
+      <IsRecorded v-if="!scoreStore.isCurrentHoleRecorded()" @click="toggleModal('confirm')"/>
+      <IsRecorded v-else />
     <StartRecord v-if="isShowModal && modalName === 'confirm' && !scoreStore.getCurrentHoleVideoUrl()"/>
   </section>
 </template>

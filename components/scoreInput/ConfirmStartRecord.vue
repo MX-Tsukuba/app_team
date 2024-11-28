@@ -24,7 +24,7 @@ const currentHoleIndex = computed(() => scoreStore.currentHoleIndex);
 onMounted(() => {
   setTimeout(() => {
     roundId.value=Number(route.params.id);
-    console.log(`[In ConfirmStartRecord.vue] roundId:${roundId.value},currentHoleIndex:${currentHoleIndex.value}`);
+    // console.log(`[In ConfirmStartRecord.vue] roundId:${roundId.value},currentHoleIndex:${currentHoleIndex.value}`);
     if (scoreStore.getCurrentHoleVideoUrl()) {
       alert('このホールは既に動画が登録されています');
       toggleModal();
