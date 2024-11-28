@@ -58,7 +58,6 @@ interface holeDetails {
   result: number | null;
   putts: number | null;
   form_Score: number | null;
-  //form_Score: number;
 }
 
 interface roundDetail {
@@ -99,11 +98,18 @@ async function fetchLog() {
     if (error) {
       console.error('Error fetching data from t_round table:', error);
     } else {
-      //console.log(JSON.stringify(roundData), null, 2); //解析結果の取得ができていることを確認済み
+      //console.log('after fetch data', JSON.stringify(roundData), null, 2); //解析結果の取得ができていることを確認済み
 
       //TODO: 一度データをpropsに渡せる形に直す。
       //できれば以下の実装を省略していきなりpropsに渡せる形にする＆月ごとに分けたい。
       const tmpDetails: roundDetail[] = [];
+      roundData.sort((a, b) => {
+        const dateA = new Date(a.date);
+        const dateB = new Date(b.date);
+        if (dateA > dateB) return -1;
+        else if (dateA === dateB) return 0;
+        else return 1;
+      });
       roundData.forEach((item) => {
         if (item.m_golfplaces !== null)
           item.m_golfplaces.m_holes.sort(
@@ -157,7 +163,6 @@ async function fetchLog() {
         });
       });
       //console.log(tmpDetails);
-      //
 
       let tmpDate: Date = tmpDetails[0].date;
       let tmpDatas: roundDetail[] = [];
@@ -172,13 +177,7 @@ async function fetchLog() {
           monthDetails.push({
             Y: tmpDate.getFullYear(),
             M: tmpDate.getMonth() + 1,
-            monthDatas: tmpDatas.sort((a, b) => {
-              const dateA = new Date(a.date);
-              const dateB = new Date(b.date);
-              if (dateA > dateB) return -1;
-              else if (dateA === dateB) return 0;
-              else return 1;
-            }),
+            monthDatas: tmpDatas,
           });
           tmpDatas = [item];
           tmpDate = item.date;
@@ -187,13 +186,7 @@ async function fetchLog() {
       monthDetails.push({
         Y: tmpDate.getFullYear(),
         M: tmpDate.getMonth() + 1,
-        monthDatas: tmpDatas.sort((a, b) => {
-          const dateA = new Date(a.date);
-          const dateB = new Date(b.date);
-          if (dateA > dateB) return -1;
-          else if (dateA === dateB) return 0;
-          else return 1;
-        }),
+        monthDatas: tmpDatas,
       });
       //console.log(monthDetails);
 
