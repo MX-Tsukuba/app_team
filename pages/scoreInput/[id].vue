@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import { useHeadVarStore } from '~/src/store/headVar.js';
-import { usePageStore } from '~/src/store/currentPage';
-import { useModalStore } from '~/src/store/modal';
+import { usePageStore, useHeadVarStore, useInputStateStore, useModalStore } from '~/src/store';
 import type { Database } from '~/types/database.types';
 import CameraImg from '~/assets/img/camera.svg';
 import CameraTransparentImg from '~/assets/img/cameraTransparent.svg';
@@ -11,9 +9,10 @@ import { InputCard, StartRecord } from '~/components/scoreInput';
 register();
 
 const headVarStore = useHeadVarStore();
-// headVarStore.title = `${golfPlaceName.value}`;宣言前に代入しているため後ろへ移動@ツジ
+headVarStore.backButtonText = '一時保存';
 const pageStore = usePageStore();
 const modalStore = useModalStore();
+const inputStateStore = useInputStateStore();
 const isShowModal = computed(() => modalStore.isShowModal);
 const modalName = computed(() => modalStore.modalName);
 const toggleModal = (name:string) => modalStore.toggleModal(name);
@@ -68,6 +67,7 @@ const selectData =async()=> {
   .from('t_rounds')
   .select('t_holes(hole_number, score_number, putts_number), m_golfplaces(golf_place_name, m_holes(hole_number, par_number))')
   .eq('id',roundId.value)
+  console.log('selectData',data);
   if(roundError){
     console.error('roundの取得に失敗しました',roundError.message)
     return null;
@@ -211,6 +211,11 @@ onMounted(()=>{
     setting();
     selectData();
   });
+  onUnmounted(()=> {
+    headVarStore.backButtonText = '';
+    inputStateStore.isInterrupted = true;
+    inputStateStore.roundId = roundId.value;
+  });
 </script>
 
 <template>
@@ -232,7 +237,7 @@ onMounted(()=>{
     <swiper-container ref="swiperCards" class='inputCards' slides-per-view="1" centered-slides="true" thumbs-swiper=".selectHole" @slideChange="onSlideChange">
       <swiper-slide v-for="(item) in items" :key="item" class="cardContainer">
         <!-- {{ item.id }} -->
-        <InputCard :roundId :currentHoleIndex :isShowModal :modalName :toggleModal :videoPlayer :videoUrl :buttonMessage  @updateCurrentHole="updateCurrentHole" @incrementCurrentHole="incrementCurrentHole"/>
+        <InputCard :itemIndex="item.id" :roundId :currentHoleIndex :playDataArr :isShowModal :modalName :toggleModal :videoPlayer :videoUrl :buttonMessage  @updateCurrentHole="updateCurrentHole" @incrementCurrentHole="incrementCurrentHole"/>
       </swiper-slide>
     </swiper-container>
 

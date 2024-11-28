@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Menu from './Menu.vue';
-import { useHeadVarStore } from '~/src/store/headVar.js';
+import { useHeadVarStore } from '~/src/store';
 const headVarStore = useHeadVarStore();
 const isOpen = ref(false);
 const handleMenubar = () => {
@@ -10,12 +10,13 @@ const handleMenubar = () => {
 
 <template>
   <header>
-    <img
-      src="~/assets/img/back.png"
-      alt="Left"
-      class="backButton"
-      @click="$router.go(-1)"
-    />
+    <div class="backButton" @click="$router.go(-1)">
+      <img
+        src="~/assets/img/back.png"
+        alt="Back"
+      />
+      <p>{{ headVarStore.backButtonText }}</p>
+    </div>
     <h1>{{ headVarStore.title }}</h1>
     <img
       src="~/assets/img/menu.png"
@@ -34,7 +35,9 @@ header{
     height: 60px;
     background: #FFF;
     box-shadow: 0px 0px 16px 0px rgba(0, 0, 0, 0.25);
-    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     position: fixed;
     top: 0;
     left: 0;    
@@ -42,14 +45,27 @@ header{
 }
 .backButton{
     margin: 0;
-    height: 30px;
+    height: 24px;
     position: fixed;
-    top: 15px;
+    top: 17px;
     left: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.backButton img{
+    height: 80%;
+    cursor: pointer;
+}
+.backButton p{
+    font-size: 12px;
+    font-weight: bold;
+    line-height: 100%;
 }
 h1{
     margin: 0;
-    padding-top: 10px;
+    line-height: 100%;
+    font-size: 24px;
 }
 .menuButton{
     margin: 0;
