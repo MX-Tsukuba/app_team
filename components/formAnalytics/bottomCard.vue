@@ -18,22 +18,37 @@
     <div class="content">
       <div v-if="selectedTab === 'score'">
         <div class="scoreItemContainer">
-          <p>right_elbow_shoulder_score: 40点</p>
-          <p>sway_score: 40点</p>
-          <p>cog_score: 40点</p>
-          <p>forward_posture_score: 40点</p>
-          <p>address_parallel_score: 40点</p>
-          <p>head_stable_score: 40点</p>
-          <p>axis_inclination_score: 40点</p>
-          <p>twisting_score: 40点</p>
+          <div class="progress" v-for="(v,i) in props.movieAnalyzeArr" :key="i">
+            <div class="name">{{v.name}}</div>
+            <div class="progressContainer">
+              <el-progress :percentage="v.score" :status="v.score <= 1 ? 'exception' : undefined"
+                :color="v.color"
+                :stroke-width="15"
+                :format="() => `${v.score}`"
+                :show-text="true"
+                text-color="inherit" font-size="16px" width="250px"></el-progress>
+              <p class="scoreleft">/100</p>
+            </div>
+          </div> 
         </div>
       </div>
       <div v-if="selectedTab === 'detail'">
         <div class="detailContainer">
-          <p class="title">詳細情報</p>
-          <div class="info">
-            <p class="time">動画撮影日時：yyyy/mm/dd 12:00</p>
-            <p class="place">場所：○○ゴルフクラブ</p>
+          <div class="score_table" v-show="isActive===true">
+            <table>
+              <thead>
+                <tr>
+                  <th>ホール</th>
+                  <th>パー</th>
+                  <th>スコア</th>
+                  <th>パッド</th>
+                  <th>フォーム</th>
+                </tr>
+              </thead>
+              <tbody class="t_body">
+                <logListTableRow v-for="i in 18" v-bind="playDataArr[i]" />
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
@@ -41,14 +56,27 @@
   </div>
 </template>
 
-<script>
-export default {
-  data() {
-    return {
-      selectedTab: 'score',
-    };
-  },
-};
+<script setup lang="ts">
+import logListTableRow from '../scoreDisplay/logListTableRow.vue';
+const selectedTab = ref<string>('score');
+
+const props=defineProps<{
+  playDataArr:{
+  holeNo: number;
+  par: number | null;
+  result: number | null;
+  putts: number | null;
+  form_Score: number | null;
+}[]
+  movieAnalyzeArr:{score:number,name:string,color:string}[]
+  isActive:boolean
+}>()
+
+
+
+
+
+
 </script>
 
 <style scoped>
@@ -111,14 +139,54 @@ pre {
     gap: 40px;
 }
 
-.detailContainer.info {
-    display: flex;
-    flex-direction: column;
-}
+
 
 .scoreItemContainer {
     display: flex;
     flex-direction: column;
-    gap: 1px;
+    gap: 10px;
+}
+:deep(.el-progress__text) {
+  color: inherit !important; 
+}
+.scoreItemContainer.name{
+  color: #333;
+font-family: Inter;
+font-size: 16px;
+font-style: normal;
+font-weight: 400;
+line-height: normal;
+}
+.scoreItemContainer.progress{
+  display: flex;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+gap: 5px;
+align-self: stretch;
+}
+.scoreItemContainer.scoreleft{
+  color: #333;
+font-family: Inter;
+font-size: 12px;
+font-style: normal;
+font-weight: 400;
+line-height: normal;
+}
+.progressContainer{
+  display: flex;
+justify-content: center;
+align-items: center;
+gap: 10px;
+}
+.score_table {
+  align-items: center;
+
+  margin: auto;
+  margin-bottom: 10px;
+  text-align: center;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 </style>

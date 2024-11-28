@@ -3,11 +3,14 @@
     <div class="card">
     <span class="closeModal" @click="toggleModal">×</span>
       <p class="title">ゴルフ場登録</p>
-      <p>ゴルフ場を選択してください</p>
+      <div :style="{textAlign:'center'}">
+        <p>ゴルフ場を選択してください</p>
+        <p v-if="!isSelect" class="warning" >ゴルフ場が選択されていません</p>
+      </div>
       <!-- ここにゴルフ場検索機能を実装する -->
        <ClientOnly>
         <div v-if="isLoading"></div>
-        <select v-else v-model="selectedName">
+        <select v-else v-model="selectedName" @change="isSelect=true" class="select">
           <option :value="v" v-for="(v,i) in golf_place_Name" :key="i" >{{ v }}</option>
         </select>
       </ClientOnly>
@@ -42,10 +45,11 @@ const formatDateToString = (date: Date): string => {
   return `${year}-${month}-${day}`
 }
 let selectedName = ref<string>("");
-let golf_place_Index = ref<number>(0);
+let golf_place_Index = ref<number>(-1);
 let golf_place_Name:string[] = [];
 let golf_place_Id:number[] = [];
 let isLoading = ref<boolean>(true);
+let isSelect=ref<boolean>(true);
 const rounds_data = {
   user_id:1,
   date:formatDateToString(new Date()),
@@ -75,6 +79,10 @@ const changeIndex = () => {
 }
 const insertRounds = async() => {
   changeIndex();
+  if(golf_place_Index.value===-1){
+    isSelect.value=false;
+    return null;
+  }
   const {data:returnData,error:insertError} = await supabase
     .from('t_rounds')
     .insert(rounds_data)
@@ -95,6 +103,10 @@ const ToScoreInput = async () => {
   } else {
     console.error('roundIdがありません');
   }
+  if(golf_place_Index.value===-1){
+
+    return null;
+  }
   toggleModal();
   console.log(`[In enterGolfCourseName.vue] ページ遷移先のround_id:${round_id.value}`);
   router.push({path:`/scoreInput/${round_id.value}`,query:{param:'scoreInput'}});
@@ -108,6 +120,17 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.warning{
+  color: red;
+  font-size: 18px;
+}
+.select{
+  width: 235px;
+  height: 40px;
+  padding: 0px 15px;
+  border-radius: 32px;
+  border: 2px solid #000;;
+  }
 .modal {
   position: fixed;
   top: 0;
