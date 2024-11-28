@@ -98,18 +98,15 @@ async function fetchLog() {
     if (error) {
       console.error('Error fetching data from t_round table:', error);
     } else {
-      //console.log('after fetch data', JSON.stringify(roundData), null, 2); //解析結果の取得ができていることを確認済み
-
-      //TODO: 一度データをpropsに渡せる形に直す。
-      //できれば以下の実装を省略していきなりpropsに渡せる形にする＆月ごとに分けたい。
       const tmpDetails: roundDetail[] = [];
-      roundData.sort((a, b) => {
-        const dateA = new Date(a.date);
-        const dateB = new Date(b.date);
-        if (dateA > dateB) return -1;
-        else if (dateA === dateB) return 0;
-        else return 1;
-      });
+      if (roundData)
+        roundData.sort((a, b) => {
+          const dateA = new Date(a.date);
+          const dateB = new Date(b.date);
+          if (dateA > dateB) return -1;
+          else if (dateA === dateB) return 0;
+          else return 1;
+        });
       roundData.forEach((item) => {
         if (item.m_golfplaces !== null)
           item.m_golfplaces.m_holes.sort(
@@ -118,41 +115,34 @@ async function fetchLog() {
         item.t_holes.sort((a, b) => a.hole_number - b.hole_number);
 
         const tmpHoleDetails: holeDetails[] = [];
-        // item.m_golfplaces?.m_holes.forEach((item1) => {
-        //   const tmpTHoles = item.t_holes.find((value) => {
-        //     return (item1.hole_number = value.hole_number);
-        //   });
-        //   if (tmpTHoles) {
-        //     tmpHoleDetails.push({
-        //       holeNo: item1.hole_number,
-        //       par: item1.par_number,
-        //       result: tmpTHoles.score_number,
-        //       putts: tmpTHoles.putts_number,
-        //       form_Score: null,
-        //     });
-        //   } else {
-        //     tmpHoleDetails.push({
-        //       holeNo: item1.hole_number,
-        //       par: item1.par_number,
-        //       result: null,
-        //       putts: null,
-        //       form_Score: null,
-        //     });
-        //   }
-        // });
-        item.t_holes.forEach((item1) => {
-          const tmpMHoles = item.m_golfplaces?.m_holes.find((value) => {
-            return value.hole_number == item1.hole_number;
-          });
-          let form_Score: number | null = null;
-          tmpHoleDetails.push({
-            holeNo: item1.hole_number,
-            par: tmpMHoles ? tmpMHoles.par_number : -1,
-            result: item1.score_number,
-            putts: item1.putts_number,
-            form_Score: form_Score,
-          });
-        });
+        for (let i = 0; i < 18; i++) {
+          const a = item.m_golfplaces?.m_holes.find(
+            (value) => value.hole_number === i + 1
+          );
+
+          const b = item.t_holes.find((value) => value.hole_number === i + 1);
+
+          if (a) {
+            if (b) {
+              tmpHoleDetails.push({
+                holeNo: a.hole_number,
+                par: a.par_number,
+                result: b.score_number,
+                putts: b.putts_number,
+                form_Score: null,
+              });
+            } else {
+              tmpHoleDetails.push({
+                holeNo: a.hole_number,
+                par: a.par_number,
+                result: null,
+                putts: null,
+                form_Score: null,
+              });
+            }
+          }
+          // console.log(tmpHoleDetails);
+        }
         tmpDetails.push({
           date: new Date(item.date),
           golfPlaceName: item.m_golfplaces
