@@ -5,13 +5,13 @@
         :class="['tab', { active: selectedTab === 'score' }]"
         @click="selectedTab = 'score'"
       >
-        <img src="~/assets/img/scoreDetail.png" />
+      解析スコア
       </div>
       <div
         :class="['tab', { active: selectedTab === 'detail' }]"
         @click="selectedTab = 'detail'"
       >
-        <img src="~/assets/img/scoreDetail.png" />
+        ゴルフスコア
       </div>
     </div>
 
@@ -19,14 +19,16 @@
       <div v-if="selectedTab === 'score'">
         <div class="scoreItemContainer">
           <div class="progress" v-for="(v,i) in props.movieAnalyzeArr" :key="i">
-            <div class="name">{{v.name}}</div>
+            <p class="name">{{v.name}}</p>
             <div class="progressContainer">
-              <el-progress :percentage="v.score" :status="v.score <= 1 ? 'exception' : undefined"
+              <el-progress
+                :percentage="v.score"
+                :status="v.score <= 1 ? 'exception' : undefined"
                 :color="v.color"
-                :stroke-width="15"
                 :format="() => `${v.score}`"
                 :show-text="true"
-                text-color="inherit" font-size="16px" width="250px"></el-progress>
+                :style="{ '--custom-color': v.color }"
+              />
               <p class="scoreleft">/100</p>
             </div>
           </div> 
@@ -87,45 +89,47 @@ const props=defineProps<{
   /* width: 360px; */
   height: 350px;
   background-color: white;
-  border-radius: 20px;
+  /* border-radius: 20px; */
+  gap: 20px;
 }
 
 .tabs {
   display: flex;
-  justify-content: flex-start;
-  width: 100%;
-  border-radius: 20px;
+align-items: center;
+gap: 20px;
+margin-top: 20px;
+  /* border-radius: 20px; */
 }
 
-.tabs :nth-child(1) {
+/* .tabs :nth-child(1) {
     border-radius: 20px 0 0 0;
 }
 
 .tabs :nth-child(2) {
     border-radius: 0 20px 0 0;
-}
+} */
 
 .tab {
   cursor: pointer;
-  width: 50%;
-  height: 80px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0px 0px 20px 0px rgba(0, 0, 0, 0.25) inset;
+  text-align: center;
+  font-size: 16px;
+  width: 120px;
+  height: 28px;
 }
 
-.tab img {
-  width: 50%;
-  height: 100%;
-}
 
 .tab.active {
-  box-shadow: none;
+  /* box-shadow: none; */
+  color: #007BE5;
+  border-bottom: 2px solid #007BE5;
 }
 
 .content {
-  margin: 20px 0;
+  margin-bottom: 20px;
+  overflow-y: auto; /* 縦方向のスクロールを許可 */
+  overflow-x: hidden; /* 横方向のスクロールを非表示に（必要に応じて） */
+  max-height: 100%; /* 親要素の高さを制限 */
+  /* position: relative;  */
 }
 
 pre {
@@ -146,10 +150,11 @@ pre {
     flex-direction: column;
     gap: 10px;
 }
-:deep(.el-progress__text) {
+/* :deep(.el-progress__text) {
   color: inherit !important; 
-}
+} */
 .scoreItemContainer.name{
+  /* width: auto; */
   color: #333;
 font-family: Inter;
 font-size: 16px;
@@ -157,15 +162,15 @@ font-style: normal;
 font-weight: 400;
 line-height: normal;
 }
-.scoreItemContainer.progress{
+.progress{
   display: flex;
 flex-direction: column;
 justify-content: center;
 align-items: center;
-gap: 5px;
+/* gap: 5px; */
 align-self: stretch;
 }
-.scoreItemContainer.scoreleft{
+.scoreleft{
   color: #333;
 font-family: Inter;
 font-size: 12px;
@@ -177,8 +182,25 @@ line-height: normal;
   display: flex;
 justify-content: center;
 align-items: center;
-gap: 10px;
+/* gap: 10px; */
 }
+.progressContainer .el-progress--line {
+  width: 276px;
+  /* height: 10px; */
+}
+::v-deep(.el-progress__text) {
+  min-width: 0 !important;
+  margin-left: 10px !important;
+  font-size: 16px !important;
+}
+::v-deep(.el-progress-bar__outer) {
+  height: 10px !important;
+}
+::v-deep(.el-progress__text) {
+  color: var(--custom-color) !important; /* 動的なテキスト色 */
+}
+
+
 .score_table {
   align-items: center;
 
