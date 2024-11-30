@@ -319,7 +319,7 @@ const fetchData = async () => {
       Movies.forEach((item) => {
         item.monthDatas.forEach((item1) => {
           if (item1.id === relation.movie_id) {
-            item1.roundId = relation.relation_id;
+            item1.roundId = relation.round_id;
           }
         });
       });
