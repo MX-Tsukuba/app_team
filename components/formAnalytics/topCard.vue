@@ -2,9 +2,9 @@
   <div id="top-card">
     <div id="header-container">
       <p>{{date}}</p>
-      <select  id="holes-select" name="holes" v-if="isActive===true" >
-        <option v-for="(v,i) in changeHoleArr" :key="i" @click="handleChange(v.movie_id)" value="v.hole_number+'H'">
-          {{ v.hole_number +'H' }}
+      <select id="holes-select" name="holes" @change="handleSelectChange">
+        <option v-for="(v, i) in changeHoleArr" :key="i" :value="v.movie_id">
+          {{ v.hole_number + 'H' }}
         </option>
       </select>
     </div>
@@ -38,9 +38,11 @@ const props=defineProps<{
 //追加で動画のURLと、他のホール選択の配列を使う
 
 
-const handleChange = async (i:number) => {
-  if (i) {
-    await props.selectMovieData(i); // 親の非同期関数を実行
+const handleSelectChange = async (event: Event) => {
+  const target = event.target as HTMLSelectElement;
+  const selectedValue = Number(target.value);
+  if (selectedValue) {
+    await props.selectMovieData(selectedValue);
   }
 };
 </script>
