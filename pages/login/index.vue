@@ -1,6 +1,7 @@
 <script setup lang="ts">
-// import {signInWithOAuth} from '~/composables/useSupabaseClient';
+import { supabaseAuthErrorCodeToJapaneseMessage } from '@/utils/supabaseAuthErrorCodeToJapaneseMessage';
 import { useRouter } from 'vue-router';
+import { watch } from 'vue';
 definePageMeta({ layout: false });
 const supabase = useSupabaseClient();
 const email = ref<string>('');
@@ -9,6 +10,8 @@ const signInFlag = ref<boolean>(true);
 const router = useRouter();
 const showPassword = ref<boolean>(false);
 const sentEmail = ref<boolean>(false);
+const signInFaildMessage = ref<string | null>(null);
+const signUpFaildMessage = ref<string | null>(null);
 
 const togglePasswordVisibility = () => {
   showPassword.value = !showPassword.value;
@@ -25,23 +28,43 @@ const signInWithGoogle = async () => {
 };
 
 const signUpWithEmail = async (email: string, password: string) => {
-  const { data, error } = await supabase.auth.signUp({
+  const { error } = await supabase.auth.signUp({
     email: email,
     password: password,
   });
-  if (error) throw error;
-  console.log(email);
-  console.log(password);
-  // alert('登録完了メールを確認してください');
+  if (error) {
+    if (error.code) {
+      signUpFaildMessage.value = supabaseAuthErrorCodeToJapaneseMessage[
+        error.code
+      ]
+        ? supabaseAuthErrorCodeToJapaneseMessage[error.code]
+        : '予期せぬエラーが発生しました。アプリケーションを再起動してください';
+    } else
+      signUpFaildMessage.value =
+        '予期せぬエラーが発生しました。アプリケーションを再起動してください';
+    return;
+  }
   sentEmail.value = true;
 };
 
 const signInWithEmail = async (email: string, password: string) => {
-  const { data, error } = await supabase.auth.signInWithPassword({
+  const { error } = await supabase.auth.signInWithPassword({
     email,
     password,
   });
-  if (error) throw error;
+  if (error) {
+    // throw error;
+    if (error.code) {
+      signInFaildMessage.value = supabaseAuthErrorCodeToJapaneseMessage[
+        error.code
+      ]
+        ? supabaseAuthErrorCodeToJapaneseMessage[error.code]
+        : '予期せぬエラーが発生しました。アプリケーションを再起動してください';
+    } else
+      signInFaildMessage.value =
+        '予期せぬエラーが発生しました。アプリケーションを再起動してください';
+    return;
+  }
   console.log('ログイン');
   router.push({ path: '/' });
 };
@@ -50,6 +73,11 @@ const changeFlag = () => {
   console.log('clicked');
   signInFlag.value = !signInFlag.value;
 };
+
+watch([email, password, signInFlag], () => {
+  signInFaildMessage.value = null;
+  signUpFaildMessage.value = null;
+});
 </script>
 
 <template>
@@ -101,6 +129,12 @@ const changeFlag = () => {
               </svg>
             </button>
           </div>
+          <p v-if="signInFaildMessage" class="errorMessage">
+            {{ signInFaildMessage }}
+          </p>
+          <p v-if="signUpFaildMessage" class="errorMessage">
+            {{ signUpFaildMessage }}
+          </p>
         </div>
         <button
           class="mailLoginButton"
@@ -438,5 +472,13 @@ const changeFlag = () => {
 .afterSendingEmail{
   text-align: center;
   font-size: 20px;
+}
+
+.errorMessage{
+  /* text-align: center; */
+  white-space: pre-wrap;
+  font-size: 12px;
+  max-width: 270px;
+  color:#E45D5D;
 }
 </style>
