@@ -67,7 +67,7 @@ const moveEditPage = (id: number) => {
 
 function getHoleDetails(i: number) {
   const detail = props.holedetails.find((item) => item.holeNo === i);
-  if (detail) {
+  if (detail?.result) {
     return detail;
   } else {
     someHoleIsNull.value = true;
