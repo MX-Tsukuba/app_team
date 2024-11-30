@@ -1,13 +1,11 @@
 <script setup lang="ts">
-import CameraImg from '~/assets/img/camera.png';
-import CameraTransparentImg from '~/assets/img/cameraTransparent.png';
+import CameraImg from '~/assets/img/camera.svg';
+import CameraTransparentImg from '~/assets/img/cameraTransparent.svg';
 import { useScoreStore } from '~/src/store/scoreInput';
 
-const route = useRoute();
 const scoreStore = useScoreStore();
 
-//ここを取得する
-const videoUrl = computed(() => scoreStore.videoUrl);
+//piniaから取得
 const currentHoleIndex = computed(() => scoreStore.currentHoleIndex);
 const videoUrlArray = computed(() => scoreStore.videoUrlArray);
 console.log(`[In IsRecorded.vue] videoUrlArray:${videoUrlArray.value}, currentHoleIndex:${currentHoleIndex.value}`);
