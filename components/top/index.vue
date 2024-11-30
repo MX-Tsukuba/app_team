@@ -16,6 +16,7 @@ import inputTag from './inputTag.vue';
 import { computed } from 'vue';
 import { useHeadVarStore } from '~/src/store/headVar.js';
 import { useModalStore } from '~/src/store/modal';
+// import { useScoreStore } from '~/src/store/scoreInput.js';
 import enterGolfCourseName from './enterGolfCourseName.vue';
 
 const headVarStore = useHeadVarStore();
