@@ -6,7 +6,6 @@ import { useModalStore, useScoreStore } from '~/src/store';
 import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { useRouter } from 'vue-router';
 import { useSupabaseClient } from '#imports';
-// import { SupabaseClient } from '@supabase/supabase-js';
 
 const video = ref<HTMLVideoElement | null>(null)
 const videoSrc = ref<string | null>(null)
@@ -98,10 +97,6 @@ const upLoadSupabaseStorage = async (video: Blob | File) => {
     if (error) {
       console.log('ファイルのアップロードに失敗しました:',error);
     } else {
-      //topからはこれでもいい
-      //scoreInputからはt_relationsにも挿入する必要あり
-      //ここで、round_id,hole_number,movie_idをクエリパラメータなりpiniaなりに入れる
-        //hole_numberはインクリメント必要
       const currentDate = new Date().toISOString().split('T')[0];
       const {data:dbData, error : dbError } = await supabase
         .from('t_movies')
