@@ -16,14 +16,14 @@
   </div>
 </template>
 <script setup>
-import homeImg from '~/assets/img/home.png';
-import homeActiveImg from '~/assets/img/homeActive.png';
-import foodImg from '~/assets/img/food.png';
-import foodActiveImg from '~/assets/img/foodActive.png';
-import bodyImg from '~/assets/img/body.png';
-import bodyActiveImg from '~/assets/img/bodyActive.png';
-import scoreImg from '~/assets/img/score.png';
-import scoreActiveImg from '~/assets/img/scoreActive.png';
+import homeImg from '~/assets/img/home.svg';
+import homeActiveImg from '~/assets/img/homeActive.svg';
+import foodImg from '~/assets/img/food.svg';
+import foodActiveImg from '~/assets/img/foodActive.svg';
+import bodyImg from '~/assets/img/body.svg';
+import bodyActiveImg from '~/assets/img/bodyActive.svg';
+import scoreImg from '~/assets/img/score.svg';
+import scoreActiveImg from '~/assets/img/scoreActive.svg';
 
 import { usePageStore } from '~/src/store/currentPage';
 const pageStore = usePageStore();

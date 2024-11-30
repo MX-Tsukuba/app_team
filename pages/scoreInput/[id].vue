@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { usePageStore, useHeadVarStore, useInputStateStore, useModalStore, useScoreStore } from '~/src/store';
 import type { Database } from '~/types/database.types';
-import CameraImg from '~/assets/img/camera.png';
-import CameraTransparentImg from '~/assets/img/cameraTransparent.png';
+import CameraImg from '~/assets/img/camera.svg';
+import CameraTransparentImg from '~/assets/img/cameraTransparent.svg';
 //swiperで必要
 import { register } from 'swiper/element/bundle';
 import { InputCard, StartRecord, IsRecorded } from '~/components/scoreInput';
