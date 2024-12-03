@@ -5,20 +5,30 @@
       <p class="title">注意！</p>
       <p>動画は各ホールにつき一度しか登録できません。</p>
       <p>launching camera...</p>
-      <!-- <p>動画はラウンドにつき一度しか登録できません。撮影を開始しますか？</p>       
-      <Nuxt-link @click="toggleModal" to="/camera" class="bButton">撮影</Nuxt-link>   -->
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { useModalStore } from '~/src/store/modal';
+import { useModalStore, useScoreStore } from '~/src/store';
 const modalStore = useModalStore();
+const scoreStore = useScoreStore();
 const toggleModal = () => modalStore.toggleModal('');
 const router = useRouter();
+const route = useRoute();
+let roundId =ref<number>(Number(route.params.id));
+const currentHoleIndex = computed(() => scoreStore.currentHoleIndex);
+
 onMounted(() => {
   setTimeout(() => {
-    router.push('/camera');
+    roundId.value=Number(route.params.id);
+    router.push({
+      path:'/camera',
+      query: {
+        id: roundId.value, 
+        param:'scoreInput'
+      }
+    });
     toggleModal();
   }, 2000);
 });

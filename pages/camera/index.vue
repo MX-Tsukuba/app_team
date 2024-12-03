@@ -2,28 +2,35 @@
 definePageMeta({
   layout: false,
 });
+import { useModalStore, useScoreStore } from '~/src/store';
 import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { useRouter } from 'vue-router';
 import { useSupabaseClient } from '#imports';
-import { useModalStore } from '~/src/store/modal';
-// import { SupabaseClient } from '@supabase/supabase-js';
 
-const video = ref<HTMLVideoElement | null>(null);
-const videoSrc = ref<string | null>(null);
-const mediaRecorder = ref<MediaRecorder | null>(null);
-const recordedChunks: Blob[] = [];
-const isRecording = ref(false);
-const router = useRouter();
+const video = ref<HTMLVideoElement | null>(null)
+const videoSrc = ref<string | null>(null)
+const mediaRecorder = ref<MediaRecorder | null>(null)
+const recordedChunks: Blob[] = []
+const isRecording = ref(false)
+const router = useRouter()
+const route = useRoute()
 
+const param = route.query.param || 'null'
+console.log(`[In camera.vue] param:${param}`)
+const roundId = route.query.id || 'null'
+const movieId = ref<number>(0)
 const modalStore = useModalStore();
+const scoreStore = useScoreStore();
 const isShowModal = computed(() => modalStore.isShowModal);
 const modalName = computed(() => modalStore.modalName);
-const toggleModal = (name: string) => modalStore.toggleModal(name);
+const toggleModal = (name:string) => modalStore.toggleModal(name);
+const currentHoleIndex = computed(() => scoreStore.currentHoleIndex);
+
 
 const recordedBlob = ref<Blob | null>(null);
 const selectedFile = ref<File | null>(null);
 
-const supabaseClient = useSupabaseClient();
+const supabase = useSupabaseClient();
 
 //Function Definition
 const startCamera = async () => {
@@ -67,46 +74,79 @@ const stopRecording = () => {
 };
 
 const upLoadSupabaseStorage = async (video: Blob | File) => {
-  try {
-    const user = await supabaseClient.auth
-      .getSession()
-      .then(({ data: { session } }) => {
-        if (!session) return null;
-        return supabaseClient.auth.getUser().then(({ data: { user } }) => user);
-      });
-    if (!user) {
+  try{
+    const user = await supabase.auth.getSession()
+    .then(({data: {session}}) => {
+      if (!session) return null;
+      return supabase.auth.getUser()
+        .then(({data: { user }}) => user)
+    })
+    if(!user){
       console.error('ユーザIDが取得できません');
       return;
     }
     const fileName: string = videoSrc.value
       ? videoSrc.value.split('/').pop()?.split('.')[0] ?? 'test/test.mp4'
       : 'test/test.mp4';
-    const { data, error } = await useSupabaseClient()
-      .storage.from('Movie')
+    const { data, error } = await supabase
+      
+      .storage
+      .from('Movie')
+      
       .upload(fileName, video);
     if (error) {
-      console.log('ファイルのアップロードに失敗しました:', error);
+      console.log('ファイルのアップロードに失敗しました:',error);
     } else {
       const currentDate = new Date().toISOString().split('T')[0];
-      const { error: dbError } = await supabaseClient.from('t_movies').insert([
-        {
-          movie_name: fileName,
-          created_at: new Date(),
-          updated_at: new Date(),
-          user_id: user.id,
-          date: currentDate,
-        },
-      ]);
+      const {data:dbData, error : dbError } = await supabase
+        .from('t_movies')
+        .insert([
+          {
+            movie_name: fileName,
+            user_id: user.id,
+            date: currentDate
+          }
+        ])
+        .select();
       if (dbError) {
-        console.log('データベースへの挿入に失敗しました:', dbError);
+        console.log(`データベースへの挿入に失敗しました dbError:${dbError}`);
       } else {
-        console.log('動画情報が t_movies に挿入されました');
+        console.log(`動画情報が t_movies に挿入されました dbData:${dbData}`);
+        movieId.value = dbData[0].id
+        console.log(`[In camera.vue] movieId.value:${movieId.value}`)
       }
-      const { data: publicUrlData } = useSupabaseClient()
-        .storage.from('Movie')
-        .getPublicUrl(fileName);
-      const publicUrl = publicUrlData.publicUrl;
-      router.push({ path: './scoreInput', query: { video: publicUrl } }); //router.pushはここを参考にする
+
+      const { data: publicUrlData } = supabase
+        .storage
+        .from('Movie')
+        .getPublicUrl(fileName)
+      const publicUrl = publicUrlData.publicUrl
+      if (param === 'top') {
+        router.push({
+          path: `/scoreDisplay`,
+        })
+        console.log(`[In camera.vue] publicUrl:${publicUrl}`)
+      } else if (param === 'scoreInput') {
+        //ここにt_relationsに挿入する処理を追加
+        const {data:dbData, error : dbError } = await supabase
+          .from('t_relations')
+          .insert([
+            {
+              round_id: roundId,
+              hole_number: currentHoleIndex.value + 1,
+              movie_id: movieId.value
+            }
+          ])
+        router.push({
+          path: `/scoreInput/${roundId}`
+        })
+        scoreStore.setVideoUrl(publicUrl);
+        scoreStore.updateVideoUrlArray(currentHoleIndex.value, publicUrl);
+        console.log(`[In camera.vue] videoUrlArray:${scoreStore.videoUrlArray}`);
+      } else {
+        console.error("リダイレクト先が見つかりません");
+        return;
+      }
     }
   } catch (err) {
     console.error('エラーが発生しました:', err);
@@ -161,15 +201,8 @@ onBeforeUnmount(() => {
       <div class="card">
         <p class="title">この動画を使用しますか？</p>
         <div class="buttons">
-          <button @click="toggleModal('confirmModal')" class="cancelButton">
-            キャンセル
-          </button>
-          <Nuxt-link
-            @click="confirmVideo"
-            to="../scoreInput"
-            class="confirmButton"
-            >確認</Nuxt-link
-          >
+          <button @click="toggleModal('confirmModal')" class="cancelButton">キャンセル</button>
+          <button @click="confirmVideo" class="confirmButton">確認</button>
         </div>
       </div>
     </div>

@@ -35,19 +35,19 @@ const pageStore = usePageStore();
 const headVarStore = useHeadVarStore();
 headVarStore.title = golfPlaceName.value?`${golfPlaceName.value}`:'動画解析結果';
 
-const selectRoundData =async()=> {
+const selectRoundData =async(number:number)=> {
   const {data,error:roundError}=await supabase
   .from('t_rounds')
-  .select('t_holes(hole_number, score_number, putts_number), m_golfplaces(golf_place_name, m_holes(hole_number, par_number)),t_relation(hole_number,movie_id)')
-  .eq('id',roundId.value)
+  .select('t_holes(hole_number, score_number, putts_number), m_golfplaces(golf_place_name, m_holes(hole_number, par_number))')
+  .eq('id',number)
   if(roundError){
     console.error('roundの取得に失敗しました',roundError.message)
     return null;
   }else{
-    //取得したデータをJSの変数に代入していく
-    for(let i=0;i<data[0].t_relation.length;i++){
-      changeHoleArr.value.push(data[0].t_relation[i]);
-    }
+    //取得したデータをJSの変数に代入していくt_relation(hole_number,movie_id),
+    // for(let i=0;i<data[0].t_relation.length;i++){
+    //   changeHoleArr.value.push(data[0].t_relation[i]);
+    // }
 
     golfPlaceName.value=data[0].m_golfplaces?.golf_place_name || 'ゴルフ場名がありません';//型定義のundifined許容を何とかする
     for(let i=0;i<18;i++){
@@ -142,17 +142,24 @@ class movieAnalyze{
   }
 }
 
-onMounted(async()=>{
+onMounted(async () => {
   pageStore.setCurrentPage('score');
-  movieId.value=route.params.id?route.params.id:movieId.value;
-  roundId.value=route.query.roundId? route.query.roundId:roundId.value;
-  isActive.value=route.query.isActive?route.query.isActive:false;
-  console.log(movieId.value,roundId.value,isActive.value,"movieId,roundId,isActiveの結果");
+  movieId.value = Number(route.params.id);
+  roundId.value = route.query.roundId ? Number(route.query.roundId) : roundId.value;
+  isActive.value = route.query.isActive ? route.query.isActive === 'true' : false;
+
+  console.log(movieId.value, roundId.value, isActive.value, "movieId, roundId, isActiveの結果");
+
   await selectMovieData(movieId.value);
-  if(isActive.value===true){
-    await selectRoundData;
+
+  if (isActive.value === true) {
+    if (!isNaN(roundId.value)) {
+      await selectRoundData(roundId.value);
+    } else {
+      console.error('無効な roundId が提供されました');
+    }
   }
-})
+});
 
 </script>
 

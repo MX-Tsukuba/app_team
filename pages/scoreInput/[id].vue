@@ -1,16 +1,17 @@
 <script setup lang="ts">
-import { usePageStore, useHeadVarStore, useInputStateStore, useModalStore } from '~/src/store';
+import { usePageStore, useHeadVarStore, useInputStateStore, useModalStore, useScoreStore } from '~/src/store';
 import type { Database } from '~/types/database.types';
-import CameraImg from '~/assets/img/camera.png';
-import CameraTransparentImg from '~/assets/img/cameraTransparent.png';
+import CameraImg from '~/assets/img/camera.svg';
+import CameraTransparentImg from '~/assets/img/cameraTransparent.svg';
 //swiperで必要
 import { register } from 'swiper/element/bundle';
-import { InputCard, StartRecord } from '~/components/scoreInput';
+import { InputCard, StartRecord, IsRecorded } from '~/components/scoreInput';
 register();
 
 const headVarStore = useHeadVarStore();
 headVarStore.backButtonText = '一時保存';
 const pageStore = usePageStore();
+const scoreStore = useScoreStore();
 const modalStore = useModalStore();
 const inputStateStore = useInputStateStore();
 const isShowModal = computed(() => modalStore.isShowModal);
@@ -65,7 +66,7 @@ const ParDataArr=ref<ParData[]>([]);
 const selectData =async()=> {
   const {data,error:roundError}=await supabase
   .from('t_rounds')
-  .select('t_holes(hole_number, score_number, putts_number), m_golfplaces(golf_place_name, m_holes(hole_number, par_number))')
+  .select('t_holes(hole_number, score_number, putts_number), m_golfplaces(golf_place_name, m_holes(hole_number, par_number)), t_relations(hole_number, movie_id, t_movies(movie_name))')
   .eq('id',roundId.value)
   console.log('selectData',data);
   if(roundError){
@@ -77,34 +78,32 @@ const selectData =async()=> {
     for(let i=0;i<18;i++){
       ParDataArr.value.push(new ParData(data[0].m_golfplaces?.m_holes[i].hole_number,data[0].m_golfplaces?.m_holes[i].par_number));
       data[0].t_holes.forEach(item=>{
-      if(item.hole_number===i+1){//ホール数とindexで1の差があるので調整
-        playDataArr.value[i].holeNumber=item.hole_number;
-        playDataArr.value[i].scoreNumber=item.score_number;
-        playDataArr.value[i].puttsNumber=item.putts_number;
-        playDataArr.value[i].isSelect=true;
-      }
-    });
+        if(item.hole_number===i+1){//ホール数とindexで1の差があるので調整
+          playDataArr.value[i].holeNumber=item.hole_number;
+          playDataArr.value[i].scoreNumber=item.score_number;
+          playDataArr.value[i].puttsNumber=item.putts_number;
+          playDataArr.value[i].isSelect=true;
+        }
+      });
+      data[0].t_relations.forEach(item=>{
+        if(item.hole_number === i + 1){
+          const fileName = item.t_movies.movie_name;
+          const { data: publicUrlData } = supabase
+          .storage
+          .from('Movie')
+          .getPublicUrl(fileName)
+      const publicUrl = publicUrlData.publicUrl
+          scoreStore.updateVideoUrlArray(i, publicUrl);
+        }
+      });
     }
+    console.log('t_relations', data)
     console.log('ParDataArr',ParDataArr.value);
     console.log('playDataArr',playDataArr.value);
+    console.log('videoUrlArray',scoreStore.videoUrlArray);
     isLoading.value=false;
   }
 }
-
-//ホール選択（クリック）とパー表示
-// const currentHole = ref<number>(3);
-// const fetchPar= async (hole: number) => {
-//   const { data, error } = await supabase
-//     .from('m_holes')
-//     .select('par_number')
-//     .eq('golfplaces_id', golfPlaceId);
-//   if (error) {
-//     console.error('Error fetching data:', error);
-//     return null;
-//   } else {
-//     return data;
-//   }
-// };
 
 const setting=()=>{
   roundId.value=Number(route.params.id);
@@ -112,6 +111,7 @@ const setting=()=>{
   playDataArr.value=new Array(18).fill({});
   for(let i=0;i<18;i++){
     playDataArr.value[i]=new playData(0,0,0);
+    scoreStore.updateVideoUrlArray(i, null);
   }
 }
 
@@ -119,10 +119,10 @@ const setting=()=>{
 
 const updateCurrentHole = (holeId:number) =>{
   currentHoleIndex.value = holeId;
+  scoreStore.setCurrentHoleIndex(holeId);
   if (swiperCards.value) {
     swiperCards.value.swiper.slideTo(holeId);
   }
-  console.log(currentHoleIndex.value,"currentHoleIndex");
 };
 
 
@@ -195,7 +195,7 @@ watch(currentHoleIndex, () => items.forEach(item => {
   else buttonMessage.value = '登録'
 }))
 const videoInsert = async()=>{
-  videoUrl.value = route.query.video as string;
+  videoUrl.value = scoreStore.getCurrentHoleVideoUrl();
   await nextTick();
   if (videoPlayer.value && videoUrl.value) {
     videoPlayer.value.src = videoUrl.value;
@@ -242,10 +242,9 @@ onMounted(()=>{
     </swiper-container>
 
 
-    <div class="circleBtn" @click="toggleModal('confirm')" :class="{'inActive': videoUrl}">
-      <img :src="videoUrl ? CameraTransparentImg : CameraImg" width="48">
-    </div>
-    <StartRecord v-if="isShowModal && modalName === 'confirm' && !videoUrl"/>
+      <IsRecorded v-if="!scoreStore.isCurrentHoleRecorded()" @click="toggleModal('confirm')"/>
+      <IsRecorded v-else />
+    <StartRecord v-if="isShowModal && modalName === 'confirm' && !scoreStore.getCurrentHoleVideoUrl()"/>
   </section>
 </template>
 

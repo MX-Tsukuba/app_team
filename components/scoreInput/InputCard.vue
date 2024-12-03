@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import type { Database } from '~/types/database.types';
 import { Information } from '~/components/scoreInput';
-import { useInputStateStore } from '~/src/store';
+import { useInputStateStore, useScoreStore } from '~/src/store';
 const inputStateStore = useInputStateStore();
+const scoreStore = useScoreStore();
 const supabase = useSupabaseClient<Database>();
+const currentHoleVideoUrl = computed(() => scoreStore.getCurrentHoleVideoUrl());
+
 type dbPlayData = {
   holeNumber?: number;
   scoreNumber?: number;
@@ -34,7 +37,9 @@ const playData = reactive({
 const addPlayData = async () => {
   console.log('inputCard_currentHoleIndex', props.currentHoleIndex);
   console.log('playData', playData);
-  const { error } = await supabase.from('t_holes').insert({
+  const { error } = await supabase
+  .from('t_holes')
+  .insert({
     "hole_number": playData.holeNumber,
     "round_id": props.roundId,
     "putts_number": playData.puttsNumber,
@@ -78,7 +83,7 @@ watch(() => props.currentHoleIndex, (newHole) => {
           </div>
         </div>
       </div>
-      <video v-if="props.videoUrl" ref="props.videoPlayer" controls class="videoArea"></video>
+      <video v-if="currentHoleVideoUrl" :src="currentHoleVideoUrl" controls class="videoArea"></video>
       <div v-else class="videoArea">
         <p>フォームを撮影すると、ここに動画が表示されます。</p>
       </div>

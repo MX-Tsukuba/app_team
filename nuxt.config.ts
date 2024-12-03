@@ -2,7 +2,12 @@
 export default defineNuxtConfig({
   devtools: { enabled: true },
 
-  modules: [`@nuxtjs/supabase`, '@pinia/nuxt','nuxt-snackbar',],
+  modules: [
+    `@nuxtjs/supabase`,
+    '@pinia/nuxt',
+    'nuxt-snackbar',
+    '@element-plus/nuxt',
+  ],
   snackbar: {
     position: 'top-right',
     duration: 3000,
@@ -22,7 +27,8 @@ export default defineNuxtConfig({
 
   vue: {
     compilerOptions: {
-      isCustomElement: (tag) => /^(swiper|swiper-slide|swiper-container)$/.test(tag),
+      isCustomElement: (tag) =>
+        /^(swiper|swiper-slide|swiper-container)$/.test(tag),
     },
   },
 
