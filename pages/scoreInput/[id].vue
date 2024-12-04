@@ -8,8 +8,11 @@ import { register } from 'swiper/element/bundle';
 import { InputCard, StartRecord, IsRecorded } from '~/components/scoreInput';
 register();
 
+const route = useRoute();
 const headVarStore = useHeadVarStore();
-headVarStore.backButtonText = '一時保存';
+console.log('route',route.query.param);
+if (route.query.param==='scoreInput') headVarStore.backButtonText = '一時保存';
+else if (route.query.param==='scoreDisplay') headVarStore.backButtonText = '編集終了';
 const pageStore = usePageStore();
 const scoreStore = useScoreStore();
 const modalStore = useModalStore();
@@ -20,7 +23,6 @@ const toggleModal = (name:string) => modalStore.toggleModal(name);
 const supabase = useSupabaseClient<Database>();
 const videoPlayer = ref<HTMLVideoElement | null>(null);
 const videoUrl = ref<string | null>(null);
-const route = useRoute();
 
 let roundId =ref<number>(Number(route.params.id));
 const golfPlaceName = ref<string | undefined>('つくばゴルフ場');
@@ -213,8 +215,13 @@ onMounted(()=>{
   });
   onUnmounted(()=> {
     headVarStore.backButtonText = '';
-    inputStateStore.isInterrupted = true;
-    inputStateStore.roundId = roundId.value;
+    if(route.query.param==='scoreDisplay'){
+      inputStateStore.isInterrupted = false;
+      inputStateStore.roundId = null;
+    }else{
+      inputStateStore.isInterrupted = true;
+      inputStateStore.roundId = roundId.value;
+    }
   });
 </script>
 
