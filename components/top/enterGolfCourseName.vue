@@ -100,6 +100,12 @@ const ToScoreInput = async () => {
     await insertRounds();
   } else if (inputStateStore.roundId) {
     round_id.value = inputStateStore.roundId;
+    router.push({
+      path: `/scoreInput/${round_id.value}`,
+      query:{
+        param:'scoreInput'
+      }
+    })
   } else {
     console.error('roundIdがありません');
   }

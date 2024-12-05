@@ -218,9 +218,11 @@ onMounted(()=>{
     if(route.query.param==='scoreDisplay'){
       inputStateStore.isInterrupted = false;
       inputStateStore.roundId = null;
+      console.log("[id].vue onUnmounted", inputStateStore.roundId)
     }else{
       inputStateStore.isInterrupted = true;
       inputStateStore.roundId = roundId.value;
+      console.log("[id].vue onUnmounted", inputStateStore.roundId)
     }
   });
 </script>
