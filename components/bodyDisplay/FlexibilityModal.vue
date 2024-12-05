@@ -111,6 +111,7 @@ const prevSlide = () => {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  height: 670px;
 }
 
 .modal-header {
