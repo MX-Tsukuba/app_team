@@ -48,10 +48,10 @@ const addPlayData = async () => {
   if (error) {
     alert(error.message);
   } else {
-  if(props.currentHoleIndex === 18){
+  if(props.currentHoleIndex === 17){
     inputStateStore.isInterrupted = false;
     inputStateStore.roundId = null;
-    await navigateTo('./scoreDisplay')
+    await navigateTo('../scoreDisplay')
   }else{
     emit('updateCurrentHole', props.currentHoleIndex + 1);
   }
