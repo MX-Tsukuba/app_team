@@ -132,7 +132,7 @@ const upLoadSupabaseStorage = async (video: Blob | File) => {
           .from('t_relations')
           .insert([
             {
-              round_id: roundId,
+              round_id: Number(roundId),
               hole_number: currentHoleIndex.value + 1,
               movie_id: movieId.value
             }
