@@ -84,7 +84,7 @@ const selectMovieData=async(number:number)=>{
     movieAnalyzeArr.value.push(new movieAnalyze(Math.round(Number(movieJson.sway_score)*100),'スウェー','#54B1CE' ));
     movieAnalyzeArr.value.push(new movieAnalyze(Math.round(Number(movieJson.cog_score)*100),'重心移動','#509A58' ));
     movieAnalyzeArr.value.push(new movieAnalyze(Math.round(Number(movieJson.forward_posture_score)*100),'前傾姿勢の維持','#509A58' ));
-    movieAnalyzeArr.value.push(new movieAnalyze(Math.round(Number(movieJson.address_parallel_score)*100),'アドレス時の平衡性','#82E3E3' ));
+    movieAnalyzeArr.value.push(new movieAnalyze(Math.round((Number(movieJson.address_parallel_score[0])+Number(movieJson.address_parallel_score[1]))*50),'アドレス時の平衡性','#82E3E3' ));
     movieAnalyzeArr.value.push(new movieAnalyze(Math.round(Number(movieJson.head_stable_score)*100),'上半身の安定性','#F28822' ));
     movieAnalyzeArr.value.push(new movieAnalyze(Math.round(Number(movieJson.axis_inclination_score)*100),'アッパー姿勢','#FECADB' ));
     movieAnalyzeArr.value.push(new movieAnalyze(Math.round(Number(movieJson.twisting_score)*100),'捻転差','#7371BF' ));
