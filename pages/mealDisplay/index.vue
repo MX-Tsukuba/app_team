@@ -354,6 +354,7 @@ console.log('chartData:', chartData.value);
     display: flex;
     align-items: flex-end;
     gap: 13px;
+    padding-left: 40px;
 }
 .kcalNumber{
     color: #F28822;
