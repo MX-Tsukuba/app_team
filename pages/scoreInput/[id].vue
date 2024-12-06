@@ -10,7 +10,6 @@ register();
 
 const route = useRoute();
 const headVarStore = useHeadVarStore();
-console.log('route',route.query.param);
 if (route.query.param==='scoreInput') headVarStore.backButtonText = '一時保存';
 else if (route.query.param==='scoreDisplay') headVarStore.backButtonText = '編集終了';
 const pageStore = usePageStore();
@@ -89,17 +88,18 @@ const selectData =async()=> {
       });
       data[0].t_relations.forEach(item=>{
         if(item.hole_number === i + 1){
-          const fileName = item.t_movies.movie_name;
-          const { data: publicUrlData } = supabase
-          .storage
-          .from('Movie')
-          .getPublicUrl(fileName)
-      const publicUrl = publicUrlData.publicUrl
-          scoreStore.updateVideoUrlArray(i, publicUrl);
+          if (item.t_movies) {
+            const fileName = String(item.t_movies.movie_name);
+            const { data: publicUrlData } = supabase
+            .storage
+            .from('Movie')
+            .getPublicUrl(fileName)
+            const publicUrl = publicUrlData.publicUrl
+            scoreStore.updateVideoUrlArray(i, publicUrl);
+          }
         }
       });
     }
-    console.log('t_relations', data)
     console.log('ParDataArr',ParDataArr.value);
     console.log('playDataArr',playDataArr.value);
     console.log('videoUrlArray',scoreStore.videoUrlArray);
