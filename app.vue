@@ -1,28 +1,28 @@
 <script setup lang="ts">
-// const snackbar = useSnackbar();
-// const supabase = useSupabaseClient();
+const snackbar = useSnackbar();
+const supabase = useSupabaseClient();
 
-// const channel = supabase
-//   .channel('public:t_movies') // スキーマ名とテーブル名を指定
-//   .on(
-//     'postgres_changes',
-//     { event: 'UPDATE', schema: 'public', table: 't_movies' },
-//     (payload) => {
-//       // console.log(payload);
-//       if (payload.new.status === 2) {
-//         snackbar.add({
-//           type: 'success',
-//           text: 'Success：解析成功に成功しました。',
-//         });
-//       } else if (payload.new.status === 9) {
-//         snackbar.add({
-//           type: 'error',
-//           text: 'Error：解析に失敗しました。',
-//         });
-//       }
-//     }
-//   )
-//   .subscribe();
+const channel = supabase
+  .channel('public:t_movies') // スキーマ名とテーブル名を指定
+  .on(
+    'postgres_changes',
+    { event: 'UPDATE', schema: 'public', table: 't_movies' },
+    (payload) => {
+      // console.log(payload);
+      if (payload.new.status === 2) {
+        snackbar.add({
+          type: 'success',
+          text: 'Success：解析成功に成功しました。',
+        });
+      } else if (payload.new.status === 9) {
+        snackbar.add({
+          type: 'error',
+          text: 'Error：解析に失敗しました。',
+        });
+      }
+    }
+  )
+  .subscribe();
 </script>
 
 <template>
