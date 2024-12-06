@@ -88,6 +88,7 @@ const toCamera = () => {
 }
 .inputTags{
   margin-top: 32px;
+  color: #333;
 }
 
 </style>

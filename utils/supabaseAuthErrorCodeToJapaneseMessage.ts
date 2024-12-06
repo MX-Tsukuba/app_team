@@ -142,5 +142,5 @@ export const supabaseAuthErrorCodeToJapaneseMessage: Record<string, string> = {
   validation_failed:
     '入力内容に問題があります。\n各項目の入力条件をご確認ください。',
   weak_password:
-    'パスワードが脆弱です。より強力なパスワードを設定してください。',
+    'パスワードが脆弱です。より強力なパスワードを設定してください。', // 具体的条件を提示
 };

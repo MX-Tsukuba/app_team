@@ -371,7 +371,7 @@ const { data } = useAsyncData(() => fetchData());
   background: transparent;
   cursor: pointer;
   font-size: 12px;
-  color: #000;
+  color: #333;
   font-weight: 400;
   position: relative;
   z-index: 2;

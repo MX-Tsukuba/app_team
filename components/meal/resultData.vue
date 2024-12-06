@@ -30,7 +30,7 @@ const props=defineProps<{
     width: 132px;
     height: 29px;
 
-    color: #000;
+    color: #333;
     font-family: Inter;
     font-size: 24px;
     font-style: normal;

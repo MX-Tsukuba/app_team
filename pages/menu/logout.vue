@@ -47,7 +47,7 @@ const signOut = async () => {
 }
 
 .title{
-  color: #000;
+  color: #333;
   font-family: Inter;
   font-size: 24px;
   font-style: normal;
