@@ -61,15 +61,16 @@ button{
 .circleBtn {
   width: 64px;
   height: 64px;
-  border-radius: 32px;
+  border-radius: 44px;
   background: #FFF;
   box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, .25);
   position: fixed;
-  right: 8px;
+  right: 12px;
   bottom: 104px;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 12px;
 }
 .bButton {
   width: 200px;

@@ -197,7 +197,7 @@ gap: 10px;
   font-size: 20px;
 }
 p{
-  color: #000;
+  color: #333;
   font-family: Inter;
   font-size: 24px;
   font-style: normal;

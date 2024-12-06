@@ -323,7 +323,7 @@ video {
   cursor: pointer;
 }
 .title{
-  color: #000;
+  color: #333;
   font-family: Inter;
   font-size: 20px;
   font-style: normal;

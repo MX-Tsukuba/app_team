@@ -184,7 +184,7 @@ const props = defineProps<scoreDetas>();
 }
 
 .score_value {
-  color: #000;
+  color: #333;
   font-family: Inter;
   font-size: 14px;
   font-style: normal;

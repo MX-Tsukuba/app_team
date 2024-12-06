@@ -46,6 +46,7 @@ const props = defineProps<inputProps>()
 .tagTitle{
   font-size: 24px;
   font-weight: bold;
+  color: #333;
 }
 .tagDescription{
   font-size: 14px;

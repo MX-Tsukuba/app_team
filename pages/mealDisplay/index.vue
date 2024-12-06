@@ -174,7 +174,7 @@ const changeWeeks=(i:number)=>{
 
 
 function getCurrentWeekDates(startDay:number=1):string[]{
-    const dayOfWeek =today.getDay();//日曜日=0,土曜日=6
+    const dayOfWeek =today.getDay(); // 日曜日=0,土曜日=6
     const diff=(dayOfWeek +7-startDay) % 7;
 
     const startOfWeek = new Date(today);
@@ -354,6 +354,7 @@ console.log('chartData:', chartData.value);
     display: flex;
     align-items: flex-end;
     gap: 13px;
+    padding-left: 40px;
 }
 .kcalNumber{
     color: #F28822;
