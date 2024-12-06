@@ -49,7 +49,7 @@ border-radius: 15px;
 border: 1px solid #509A58;
 }
 .unit{
-    color: #000;
+    color: #333;
 font-family: Inter;
 font-size: 24px;
 font-style: normal;

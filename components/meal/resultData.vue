@@ -31,7 +31,7 @@ const props=defineProps<{
     width: 75%;
     /* height: 29px; */
 
-    color: #333333;
+    color: #333;
     font-family: Inter;
     font-size: 24px;
     font-style: normal;
