@@ -23,7 +23,7 @@ defineEmits<{
     height: 60px;
 
     border-radius: 60px;
-    border: 1px solid #F28822;
+    /* border: 1px solid #F28822; */
     background: #FFF;
 }
 </style>

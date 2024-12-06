@@ -8,32 +8,31 @@ const sendMessage = () => {
 
 <template>
    <div class="contact-container">
-        <h1>Contact Us</h1>
-        <p>If you have any questions, feel free to reach out using the form below.</p>
+        <h1>お問い合わせ</h1>
+        <p>迷惑メール防止のためにメールの受信設定をしている場合は、「motion-x.jp」のドメイン指定解除を行ってください。</p>
 
         <form>
             <div class="form-group">
-                <label for="name">Name</label>
-                <input type="text" id="name" name="name" placeholder="Enter your name" required>
+                <label for="name">氏名</label>
+                <input type="text" id="name" name="name" placeholder="田中 太郎" required>
             </div>
 
             <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" id="email" name="email" placeholder="Enter your email" required>
+                <label for="email">メールアドレス</label>
+                <input type="email" id="email" name="email" placeholder="motionx@example.com" required>
             </div>
 
             <div class="form-group">
-                <label for="message">Message</label>
-                <textarea id="message" name="message" placeholder="Enter your message" rows="6" required></textarea>
+                <label for="message">お問い合わせ内容</label>
+                <textarea id="message" name="message" placeholder="お問い合わせ内容を入力してください" rows="6" required></textarea>
             </div>
 
-            <button type="submit" class="bButton" @click="sendMessage">Send Message</button>
+            <button type="submit" class="bButton" @click="sendMessage">送信</button>
         </form>
     </div>
 </template>
 
 <style scoped>
-
 .contact-container {
     display: flex;
     flex-direction: column;
@@ -44,13 +43,13 @@ const sendMessage = () => {
 
 h1 {
     margin-bottom: 20px;
-    color: #333;
 }
 
 p {
+    width: 90%;
     font-size: 16px;
     margin-bottom: 30px;
-    color: #666;
+    color: #333;
 }
 
 form{

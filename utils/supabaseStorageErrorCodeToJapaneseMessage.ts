@@ -63,5 +63,5 @@ export const supabaseStorageErrorCodeToJapaneseMessage: Record<string, string> =
     MissingPart:
       'ファイルの一部が欠落しています。アップロードを最初からやり直してください。',
     SlowDown:
-      'リクエストが多すぎます。しばらく時間をおいてからゆっくりと操作を行ってください。',
+      'リクエストが多すぎます。しばらく時間をおいてから操作を行ってください。',
   };

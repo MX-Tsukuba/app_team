@@ -1,8 +1,8 @@
 <template>
   <div class="changeDate">
-      <button @click="$emit('firstclick')"><img class="dateBtn reverse" src="~assets/img/right.png"></button>
+      <button @click="$emit('firstclick')" class="btn"><img class="dateBtn reverse" src="~assets/img/right.png"></button>
       <p class="date">{{formattedDate}}</p>
-      <button @click="$emit('secondclick')"><img class="dateBtn" src="~assets/img/right.png"></button>
+      <button @click="$emit('secondclick')" class="btn"><img class="dateBtn" src="~assets/img/right.png"></button>
   </div>
 </template>
 
@@ -21,7 +21,7 @@ defineProps<{
 .changeDate{
     display: flex;
     align-items: center;
-    gap: 8px;
+    /* gap: 8px; */
 }
 .date{
     color: #777;
@@ -36,4 +36,12 @@ defineProps<{
 }
 .reverse{
     transform: rotate(180deg);
-}</style>
+}
+.btn{
+  display: flex;
+  align-items: center;
+  height: 24px;
+  padding: 0 8px;
+}
+
+</style>

@@ -3,7 +3,8 @@
 
 <template>
   <div class="settings">
-    <p>settings</p>
+    <h1>設定</h1>
+    <p>設定項目は準備中です。</p>
   </div>
 </template>
 
@@ -14,5 +15,11 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+p {
+    width: 90%;
+    font-size: 16px;
+    color: #333;
+    text-align: center;
 }
 </style>

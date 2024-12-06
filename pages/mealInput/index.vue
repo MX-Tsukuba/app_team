@@ -58,6 +58,9 @@ const formattedDate:string = computed(() => formatDateToString(selectedDate.valu
 const moveDate = (days: number): void => {
   const newDate = new Date(selectedDate.value)
   newDate.setDate(newDate.getDate() + days)
+  if(newDate.getDate()>new Date().getDate() && newDate.getMonth()===new Date().getMonth() && newDate.getFullYear()===new Date().getFullYear()){
+    return;
+  }
   selectedDate.value = newDate
 }
 
@@ -153,13 +156,16 @@ onMounted(loadImage)
     <div class="mainInputCard">
         <div class="inputLayout">
             <div class="inputDetails">
-                <div class="mealcalorie">
-                    <p>食事名</p>
+                <div>
+                    <p class="inputName">食事名</p>
                     <input class="input" v-model="myArr[counter].title" placeholder="食事データを入力">
                 </div>
-                <div class="mealcalorie">
-                    <p>カロリー</p>
-                    <input class="input" type="number" v-model="myArr[counter].calorie" placeholder="カロリーを入力">
+                <div>
+                    <p class="inputName">カロリー</p>
+                    <div style="display: flex; align-items:end; gap: 4px;" >
+                        <input class="inputkcal" type="number" v-model="myArr[counter].calorie" placeholder="カロリーを入力">
+                        <p class="kcal">kcal</p>
+                    </div>
                 </div>
             </div>
             <button class="addBtn" @click="addObject()"><p class="addName">追加</p></button>
@@ -171,13 +177,8 @@ onMounted(loadImage)
                 <p class="sum">{{sumCalorie}}kcal</p>
             </div>
             <div class="btnAll">
-                <div class="menuBtn">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="36" height="24" viewBox="0 0 36 24" fill="none">
-                        <path d="M0 24V20H36V24H0ZM0 14V10H36V14H0ZM0 4V0H36V4H0Z" fill="#777777" fill-opacity="0.5"/>
-                    </svg>
-                </div>
                 <div class="insertBtn" >
-                        <button @click="insertToDatabase">
+                    <button @click="insertToDatabase" class="btn" >
                         <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 50 50" fill="none">
                         <path d="M28.6687 25.0212L6.25208 22.7629L6.25 8.48785C6.25027 8.10665 6.34793 7.73184 6.53372 7.39898C6.7195 7.06611 6.98724 6.78623 7.31155 6.58589C7.63586 6.38554 8.00598 6.27138 8.38679 6.25422C8.76761 6.23706 9.14649 6.31748 9.4875 6.48785L42.5125 23.0004C42.8835 23.1864 43.1954 23.472 43.4134 23.8252C43.6314 24.1784 43.7468 24.5853 43.7468 25.0004C43.7468 25.4154 43.6314 25.8223 43.4134 26.1755C43.1954 26.5287 42.8835 26.8143 42.5125 27.0004L9.49167 43.5128C9.15066 43.6832 8.77177 43.7636 8.39096 43.7465C8.01014 43.7293 7.64003 43.6152 7.31572 43.4148C6.99141 43.2145 6.72367 42.9346 6.53788 42.6017C6.3521 42.2689 6.25444 41.8941 6.25417 41.5129V27.2379L28.6687 25.0212Z" fill="#F28822"/></svg>
                     </button>
@@ -199,7 +200,7 @@ onMounted(loadImage)
 .kindBtn{
     position: absolute;
     top: 70px;
-    left: 0;
+    left: 8px;
 }
 .dateAll{
     display: flex;
@@ -244,6 +245,14 @@ onMounted(loadImage)
     gap: 28px;
     align-self: stretch;
 }
+.inputName{
+    color: #333333;
+    font-family: Inter;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
 .input{
     display: flex;
     width: 254px;
@@ -256,6 +265,27 @@ onMounted(loadImage)
 
     border-radius: 15px;
     border: 1px solid #F28822;
+}
+.inputkcal{
+    display: flex;
+    width: 216px;
+    height: 48px;
+    padding: 0px 10px;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+
+    border-radius: 15px;
+    border: 1px solid #F28822; 
+}
+.kcal{
+    color: #333333;
+    font-family: Inter;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
 }
 .addBtn{
     display: flex;
@@ -332,10 +362,14 @@ onMounted(loadImage)
     justify-content: center;
     align-items: center;
 
-    border-radius: 30px;
+    border-radius: 35px;
     border: 1px solid #F28822;
 }
-
+.insertBtn .btn{
+    height: 50px;
+    /* padding-left: 6px; */
+    padding: 3px 0 3px 6px;
+}
 
 
 

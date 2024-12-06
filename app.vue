@@ -1,3 +1,30 @@
+<script setup lang="ts">
+const snackbar = useSnackbar();
+const supabase = useSupabaseClient();
+
+const channel = supabase
+  .channel('public:t_movies') // スキーマ名とテーブル名を指定
+  .on(
+    'postgres_changes',
+    { event: 'UPDATE', schema: 'public', table: 't_movies' },
+    (payload) => {
+      // console.log(payload);
+      if (payload.new.status === 2) {
+        snackbar.add({
+          type: 'success',
+          text: 'Success：解析成功に成功しました。',
+        });
+      } else if (payload.new.status === 9) {
+        snackbar.add({
+          type: 'error',
+          text: 'Error：解析に失敗しました。',
+        });
+      }
+    }
+  )
+  .subscribe();
+</script>
+
 <template>
   <NuxtLayout>
     <NuxtPage class="whole" />
@@ -34,15 +61,16 @@ button{
 .circleBtn {
   width: 64px;
   height: 64px;
-  border-radius: 32px;
+  border-radius: 44px;
   background: #FFF;
   box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, .25);
   position: fixed;
-  right: 8px;
+  right: 12px;
   bottom: 104px;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 12px;
 }
 .bButton {
   width: 200px;

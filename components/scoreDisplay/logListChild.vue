@@ -1,8 +1,13 @@
 <template>
   <div class="card_whole">
-    <div class="date">
-      {{ props.date.getMonth() + 1 }}月{{ props.date.getDate() }}日
-      {{ calculateDays(props.date) }}
+    <div class="dateAndPlaceTag">
+      <div class="date">
+        {{ props.date.getMonth() + 1 }}月{{ props.date.getDate() }}日
+        {{ calculateDays(props.date) }}
+      </div>
+      <div class="place_tag">
+        <div class="place_text">📍{{ props.golfPlaceName }}</div>
+      </div>
     </div>
     <div class="button_fram" @click="toggleScoreTable">
       <div v-if="isScoreTableVisible" class="arrow open">
@@ -17,9 +22,9 @@
         <div class="score_text">合計スコア</div>
         <div class="score_value">{{ calculateScore(props.holedetails) }}</div>
       </div>
-      <div class="place_tag">
+      <!-- <div class="place_tag">
         <div class="place_text">📍{{ props.golfPlaceName }}</div>
-      </div>
+      </div> -->
       <div class="no_Value_tag" v-show="someHoleIsNull">
         <div class="isNull_text">！未入力</div>
       </div>
@@ -62,7 +67,7 @@ const someHoleIsNull = ref<boolean>(false);
 const router = useRouter();
 
 const moveEditPage = (id: number) => {
-  router.push(`/scoreInput/${id}`);
+  router.push({path: `/scoreInput/${id}`, query: {param: 'scoreDisplay'}});
 };
 
 function getHoleDetails(i: number) {
@@ -188,6 +193,8 @@ const props = defineProps<scoreDetas>();
 }
 
 .place_tag {
+  position: absolute;
+  left: 122px;
   display: flex;
   height: 24px;
   justify-content: center;
@@ -196,6 +203,7 @@ const props = defineProps<scoreDetas>();
   border-radius: 18px;
   background: #ebebeb;
   padding-right: 10px;
+  white-space: nowrap;
 }
 
 .place_text {
@@ -311,5 +319,12 @@ thead {
   background: #90b9dc;
   color: #fff;
   font-size: 12px;
+}
+
+.dateAndPlaceTag{
+  position: relative;
+  display:flex;
+  flex-direction: row;
+  gap: 20px;
 }
 </style>
