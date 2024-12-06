@@ -67,7 +67,7 @@ const someHoleIsNull = ref<boolean>(false);
 const router = useRouter();
 
 const moveEditPage = (id: number) => {
-  router.push(`/scoreInput/${id}`);
+  router.push({path: `/scoreInput/${id}`, query: {param: 'scoreDisplay'}});
 };
 
 function getHoleDetails(i: number) {
