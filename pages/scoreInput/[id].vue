@@ -10,7 +10,6 @@ register();
 
 const route = useRoute();
 const headVarStore = useHeadVarStore();
-console.log('route',route.query.param);
 if (route.query.param==='scoreInput') headVarStore.backButtonText = '一時保存';
 else if (route.query.param==='scoreDisplay') headVarStore.backButtonText = '編集終了';
 const pageStore = usePageStore();
@@ -101,7 +100,6 @@ const selectData =async()=> {
         }
       });
     }
-    console.log('t_relations', data)
     console.log('ParDataArr',ParDataArr.value);
     console.log('playDataArr',playDataArr.value);
     console.log('videoUrlArray',scoreStore.videoUrlArray);
@@ -220,11 +218,9 @@ onMounted(()=>{
     if(route.query.param==='scoreDisplay'){
       inputStateStore.isInterrupted = false;
       inputStateStore.roundId = null;
-      console.log("[id].vue onUnmounted", inputStateStore.roundId)
     }else{
       inputStateStore.isInterrupted = true;
       inputStateStore.roundId = roundId.value;
-      console.log("[id].vue onUnmounted", inputStateStore.roundId)
     }
   });
 </script>

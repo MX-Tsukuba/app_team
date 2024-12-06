@@ -113,7 +113,6 @@ const upLoadSupabaseStorage = async (video: Blob | File) => {
       } else {
         console.log(`動画情報が t_movies に挿入されました dbData:${dbData}`);
         movieId.value = dbData[0].id
-        console.log(`[In camera.vue] movieId.value:${movieId.value}`)
       }
 
       const { data: publicUrlData } = supabase
@@ -125,7 +124,6 @@ const upLoadSupabaseStorage = async (video: Blob | File) => {
         router.push({
           path: `/scoreDisplay`,
         })
-        console.log(`[In camera.vue] publicUrl:${publicUrl}`)
       } else if (param === 'scoreInput') {
         //ここにt_relationsに挿入する処理を追加
         const {data:dbData, error : dbError } = await supabase
@@ -142,7 +140,6 @@ const upLoadSupabaseStorage = async (video: Blob | File) => {
         })
         scoreStore.setVideoUrl(publicUrl);
         scoreStore.updateVideoUrlArray(currentHoleIndex.value, publicUrl);
-        console.log(`[In camera.vue] videoUrlArray:${scoreStore.videoUrlArray}`);
       } else {
         console.error("リダイレクト先が見つかりません");
         return;
