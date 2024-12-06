@@ -76,7 +76,6 @@ const selectData = async() => {
 const changeIndex = () => {
   golf_place_Index.value=golf_place_Name.findIndex(str=>str===selectedName.value);
   rounds_data.golf_place_id=golf_place_Id[golf_place_Index.value];
-  console.log(golf_place_Index.value, rounds_data.golf_place_id);
 }
 const insertRounds = async() => {
   changeIndex();
