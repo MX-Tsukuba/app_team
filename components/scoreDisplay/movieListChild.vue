@@ -124,7 +124,7 @@ const props = defineProps<movie>();
 }
 
 .score_value {
-  color: #000;
+  color: #333;
   font-family: Inter;
   font-size: 14px;
   font-style: normal;
@@ -153,7 +153,7 @@ const props = defineProps<movie>();
 }
 
 .state_unanalyzed{
-  color: #000000;
+  color: #333;
   font-family: Inter;
   font-size: 14px;
   font-style: normal;

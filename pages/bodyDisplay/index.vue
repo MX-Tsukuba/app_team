@@ -1,12 +1,19 @@
 <template>
   <div class="homebody">
-    <div class="tab-container">
-      <button
-        v-for="(label, index) in tabLabels"
-        :key="index"
-        :class="['buttonClass',{ 'active': isDisplay === index }]"
-        @click="selectTab(index)"
-      >{{ label }}</button>
+    <div id="tab-container">
+      <div class="tab-labels">
+        <button
+          v-for="(label, index) in tabLabels"
+          :key="index"
+          class="label"
+          :class="{ active: isDisplay === index }"
+          @click="selectTab(index)"
+          ref="tabButtons"
+        >
+          <p class="label">{{ label }}</p>
+        </button>
+        <div class="indicator" :style="indicatorStyle"></div>
+      </div>
     </div>
 
     <div class="gragh">
@@ -17,11 +24,11 @@
                 </ClientOnly>
       </div>
       <div class="changeWeeks">
-        <button style="display: flex;" @click="changeWeeks(-7)">
+        <button style="display: flex; align-items: center;" @click="changeWeeks(-7)">
           <img class="weekBtn reverse" src="~/assets/img/right.png">
           <p class="weeks">前の週</p>
         </button>
-        <button style="display: flex;" @click="changeWeeks(7)">
+        <button style="display: flex; align-items: center;" @click="changeWeeks(7)">
             <p class="weeks">次の週</p>
             <img class="weekBtn " src="~/assets/img/right.png">
         </button>
@@ -42,7 +49,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { onMounted, ref, computed } from 'vue'
 import { useHeadVarStore } from '~/src/store/headVar.js'
 import { usePageStore } from '~/src/store/currentPage';
 import type { Database } from '~/types/database.types.ts';
@@ -83,7 +90,17 @@ const chartData = computed(() => ({
 }))
 const chartOptions = {
   responsive: true,
-  maintainAspectRatio: false
+  maintainAspectRatio: false,
+  plugins: {
+    legend: {
+      display: false
+    }
+  },
+  scales: {
+    y: {
+      beginAtZero: true
+    }
+  }
 }
 
 
@@ -188,52 +205,89 @@ onMounted(async() => {
       await selectData();
       selectTodayData();
     })
+
+const tabButtons = ref<HTMLButtonElement[]>([]);
+const indicatorStyle = computed(() => {
+  const tabButton = tabButtons.value[isDisplay.value];
+  const tabWidth = tabButton ? tabButton.offsetWidth : 0;
+  const tabPosition = tabButton ? tabButton.offsetLeft : 0;
+
+  return {
+    width: `${tabWidth}px`,
+    transform: `translateX(${tabPosition}px)`,
+  };
+});
+
+onMounted(() => {
+  indicatorStyle.value;
+});
 </script>
 
 <style scoped>
+.label{
+  color: #000;
+font-family: Roboto;
+font-size: 12px;
+font-style: normal;
+font-weight: 400;
+line-height: normal;
+}
 .homebody{
     display: flex;
     padding: 52px 0;
     flex-direction: column;
     align-items: center;
+    margin-top: 20px;
+    gap:12px;
 }
-.tab-container{
+#tab-container {
   display: flex;
-  flex-direction: row;
+  justify-content: center;
   width: 264px;
-height: 32px;
-flex-shrink: 0;
-border-radius: 9px;
-background: #DADADB;
-  font-size: 12px;
-  margin: 20px 0;
 }
-.buttonClass{
+
+.tab-labels {
+  position: relative;
   display: flex;
-  flex-direction: row;
-width: 80px;
-padding: 7px 22px;
-justify-content: center;
-align-items: center;
-gap: 10px;
-
-opacity: 0.6;
+  width: 100%;
+  height: 32px;
+  border-radius: 9px;
+  background: #dadadb;
+  font-size: 12px;
 }
-.active{
-/* height: 28px; */
-/* flex-shrink: 0; */
 
-border-radius: 7px;
-border: 1px solid rgba(0, 0, 0, 0.04);
-background: #FFF;
-box-shadow: 0px 3px 8px 0px rgba(0, 0, 0, 0.12), 0px 3px 1px 0px rgba(0, 0, 0, 0.04);
+.label {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 7px 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 12px;
+  color: #000;
+  font-weight: 400;
+  position: relative;
+  z-index: 2;
+}
+
+.indicator {
+  position: absolute;
+  z-index: 1;
+  top: 2px;
+  height: calc(100% - 4px);
+  border-radius: 7px;
+  background: #fff;
+  box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.12), 0px 3px 1px rgba(0, 0, 0, 0.04);
+  transition: transform 0.3s ease;
 }
 .gragh{
     display: flex;
-    width: 360px;
+    width: 390px;
+    margin-bottom: 20px;
     flex-direction: column;
     align-items: center;
-    margin-bottom: 20px;
 
     border-radius: 20px;
     background: #FFF;
@@ -242,17 +296,20 @@ box-shadow: 0px 3px 8px 0px rgba(0, 0, 0, 0.12), 0px 3px 1px 0px rgba(0, 0, 0, 0
 .graghChart{
     width: 330px;
     height: 223.462px;
+    margin-top: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 .changeWeeks{
+    margin: 12px 12px;
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
     align-self: stretch;
 }
 .weekBtn{
+    height: 15px;
     color: #777;
     text-align: center;
     font-family: "Crimson Text";
@@ -296,5 +353,6 @@ height: 28px;
 border-bottom: 2px solid #509A58;
 color: #509A58;
 font-size: 16px;
+justify-content: center;
 }
 </style>

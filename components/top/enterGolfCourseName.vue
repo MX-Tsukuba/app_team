@@ -15,13 +15,13 @@
         </select>
       </ClientOnly>
       <div class="buttonContainer">
-        <div @click="ToScoreInput()" class="bButton">登録</div>
+        <div @click="ToNewScoreInput()" class="bButton">登録</div>
         <div v-if="inputStateStore.isInterrupted" class="interruptedArea">
           <div class="border">
             <hr/>
             <span class="textOr">or</span>
           </div>        
-          <p @click="ToScoreInput()" class="rButton">入力を再開</p>
+          <p @click="ToRestartScoreInput()" class="rButton">入力を再開</p>
         </div>
       </div>
     </div>
@@ -95,21 +95,42 @@ const insertRounds = async() => {
     }
 }
 
-const ToScoreInput = async () => {
+const ToNewScoreInput = async () => {
+  await insertRounds();
+  console.log(`[In enterGolfCourseName.vue] ページ遷移先のround_id:${round_id.value}`);
+
+  if(golf_place_Index.value===-1){
+    console.log('return null')
+    return null;
+  }
+  toggleModal();
+  router.push({
+    path:`/scoreInput/${round_id.value}`,
+    query:{
+      param:'scoreInput'
+    }
+  });
+};
+
+const ToRestartScoreInput = async () => {
   if (!inputStateStore.isInterrupted) {
-    await insertRounds();
+    console.log(`[In enterGolfCourseName.vue] ToRestartScoreInput スコア入力の中断に失敗しています`);
   } else if (inputStateStore.roundId) {
     round_id.value = inputStateStore.roundId;
+    console.log(round_id.value);
+    router.push({
+      path: `/scoreInput/${round_id.value}`,
+      query:{
+        param:'scoreInput'
+      }
+    })
   } else {
     console.error('roundIdがありません');
   }
   if(golf_place_Index.value===-1){
-
     return null;
   }
   toggleModal();
-  console.log(`[In enterGolfCourseName.vue] ページ遷移先のround_id:${round_id.value}`);
-  router.push({path:`/scoreInput/${round_id.value}`,query:{param:'scoreInput'}});
 };
 
 onMounted(() => {

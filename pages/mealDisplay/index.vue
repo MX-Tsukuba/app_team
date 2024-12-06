@@ -8,11 +8,11 @@
                 </ClientOnly>
             </div>
             <div class="changeWeeks">
-                <button style="display: flex;" @click="changeWeeks(-7)">
+                <button style="display: flex; align-items: center;" @click="changeWeeks(-7)">
                     <img class="weekBtn reverse" src="~/assets/img/right.png">
                     <p class="weeks">前の週</p>
                 </button>
-                <button style="display: flex;" @click="changeWeeks(7)">
+                <button style="display: flex; align-items: center;" @click="changeWeeks(7)">
                     <p class="weeks">次の週</p>
                     <img class="weekBtn " src="~/assets/img/right.png">
                 </button>
@@ -20,9 +20,12 @@
         </div>
         <div class="resultCard">
             <div class="day">
-                <button @click="changeDate(-1)" class="dayfont daybtn">-</button>
-                <p class="dayfont">{{ weekDates[dateNowIndex] }}</p> <!--日付の変更がうまくいかないから表示方法とか変える予定-->
-                <button @click="changeDate(1)" class="dayfont daybtn">+</button>
+                <!-- <button @click="changeDate(-1)" class="dayfont daybtn">-</button> --->
+                <button @click="changeDate(-1)"><img class="dateBtn reverse" src="~assets/img/right.png"></button> 
+                <p class="dayfont">{{ weekDates[dateNowIndex] }}</p> 
+                <!-- <button @click="changeDate(1)" class="dayfont daybtn">+</button> --> 
+               <button @click="changeDate(1)"><img class="dateBtn" src="~assets/img/right.png"></button>
+                <!-- <changeDate :formatted-date="weekDates[dateNowIndex]" @firstclick="changeDate(-1)" @secondclick="changeDate(1)" ></changeDate> -->
             </div>
             <div class="dayKcal">
                 <div class="dayKcalAll">
@@ -37,16 +40,18 @@
                 </div>
                 <div class="table">
                     <p class="kindDisplay">{{ kindNow[kindNowIndex] }} 合計</p>
-                    <p class="sum">{{ kindSum[kindNowIndex][dateNowIndex] }}kcal</p>
+                    <div class="sum" style="display:flex; align-items:end; gap: 4px;">
+                        <p class="sum">{{ kindSum[kindNowIndex][dateNowIndex] }}</p>
+                        <p class="kcal">kcal</p>
+                    </div>
                     <div class="resultData" >
-                        <div v-if="!isLoading" >
                             <resultData
                             v-for="item in selectedView"
                             :key="item.id"
                             :title="item.title"
                             :calorie="item.calorie"
+                            v-if="!isLoading"
                             />
-                        </div>
                         <div v-if="isLoading">Loading...</div>
                     </div>
                 </div>
@@ -90,7 +95,17 @@ const chartData = computed(() => ({
 }))
 const chartOptions = {
   responsive: true,
-  maintainAspectRatio: false
+  maintainAspectRatio: false,
+  plugins: {
+    legend: {
+      display: false
+    }
+  },
+  scales: {
+    y: {
+      beginAtZero: true
+    }
+  }
 }
 let kindImages=reactive( [
     {
@@ -159,7 +174,7 @@ const changeWeeks=(i:number)=>{
 
 
 function getCurrentWeekDates(startDay:number=1):string[]{
-    const dayOfWeek =today.getDay();//日曜日=0,土曜日=6
+    const dayOfWeek =today.getDay(); // 日曜日=0,土曜日=6
     const diff=(dayOfWeek +7-startDay) % 7;
 
     const startOfWeek = new Date(today);
@@ -249,7 +264,8 @@ console.log('chartData:', chartData.value);
 }
 .gragh{
     display: flex;
-    width: 360px;
+    width: 390px;
+    margin: 20px auto;
     flex-direction: column;
     align-items: center;
 
@@ -260,17 +276,20 @@ console.log('chartData:', chartData.value);
 .graghChart{
     width: 330px;
     height: 223.462px;
+    margin-top: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 .changeWeeks{
+    margin: 12px 12px;
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
     align-self: stretch;
 }
 .weekBtn{
+    height: 15px;
     color: #777;
     text-align: center;
     font-family: "Crimson Text";
@@ -291,7 +310,7 @@ console.log('chartData:', chartData.value);
 .resultCard{
     width: 390px;
     height: 1000px;
-
+    border-radius: 20px;
     /* position: absolute;
     bottom: -400.538px; */
 
@@ -303,6 +322,7 @@ console.log('chartData:', chartData.value);
     top: 12px;
     left: 25px;
     display: flex;
+    /* gap: 6px; */
     /* color: #777;
     font-family: Inter;
     font-size: 15px;
@@ -334,6 +354,7 @@ console.log('chartData:', chartData.value);
     display: flex;
     align-items: flex-end;
     gap: 13px;
+    padding-left: 40px;
 }
 .kcalNumber{
     color: #F28822;
@@ -390,9 +411,10 @@ console.log('chartData:', chartData.value);
 }
 .resultData{
     height: 180px;
+    width: 100%;
     overflow-y: auto;
     display: flex;
-    padding: 0px 20px;
+    /* padding: 0px 20px; */
     flex-direction: column;
     align-items: center;
     gap: 16px;
@@ -402,6 +424,9 @@ console.log('chartData:', chartData.value);
 input[type="date"]::-webkit-calendar-picker-indicator {
     display: none;
 }
-
+.dateBtn{
+    width: 11px; height: 15px;
+    padding: 0 6px;
+}
 
 </style>

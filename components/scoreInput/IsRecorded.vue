@@ -11,7 +11,6 @@ const videoUrlArray = computed(() => scoreStore.videoUrlArray);
 console.log(`[In IsRecorded.vue] videoUrlArray:${videoUrlArray.value}, currentHoleIndex:${currentHoleIndex.value}`);
 
 const isCurrentHoleRecorded = computed(() => scoreStore.isCurrentHoleRecorded());
-console.log(`[In IsRecorded.vue] isCurrentHoleRecorded:${isCurrentHoleRecorded.value}`);
 </script>
 <template>
     <div class="circleBtn" :class="{'inActive': isCurrentHoleRecorded}">

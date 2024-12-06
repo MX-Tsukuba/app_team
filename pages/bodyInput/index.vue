@@ -2,7 +2,7 @@
 import changeDate from '~/components/meal/changeDate.vue';
 import { onMounted } from 'vue'
 import { useHeadVarStore } from '~/src/store/headVar.js'
-import  FlexibilityModal  from '~/components/scoreInput/FlexibilityModal.vue'
+import  FlexibilityModal  from '~/components/bodyDisplay/FlexibilityModal.vue'
 import { usePageStore } from '~/src/store/currentPage';
 
 const headVarStore = useHeadVarStore()
@@ -34,24 +34,28 @@ const formattedDate = computed<string>(() => formatDateToString(selectedDate.val
 const moveDate = (days: number): void => {
   const newDate = new Date(selectedDate.value)
   newDate.setDate(newDate.getDate() + days)
+  if(newDate.getDate()>new Date().getDate() && newDate.getMonth()===new Date().getMonth() && newDate.getFullYear()===new Date().getFullYear()){
+    return;
+  }
   selectedDate.value = newDate
 }
 
 
-const insertBody=async ()=>{
-  const {error}=await supabase
-  .from('body_inputs')
-  .insert({
-    date:formattedDate.value,
-    weight:bodyWeight.value,
-    flexibility:flexibility.value,
-    height:bodyHeight.value,
-  });
+const insertBody = async () => {
+  const { error } = await supabase
+    .from('body_inputs')
+    .upsert({
+      date: formattedDate.value,
+      weight: bodyWeight.value,
+      flexibility: flexibility.value,
+      height: bodyHeight.value,
+    }, { onConflict: 'date' });
+
   if (error) {
-  console.error('Error inserting data:', error);
+    console.error('Error inserting or updating data:', error);
   } else {
-  console.log('Data inserted successfully');
-  await navigateTo('./bodyDisplay');
+    console.log('Data inserted or updated successfully');
+    await navigateTo('./bodyDisplay');
   }
 }
 
@@ -77,21 +81,25 @@ const showModal = () => {
     <div class="BinputLayout">
       <div class="BinputDetails">
         <div class="BinputCard">
-          <div class="inputName">体重</div>
+          <div class="inputName"><p class="inputText">体重(必須)</p></div>
           <div class="inputBody">
             <input class="Binput"placeholder="数値を入力" v-model="bodyWeight"></input>
             <p>kg</p>
           </div>
         </div>
         <div class="inputCard">
-          <div class="inputName">身長</div>
+          <div class="inputName"><p class="inputText">身長</p></div>
           <div class="inputBody">
             <input class="Binput"placeholder="数値を入力(任意)" v-model="bodyHeight"></input>
             <p>cm</p>
           </div>
         </div>
         <div class="inputCard">
-          <div >柔軟性<span class="help-icon" @click="showModal">?</span></div>
+          <div class="inputName">
+            <p class="inputText">柔軟性</p>
+            <!-- <span class="help-icon" @click="showModal">?</span> -->
+            <img src="~assets/img/information.png" alt="information" class="help-icon" @click="showModal" >
+          </div>
           <div class="inputBody">
             <input class="Binput" placeholder="数値を入力(任意)" v-model="flexibility"></input>
             <p>cm</p>
@@ -167,14 +175,14 @@ const showModal = () => {
 }
 .inputName{
   display: flex;
-  width: 296px;
-  padding: 1px 0px;
-  flex-direction: column;
-  align-items: flex-start;
+padding: 8px;
+align-items: center;
+gap: 10px;
 }
 .inputBody{
   display: flex;
   align-items: flex-end;
+  gap:6px;
 }
 .Binput{
   display: flex;
@@ -186,9 +194,10 @@ const showModal = () => {
   gap: 10px;
   border-radius: 15px;
   border: 1px solid #509A58;
+  font-size: 20px;
 }
 p{
-  color: #000;
+  color: #333;
   font-family: Inter;
   font-size: 24px;
   font-style: normal;
@@ -218,8 +227,13 @@ p{
 
 .help-icon {
   cursor: pointer;
-  font-weight: bold;
-  font-size: 18px;
-  margin-left: 8px;
+}
+.inputText{
+  color: #000;
+font-family: Inter;
+font-size: 14px;
+font-style: normal;
+font-weight: 400;
+line-height: normal;
 }
 </style>
