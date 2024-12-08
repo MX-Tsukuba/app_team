@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import { usePageStore, useHeadVarStore, useInputStateStore, useModalStore, useScoreStore } from '~/src/store';
+import {
+  usePageStore,
+  useHeadVarStore,
+  useInputStateStore,
+  useModalStore,
+  useScoreStore,
+} from '~/src/store';
 import type { Database } from '~/types/database.types';
 import CameraImg from '~/assets/img/camera.svg';
 import CameraTransparentImg from '~/assets/img/cameraTransparent.svg';
@@ -10,116 +16,118 @@ register();
 
 const route = useRoute();
 const headVarStore = useHeadVarStore();
-if (route.query.param==='scoreInput') headVarStore.backButtonText = '一時保存';
-else if (route.query.param==='scoreDisplay') headVarStore.backButtonText = '編集終了';
+if (route.query.param === 'scoreInput')
+  headVarStore.backButtonText = '一時保存';
+else if (route.query.param === 'scoreDisplay')
+  headVarStore.backButtonText = '編集終了';
 const pageStore = usePageStore();
 const scoreStore = useScoreStore();
 const modalStore = useModalStore();
 const inputStateStore = useInputStateStore();
 const isShowModal = computed(() => modalStore.isShowModal);
 const modalName = computed(() => modalStore.modalName);
-const toggleModal = (name:string) => modalStore.toggleModal(name);
+const toggleModal = (name: string) => modalStore.toggleModal(name);
 const supabase = useSupabaseClient<Database>();
 const videoPlayer = ref<HTMLVideoElement | null>(null);
 const videoUrl = ref<string | null>(null);
 
-let roundId =ref<number>(Number(route.params.id));
+let roundId = ref<number>(Number(route.params.id));
 const golfPlaceName = ref<string | undefined>('つくばゴルフ場');
-let isLoading=ref<boolean>(true);
-const currentHoleIndex=ref<number>(0);
+let isLoading = ref<boolean>(true);
+const currentHoleIndex = ref<number>(0);
 const swiperCards = ref();
 
-const buttonMessage = ref<string>('登録')
+const buttonMessage = ref<string>('登録');
 headVarStore.title = `${golfPlaceName.value}`;
-
-
 
 class playData {
   holeNumber?: number;
   scoreNumber?: number;
   puttsNumber?: number;
-  isSelect:boolean
 
-  constructor(holeNumber?:number,scoreNumber?:number,puttsNumber?:number){
-    this.holeNumber=holeNumber;
-    this.scoreNumber=scoreNumber;
-    this.puttsNumber=puttsNumber;
-    this.isSelect=false;
+  constructor(holeNumber?: number, scoreNumber?: number, puttsNumber?: number) {
+    this.holeNumber = holeNumber;
+    this.scoreNumber = scoreNumber;
+    this.puttsNumber = puttsNumber;
+  }
+}
+
+class ParData {
+  hole_number?: number;
+  par_number?: number;
+
+  constructor(hole_number?: number, par_number?: number) {
+    this.hole_number = hole_number;
+    this.par_number = par_number;
+  }
+}
+
+const playDataArr = ref<playData[]>([]);
+const ParDataArr = ref<ParData[]>([]);
+
+//データの取得@辻
+const selectData = async () => {
+  const { data: data, error: roundError } = await supabase
+    .from('t_rounds')
+    .select(
+      't_holes(hole_number, score_number, putts_number), m_golfplaces(golf_place_name, m_holes(hole_number, par_number)), t_relations(hole_number, movie_id, t_movies(movie_name))'
+    )
+    .eq('id', roundId.value);
+  console.log('selectData', data);
+
+  // エラーハンドリング
+  if (roundError) {
+    console.error('roundの取得に失敗しました', roundError.message);
+    return null;
+  }
+
+  //取得したデータをJSの変数に代入していく
+  golfPlaceName.value =
+    data[0].m_golfplaces?.golf_place_name || 'ゴルフ場名がありません'; //型定義のundifined許容を何とかする
+  for (let i = 0; i < 18; i++) {
+    ParDataArr.value.push(
+      new ParData(
+        data[0].m_golfplaces?.m_holes[i].hole_number,
+        data[0].m_golfplaces?.m_holes[i].par_number
+      )
+    );
+    data[0].t_holes.forEach((item) => {
+      if (item.hole_number === i + 1) {
+        //ホール数とindexで1の差があるので調整
+        playDataArr.value[i].holeNumber = item.hole_number;
+        playDataArr.value[i].scoreNumber = item.score_number;
+        playDataArr.value[i].puttsNumber = item.putts_number;
+      }
+    });
+    data[0].t_relations.forEach((item) => {
+      if (item.hole_number === i + 1) {
+        if (item.t_movies) {
+          const fileName = String(item.t_movies.movie_name);
+          const { data: publicUrlData } = supabase.storage
+            .from('Movie')
+            .getPublicUrl(fileName);
+          const publicUrl = publicUrlData.publicUrl;
+          scoreStore.updateVideoUrlArray(i, publicUrl);
+        }
+      }
+    });
+  }
+  isLoading.value = false;
+};
+
+const setting = () => {
+  roundId.value = Number(route.params.id);
+  ParDataArr.value = [];
+  playDataArr.value = new Array(18).fill({});
+  for (let i = 0; i < 18; i++) {
+    playDataArr.value[i] = new playData(0, 0, 0);
+    scoreStore.updateVideoUrlArray(i, null);
   }
 };
 
-class ParData{
-    hole_number?: number;
-    par_number?: number;
-
-    constructor(hole_number?:number,par_number?:number){
-      this.hole_number=hole_number;
-      this.par_number=par_number;
-    }
-}
-
-const playDataArr=ref<playData[]>([]);
-const ParDataArr=ref<ParData[]>([]);
-
-
-
-//データの取得@辻
-const selectData =async()=> {
-  const {data,error:roundError}=await supabase
-  .from('t_rounds')
-  .select('t_holes(hole_number, score_number, putts_number), m_golfplaces(golf_place_name, m_holes(hole_number, par_number)), t_relations(hole_number, movie_id, t_movies(movie_name))')
-  .eq('id',roundId.value)
-  console.log('selectData',data);
-  if(roundError){
-    console.error('roundの取得に失敗しました',roundError.message)
-    return null;
-  }else{
-      //取得したデータをJSの変数に代入していく
-    golfPlaceName.value=data[0].m_golfplaces?.golf_place_name || 'ゴルフ場名がありません';//型定義のundifined許容を何とかする
-    for(let i=0;i<18;i++){
-      ParDataArr.value.push(new ParData(data[0].m_golfplaces?.m_holes[i].hole_number,data[0].m_golfplaces?.m_holes[i].par_number));
-      data[0].t_holes.forEach(item=>{
-        if(item.hole_number===i+1){//ホール数とindexで1の差があるので調整
-          playDataArr.value[i].holeNumber=item.hole_number;
-          playDataArr.value[i].scoreNumber=item.score_number;
-          playDataArr.value[i].puttsNumber=item.putts_number;
-          playDataArr.value[i].isSelect=true;
-        }
-      });
-      data[0].t_relations.forEach(item=>{
-        if(item.hole_number === i + 1){
-          if (item.t_movies) {
-            const fileName = String(item.t_movies.movie_name);
-            const { data: publicUrlData } = supabase
-            .storage
-            .from('Movie')
-            .getPublicUrl(fileName)
-            const publicUrl = publicUrlData.publicUrl
-            scoreStore.updateVideoUrlArray(i, publicUrl);
-          }
-        }
-      });
-    }
-    console.log('ParDataArr',ParDataArr.value);
-    console.log('playDataArr',playDataArr.value);
-    console.log('videoUrlArray',scoreStore.videoUrlArray);
-    isLoading.value=false;
-  }
-}
-
-const setting=()=>{
-  roundId.value=Number(route.params.id);
-  ParDataArr.value=[];
-  playDataArr.value=new Array(18).fill({});
-  for(let i=0;i<18;i++){
-    playDataArr.value[i]=new playData(0,0,0);
-    scoreStore.updateVideoUrlArray(i, null);
-  }
-}
-
 // const {data}  = await useAsyncData(()=>fetchPar(currentHole.value), {watch: [currentHole]});
 
-const updateCurrentHole = (holeId:number) =>{
+const updateCurrentHole = (holeId: number) => {
   currentHoleIndex.value = holeId;
   scoreStore.setCurrentHoleIndex(holeId);
   if (swiperCards.value) {
@@ -127,19 +135,30 @@ const updateCurrentHole = (holeId:number) =>{
   }
 };
 
-
+const updatePlayDataArr = (playData: {
+  holeNumber: number;
+  puttsNumber: number;
+  scoreNumber: number;
+}) => {
+  console.log('updated playDataArr');
+  playDataArr.value[playData.holeNumber - 1].holeNumber = playData.holeNumber;
+  playDataArr.value[playData.holeNumber - 1].scoreNumber = playData.scoreNumber;
+  playDataArr.value[playData.holeNumber - 1].puttsNumber = playData.puttsNumber;
+  console.log(playDataArr);
+};
 
 //ホール選択（スライド）
 interface holeObj {
-  id: number,
+  id: number;
   card: {
-    isLarge:boolean,
-    isMedium:boolean,
-    isSmall:boolean,
-  }
-};
-const items:holeObj[] = reactive([]);
-for (let i = 0; i < 18; i++) {//indexに合わせて1から17に変更@辻
+    isLarge: boolean;
+    isMedium: boolean;
+    isSmall: boolean;
+  };
+}
+const items: holeObj[] = reactive([]);
+for (let i = 0; i < 18; i++) {
+  //indexに合わせて1から17に変更@辻
 
   const singleObject = {
     id: i,
@@ -147,22 +166,24 @@ for (let i = 0; i < 18; i++) {//indexに合わせて1から17に変更@辻
       isLarge: false,
       isMedium: false,
       isSmall: false,
-    }
+    },
   };
   if (i === 0) {
     singleObject.card.isLarge = true;
-  } else if (i === 1 ) {//|| i === 3
+  } else if (i === 1) {
+    //|| i === 3
     singleObject.card.isMedium = true;
-  } else if (i ===2) {// 0 || i === 4
+  } else if (i === 2) {
+    // 0 || i === 4
     singleObject.card.isSmall = true;
-  }else{
-    singleObject.card.isLarge=false;
-    singleObject.card.isMedium=false;
-    singleObject.card.isSmall=true;
+  } else {
+    singleObject.card.isLarge = false;
+    singleObject.card.isMedium = false;
+    singleObject.card.isSmall = true;
   }
-  items.push(singleObject)
-};
-const incrementCurrentHole = (newHole:number) => {
+  items.push(singleObject);
+}
+const incrementCurrentHole = (newHole: number) => {
   currentHoleIndex.value = newHole;
 };
 const onSlideChange = () => {
@@ -170,88 +191,144 @@ const onSlideChange = () => {
     const newIndex = swiperCards.value.swiper.activeIndex;
     currentHoleIndex.value = newIndex;
   }
-  console.log("onSlideChange",swiperCards.value.swiper.activeIndex);
+  console.log('onSlideChange', swiperCards.value.swiper.activeIndex);
 };
 
 //スワイプで中心に来たカードのindexをcurrentHoleとして表示の変更をする
 
-watch(currentHoleIndex, () => items.forEach(item => {
-  if (item.id === currentHoleIndex.value) {
-    item.card.isLarge = true;
-    item.card.isMedium = false;
-    item.card.isSmall = false;
-  } else if (item.id === currentHoleIndex.value - 1 || item.id === currentHoleIndex.value + 1) {
-    item.card.isLarge = false;
-    item.card.isMedium = true;
-    item.card.isSmall = false;
-  } else if (item.id === currentHoleIndex.value - 2 || item.id === currentHoleIndex.value + 2) {
-    item.card.isLarge = false;
-    item.card.isMedium = false;
-    item.card.isSmall = true;
-  }else{
-    item.card.isLarge = false;
-    item.card.isMedium = false;
-    item.card.isSmall = true;
-  }
-  if(currentHoleIndex.value === 17)buttonMessage.value = '完了'
-  else buttonMessage.value = '登録'
-}))
-const videoInsert = async()=>{
+watch(currentHoleIndex, () =>
+  items.forEach((item) => {
+    if (item.id === currentHoleIndex.value) {
+      item.card.isLarge = true;
+      item.card.isMedium = false;
+      item.card.isSmall = false;
+    } else if (
+      item.id === currentHoleIndex.value - 1 ||
+      item.id === currentHoleIndex.value + 1
+    ) {
+      item.card.isLarge = false;
+      item.card.isMedium = true;
+      item.card.isSmall = false;
+    } else if (
+      item.id === currentHoleIndex.value - 2 ||
+      item.id === currentHoleIndex.value + 2
+    ) {
+      item.card.isLarge = false;
+      item.card.isMedium = false;
+      item.card.isSmall = true;
+    } else {
+      item.card.isLarge = false;
+      item.card.isMedium = false;
+      item.card.isSmall = true;
+    }
+    if (currentHoleIndex.value === 17) buttonMessage.value = '完了';
+    else buttonMessage.value = '登録';
+  })
+);
+const videoInsert = async () => {
   videoUrl.value = scoreStore.getCurrentHoleVideoUrl();
   await nextTick();
   if (videoPlayer.value && videoUrl.value) {
     videoPlayer.value.src = videoUrl.value;
   }
-}
+};
 
-onMounted(()=>{
-    pageStore.setCurrentPage('score');
-    videoInsert();
-    if(swiperCards.value){
-      swiperCards.value.swiper.on('slideChange', onSlideChange);
-    }
-    setting();
-    selectData();
-  });
-  onUnmounted(()=> {
-    headVarStore.backButtonText = '';
-    if(route.query.param==='scoreDisplay'){
-      inputStateStore.isInterrupted = false;
-      inputStateStore.roundId = null;
-    }else{
-      inputStateStore.isInterrupted = true;
-      inputStateStore.roundId = roundId.value;
-    }
-  });
+onMounted(() => {
+  pageStore.setCurrentPage('score');
+  videoInsert();
+  if (swiperCards.value) {
+    swiperCards.value.swiper.on('slideChange', onSlideChange);
+  }
+  setting();
+  selectData();
+});
+onUnmounted(() => {
+  headVarStore.backButtonText = '';
+  if (route.query.param === 'scoreDisplay') {
+    inputStateStore.isInterrupted = false;
+    inputStateStore.roundId = null;
+  } else {
+    inputStateStore.isInterrupted = true;
+    inputStateStore.roundId = roundId.value;
+  }
+});
 </script>
 
 <template>
   <section class="scoreInputWhole">
     <div class="displayBox">
       <div class="displayHolePar">
-        {{ currentHoleIndex+1 }}H
-        <p class="displayPar" v-if="!isLoading">par{{ ParDataArr[currentHoleIndex].par_number }}</p>
-        <p class="displayPar" v-else >par0</p>
+        {{ currentHoleIndex + 1 }}H
+        <p class="displayPar" v-if="!isLoading">
+          par{{ ParDataArr[currentHoleIndex].par_number }}
+        </p>
+        <p class="displayPar" v-else>par0</p>
       </div>
-      <hr class="displayLine"/>
+      <hr class="displayLine" />
     </div>
 
-    <swiper-container class="selectHole" slides-per-view="auto" centered-slides="true" space-between="5" free-mode="true"
-    watch-slides-progress="true">
-      <swiper-slide v-for="(item, index) in items" :key="index" class="eachHole" @click="updateCurrentHole(item.id)" :class="{'holeCardLarge': item.card.isLarge, 'holeCardMedium': item.card.isMedium, 'holeCardSmall': item.card.isSmall}">{{ item.id+1 }}H</swiper-slide>    
+    <swiper-container
+      class="selectHole"
+      slides-per-view="auto"
+      centered-slides="true"
+      space-between="5"
+      free-mode="true"
+      watch-slides-progress="true"
+    >
+      <swiper-slide
+        v-for="(item, index) in items"
+        :key="index"
+        class="eachHole"
+        @click="updateCurrentHole(item.id)"
+        :class="{
+          holeCardLarge: item.card.isLarge,
+          holeCardMedium: item.card.isMedium,
+          holeCardSmall: item.card.isSmall,
+        }"
+        >{{ item.id + 1 }}H</swiper-slide
+      >
     </swiper-container>
 
-    <swiper-container ref="swiperCards" class='inputCards' slides-per-view="1" centered-slides="true" thumbs-swiper=".selectHole" @slideChange="onSlideChange">
-      <swiper-slide v-for="(item) in items" :key="item" class="cardContainer">
+    <swiper-container
+      ref="swiperCards"
+      class="inputCards"
+      slides-per-view="1"
+      centered-slides="true"
+      thumbs-swiper=".selectHole"
+      @slideChange="onSlideChange"
+    >
+      <swiper-slide v-for="item in items" :key="item" class="cardContainer">
         <!-- {{ item.id }} -->
-        <InputCard :itemIndex="item.id" :roundId :currentHoleIndex :playDataArr :isShowModal :modalName :toggleModal :videoPlayer :videoUrl :buttonMessage  @updateCurrentHole="updateCurrentHole" @incrementCurrentHole="incrementCurrentHole"/>
+        <InputCard
+          :itemIndex="item.id"
+          :roundId
+          :currentHoleIndex
+          :playDataArr
+          :isShowModal
+          :modalName
+          :toggleModal
+          :videoPlayer
+          :videoUrl
+          :buttonMessage
+          @updateCurrentHole="updateCurrentHole"
+          @incrementCurrentHole="incrementCurrentHole"
+          @updatePlayDataArr="updatePlayDataArr"
+        />
       </swiper-slide>
     </swiper-container>
 
-
-      <IsRecorded v-if="!scoreStore.isCurrentHoleRecorded()" @click="toggleModal('confirm')"/>
-      <IsRecorded v-else />
-    <StartRecord v-if="isShowModal && modalName === 'confirm' && !scoreStore.getCurrentHoleVideoUrl()"/>
+    <IsRecorded
+      v-if="!scoreStore.isCurrentHoleRecorded()"
+      @click="toggleModal('confirm')"
+    />
+    <IsRecorded v-else />
+    <StartRecord
+      v-if="
+        isShowModal &&
+        modalName === 'confirm' &&
+        !scoreStore.getCurrentHoleVideoUrl()
+      "
+    />
   </section>
 </template>
 

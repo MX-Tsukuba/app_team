@@ -11,8 +11,7 @@ type dbPlayData = {
   holeNumber?: number;
   scoreNumber?: number;
   puttsNumber?: number;
-  isSelect:boolean
-}
+};
 interface Props {
   itemIndex: number;
   roundId: number;
@@ -24,10 +23,14 @@ interface Props {
   videoPlayer: HTMLVideoElement | null;
   videoUrl: string | null;
   buttonMessage: string;
-};
+}
 
 const props = defineProps<Props>();
-const emit = defineEmits(['updateCurrentHole', 'incrementCurrentHole']);
+const emit = defineEmits([
+  'updateCurrentHole',
+  'incrementCurrentHole',
+  'updatePlayDataArr',
+]);
 const playData = reactive({
   holeNumber: props.currentHoleIndex + 1,
   puttsNumber: props.playDataArr[props.itemIndex]?.puttsNumber || 0,
@@ -37,58 +40,87 @@ const playData = reactive({
 const addPlayData = async () => {
   console.log('inputCard_currentHoleIndex', props.currentHoleIndex);
   console.log('playData', playData);
-  const { error } = await supabase
-  .from('t_holes')
-  .insert({
-    "hole_number": playData.holeNumber,
-    "round_id": props.roundId,
-    "putts_number": playData.puttsNumber,
-    "score_number": playData.scoreNumber,
-  });
-  if (error) {
-    alert(error.message);
-  } else {
-  if(props.currentHoleIndex === 17){
-    inputStateStore.isInterrupted = false;
-    inputStateStore.roundId = null;
-    await navigateTo('../scoreDisplay')
-  }else{
-    emit('updateCurrentHole', props.currentHoleIndex + 1);
-  }
-    return true;
+  if (playData.scoreNumber) {
+    const { error } = await supabase.from('t_holes').upsert(
+      {
+        hole_number: playData.holeNumber,
+        round_id: props.roundId,
+        putts_number: playData.puttsNumber,
+        score_number: playData.scoreNumber,
+      },
+      { onConflict: 'hole_number, round_id' }
+    );
+    if (error) {
+      alert(error.message);
+    } else {
+      if (props.currentHoleIndex === 17) {
+        inputStateStore.isInterrupted = false;
+        inputStateStore.roundId = null;
+        await navigateTo('../scoreDisplay');
+      } else {
+        emit('updatePlayDataArr', playData);
+        emit('updateCurrentHole', props.currentHoleIndex + 1);
+      }
+      return true;
+    }
   }
 };
-watch(() => props.currentHoleIndex, (newHole) => {
-  playData.holeNumber = newHole + 1;
-  playData.puttsNumber = props.playDataArr[props.itemIndex]?.puttsNumber || 0;
-  playData.scoreNumber = props.playDataArr[props.itemIndex]?.scoreNumber || 0;
-});
+watch(
+  () => props.currentHoleIndex,
+  (newHole) => {
+    playData.holeNumber = newHole + 1;
+    playData.puttsNumber = props.playDataArr[props.itemIndex]?.puttsNumber || 0;
+    playData.scoreNumber = props.playDataArr[props.itemIndex]?.scoreNumber || 0;
+  }
+);
 </script>
 
 <template>
   <div class="inputData">
-      <img src="~assets/img/information.png" alt="information" class="information" @click="props.toggleModal('info')">
-      <Information v-if="props.isShowModal && props.modalName === 'info'"/>
-      <div class="scorePuttsBox">
+    <img
+      src="~assets/img/information.png"
+      alt="information"
+      class="information"
+      @click="props.toggleModal('info')"
+    />
+    <Information v-if="props.isShowModal && props.modalName === 'info'" />
+    <div class="scorePuttsBox">
+      <div>
+        <p class="scorePuttsTitle">スコア</p>
         <div>
-          <p class="scorePuttsTitle">スコア</p>
-          <div>
-            <input type="number" pattern="\d*" class="scorePuttsData" v-model="playData.scoreNumber">
-          </div>
-        </div>
-        <div>
-          <p class="scorePuttsTitle">パット数</p>
-          <div>
-            <input type="number" pattern="\d*" class="scorePuttsData" v-model="playData.puttsNumber">
-          </div>
+          <input
+            type="number"
+            pattern="\d*"
+            class="scorePuttsData"
+            v-model="playData.scoreNumber"
+          />
         </div>
       </div>
-      <video v-if="currentHoleVideoUrl" :src="currentHoleVideoUrl" controls class="videoArea"></video>
-      <div v-else class="videoArea">
-        <p>フォームを撮影すると、ここに動画が表示されます。</p>
+      <div>
+        <p class="scorePuttsTitle">パット数</p>
+        <div>
+          <input
+            type="number"
+            pattern="\d*"
+            class="scorePuttsData"
+            v-model="playData.puttsNumber"
+          />
+        </div>
       </div>
-      <button @click="addPlayData" class="bButton">{{ props.buttonMessage }}</button>
     </div>
+    <video
+      v-if="currentHoleVideoUrl"
+      :src="currentHoleVideoUrl"
+      controls
+      class="videoArea"
+    ></video>
+    <div v-else class="videoArea">
+      <p>フォームを撮影すると、ここに動画が表示されます。</p>
+    </div>
+    <button @click="addPlayData" class="bButton">
+      {{ props.buttonMessage }}
+    </button>
+  </div>
 </template>
 
 <style scoped>
