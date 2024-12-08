@@ -150,7 +150,7 @@ const props = defineProps<roundDetail>();
 
 .score_tag {
   display: flex;
-  width: 110px;
+  width: 120px;
   height: 24px;
   justify-content: center;
   align-items: center;
@@ -179,7 +179,7 @@ const props = defineProps<roundDetail>();
 
 .place_tag {
   position: absolute;
-  left: 122px;
+  left: 132px;
   display: flex;
   height: 24px;
   justify-content: center;
@@ -310,6 +310,5 @@ thead {
   position: relative;
   display:flex;
   flex-direction: row;
-  gap: 20px;
 }
 </style>

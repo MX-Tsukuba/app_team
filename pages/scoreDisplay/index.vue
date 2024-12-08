@@ -59,7 +59,7 @@ const indicatorStyle = computed(() => {
 
 const supabase = useSupabaseClient<Database>();
 
-async function fetchLog() {
+const fetchLog = async () => {
   const scoreLogs: monthScoreLog[] = [];
   const tmpRoundDetailsList: roundDetail[] = [];
 
@@ -153,7 +153,7 @@ async function fetchLog() {
     roundDetails: tmpMonthRoundDetails,
   });
   return scoreLogs;
-}
+};
 
 const fetchMovies = async () => {
   const { data, error } = await supabase
@@ -179,8 +179,6 @@ const fetchMovies = async () => {
     else if (dateA === dateB) return 0;
     else return 1;
   });
-  //console.log(data);
-  //console.log(tmpMovieDetailsList);
 
   const movieLogs: monthMovieLog[] = [];
   let tmpDate: Date = tmpMovieDetailsList[0].date;
