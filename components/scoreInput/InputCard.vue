@@ -23,6 +23,7 @@ interface Props {
   videoPlayer: HTMLVideoElement | null;
   videoUrl: string | null;
   buttonMessage: string;
+  isFetched: boolean;
 }
 
 const props = defineProps<Props>();
@@ -71,6 +72,19 @@ watch(
     playData.holeNumber = newHole + 1;
     playData.puttsNumber = props.playDataArr[props.itemIndex]?.puttsNumber || 0;
     playData.scoreNumber = props.playDataArr[props.itemIndex]?.scoreNumber || 0;
+  }
+);
+
+watch(
+  () => props.isFetched,
+  (flag) => {
+    if (!flag) {
+      playData.holeNumber = props.currentHoleIndex + 1;
+      playData.puttsNumber =
+        props.playDataArr[props.itemIndex]?.puttsNumber || 0;
+      playData.scoreNumber =
+        props.playDataArr[props.itemIndex]?.scoreNumber || 0;
+    }
   }
 );
 </script>
