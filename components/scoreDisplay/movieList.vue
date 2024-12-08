@@ -1,34 +1,23 @@
 <script setup lang="ts">
 import MovieListChild from './movieListChild.vue';
+import type { movieDetail, monthMovieLog } from '~/types/scoreDisplay';
 
-interface movieList {
-  Y: number;
-  M: number;
-  monthDatas: {
-    id: number;
-    date: Date;
-    status: number;
-    total_score: number | null;
-    roundId: number | null;
-  }[];
-}
-
-interface data {
-  values: movieList[];
-}
+type data = {
+  value: monthMovieLog[];
+};
 const props = defineProps<data>();
 </script>
 
 <template>
-  <div class="sub_container" v-for="d in props.values">
-    <div class="month">{{ d.Y }}年{{ d.M }}月</div>
+  <div class="sub_container" v-for="d in props.value">
+    <div class="month">{{ d.year }}年{{ d.month }}月</div>
     <div class="subsub_container">
       <MovieListChild
-        v-for="movie in d.monthDatas"
+        v-for="movie in d.movieDetails"
         :id="movie.id"
         :date="movie.date"
         :status="movie.status"
-        :total_score="movie.total_score"
+        :formScore="movie.formScore"
         :roundId="movie.roundId"
       />
     </div>

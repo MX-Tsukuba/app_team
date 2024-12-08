@@ -1,13 +1,13 @@
 <template>
   <div class="sub_container" v-for="item in props.value">
-    <div class="month">{{ item.Y }}年{{ item.M }}月</div>
+    <div class="month">{{ item.year }}年{{ item.month }}月</div>
     <div class="subsub_container">
       <logListChild
-        v-for="item1 in item.monthDatas"
+        v-for="item1 in item.roundDetails"
         :date="item1.date"
         :golfPlaceName="item1.golfPlaceName"
         :roundId="item1.roundId"
-        :holedetails="item1.holeDetails"
+        :holeDetails="item1.holeDetails"
       />
     </div>
   </div>
@@ -15,33 +15,17 @@
 
 <script setup lang="ts">
 import logListChild from './logListChild.vue';
+import type {
+  holeDetail,
+  roundDetail,
+  monthScoreLog,
+} from '@/types/scoreDisplay';
 
-interface holeDetails {
-  holeNo: number;
-  par: number;
-  result: number | null;
-  putts: number | null;
-  form_Score: number | null;
-  //form_Score: number;
-}
+type data = {
+  value: monthScoreLog[];
+};
 
-interface roundDetail {
-  date: Date;
-  golfPlaceName: string;
-  roundId: number;
-  holeDetails: holeDetails[];
-}
-
-interface monthDetail {
-  Y: number;
-  M: number;
-  monthDatas: roundDetail[];
-}
-
-interface datas {
-  value: monthDetail[];
-}
-const props = defineProps<datas>();
+const props = defineProps<data>();
 </script>
 
 <style scoped>

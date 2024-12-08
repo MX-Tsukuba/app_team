@@ -19,8 +19,8 @@
         <div class="indicator" :style="indicatorStyle"></div>
       </div>
     </div>
-    <ScoreDisplay v-if="activeTab === 0" :value="data ? data.logs : []" />
-    <MovieDisplay v-else :values="data ? data.movies : []" />
+    <ScoreDisplay v-if="activeTab === 0" :value="data ? data.scoreLogs : []" />
+    <MovieDisplay v-else :value="data ? data.movieLogs : []" />
   </div>
 </template>
 
@@ -30,6 +30,13 @@ import MovieDisplay from '~/components/scoreDisplay/movieList.vue';
 import { useHeadVarStore } from '~/src/store/headVar.js';
 import { usePageStore } from '~/src/store/currentPage';
 import type { Database } from '~/types/database.types';
+import type {
+  holeDetail,
+  roundDetail,
+  monthScoreLog,
+  movieDetail,
+  monthMovieLog,
+} from '@/types/scoreDisplay.d.ts';
 
 const headVarStore = useHeadVarStore();
 headVarStore.title = 'スコア記録';
@@ -52,148 +59,100 @@ const indicatorStyle = computed(() => {
 
 const supabase = useSupabaseClient<Database>();
 
-interface holeDetails {
-  holeNo: number;
-  par: number;
-  result: number | null;
-  putts: number | null;
-  form_Score: number | null;
-}
-
-interface roundDetail {
-  date: Date;
-  golfPlaceName: string;
-  roundId: number;
-  holeDetails: holeDetails[];
-}
-
-interface monthDetail {
-  Y: number;
-  M: number;
-  monthDatas: roundDetail[];
-}
-
-interface movieList {
-  Y: number;
-  M: number;
-  monthDatas: {
-    id: number;
-    date: Date;
-    status: number;
-    total_score: number | null;
-    roundId: number | null;
-  }[];
-}
-
 async function fetchLog() {
-  const monthDetails = Array<monthDetail>();
-  try {
-    //TODO: 特定のユーザのデータゴルフデータを全て取得、ユーザの識別についてはローレベルセキュリティで実行する。
-    const { data: roundData, error } = await supabase
-      .from('t_rounds')
-      .select(
-        'id, date, t_holes(hole_number, score_number, putts_number), m_golfplaces(golf_place_name, m_holes(hole_number, par_number))'
-      )
-      .eq('user_id', 1);
-    if (error) {
-      console.error('Error fetching data from t_round table:', error);
-    } else {
-      const tmpDetails: roundDetail[] = [];
-      if (roundData)
-        roundData.sort((a, b) => {
-          const dateA = new Date(a.date);
-          const dateB = new Date(b.date);
-          if (dateA > dateB) return -1;
-          else if (dateA === dateB) return 0;
-          else return 1;
-        });
-      roundData.forEach((item) => {
-        if (item.m_golfplaces !== null)
-          item.m_golfplaces.m_holes.sort(
-            (a, b) => a.hole_number - b.hole_number
-          );
-        item.t_holes.sort((a, b) => a.hole_number - b.hole_number);
+  const scoreLogs: monthScoreLog[] = [];
+  const tmpRoundDetailsList: roundDetail[] = [];
 
-        const tmpHoleDetails: holeDetails[] = [];
-        for (let i = 0; i < 18; i++) {
-          const a = item.m_golfplaces?.m_holes.find(
-            (value) => value.hole_number === i + 1
-          );
+  //TODO: 特定のユーザのデータゴルフデータを全て取得、ユーザの識別についてはローレベルセキュリティで実行する。
+  const { data, error } = await supabase
+    .from('t_rounds')
+    .select(
+      'id, date, t_holes(hole_number, score_number, putts_number), m_golfplaces(golf_place_name, m_holes(hole_number, par_number))'
+    );
+  if (error) throw error;
 
-          const b = item.t_holes.find((value) => value.hole_number === i + 1);
+  //idでソート
+  data.sort((a, b) => {
+    return a.id - b.id;
+  });
 
-          if (a) {
-            if (b) {
-              tmpHoleDetails.push({
-                holeNo: a.hole_number,
-                par: a.par_number,
-                result: b.score_number,
-                putts: b.putts_number,
-                form_Score: null,
-              });
-            } else {
-              tmpHoleDetails.push({
-                holeNo: a.hole_number,
-                par: a.par_number,
-                result: null,
-                putts: null,
-                form_Score: null,
-              });
-            }
-          }
-          // console.log(tmpHoleDetails);
-        }
-        tmpDetails.push({
-          date: new Date(item.date),
-          golfPlaceName: item.m_golfplaces
-            ? item.m_golfplaces.golf_place_name
-            : '情報がありません',
-          roundId: item.id,
-          holeDetails: tmpHoleDetails,
-        });
-      });
-      //console.log(tmpDetails);
+  // 日付で降順にソート
+  data.sort((a, b) => {
+    const dateA = new Date(a.date);
+    const dateB = new Date(b.date);
+    if (dateA > dateB) return -1;
+    else if (dateA === dateB) return 0;
+    else return 1;
+  });
 
-      let tmpDate: Date = tmpDetails[0].date;
-      let tmpDatas: roundDetail[] = [];
-      tmpDetails.forEach((item) => {
-        const itemDate = item.date;
-        if (
-          itemDate.getFullYear() === tmpDate.getFullYear() &&
-          itemDate.getMonth() === tmpDate.getMonth()
-        ) {
-          tmpDatas.push(item);
-        } else {
-          monthDetails.push({
-            Y: tmpDate.getFullYear(),
-            M: tmpDate.getMonth() + 1,
-            monthDatas: tmpDatas,
+  data.forEach((item) => {
+    if (item.m_golfplaces !== null)
+      item.m_golfplaces.m_holes.sort((a, b) => a.hole_number - b.hole_number);
+    item.t_holes.sort((a, b) => a.hole_number - b.hole_number);
+
+    const tmpHoleDetails: holeDetail[] = [];
+    for (let i = 0; i < 18; i++) {
+      const a = item.m_golfplaces?.m_holes.find(
+        (value) => value.hole_number === i + 1
+      );
+
+      const b = item.t_holes.find((value) => value.hole_number === i + 1);
+
+      if (a) {
+        if (b) {
+          tmpHoleDetails.push({
+            holeNumber: a.hole_number,
+            parNumber: a.par_number,
+            golfScore: b.score_number,
+            puttsNumber: b.putts_number,
+            formScore: null,
           });
-          tmpDatas = [item];
-          tmpDate = item.date;
+        } else {
+          tmpHoleDetails.push({
+            holeNumber: a.hole_number,
+            parNumber: a.par_number,
+            golfScore: null,
+            puttsNumber: null,
+            formScore: null,
+          });
         }
-      });
-      monthDetails.push({
-        Y: tmpDate.getFullYear(),
-        M: tmpDate.getMonth() + 1,
-        monthDatas: tmpDatas,
-      });
-      //console.log(monthDetails);
-
-      monthDetails.sort((a, b) => {
-        if (a.Y > b.Y) return -1;
-        else if (a.Y < b.Y) return 1;
-        else {
-          if (a.M > b.M) return -1;
-          else return 1;
-        }
-      });
-
-      return monthDetails;
+      }
     }
-  } catch (e) {
-    console.error('Unexpected Error', e);
-  }
+    tmpRoundDetailsList.push({
+      date: new Date(item.date),
+      golfPlaceName: item.m_golfplaces
+        ? item.m_golfplaces.golf_place_name
+        : '情報がありません',
+      roundId: item.id,
+      holeDetails: tmpHoleDetails,
+    });
+  });
+
+  let tmpDate: Date = tmpRoundDetailsList[0].date;
+  let tmpMonthRoundDetails: roundDetail[] = [];
+  tmpRoundDetailsList.forEach((item) => {
+    const itemDate = item.date;
+    if (
+      itemDate.getFullYear() === tmpDate.getFullYear() &&
+      itemDate.getMonth() === tmpDate.getMonth()
+    ) {
+      tmpMonthRoundDetails.push(item);
+    } else {
+      scoreLogs.push({
+        year: tmpDate.getFullYear(),
+        month: tmpDate.getMonth() + 1,
+        roundDetails: tmpMonthRoundDetails,
+      });
+      tmpMonthRoundDetails = [item];
+      tmpDate = item.date;
+    }
+  });
+  scoreLogs.push({
+    year: tmpDate.getFullYear(),
+    month: tmpDate.getMonth() + 1,
+    roundDetails: tmpMonthRoundDetails,
+  });
+  return scoreLogs;
 }
 
 const fetchMovies = async () => {
@@ -202,26 +161,18 @@ const fetchMovies = async () => {
     .select('created_at, id, status, result');
   if (error) throw error;
 
-  const moviesArray = <
-    {
-      id: number;
-      date: Date;
-      status: number;
-      total_score: number | null;
-      roundId: number | null;
-    }[]
-  >[];
+  const tmpMovieDetailsList: movieDetail[] = [];
 
   data.forEach((item) => {
-    moviesArray.push({
+    tmpMovieDetailsList.push({
       id: item.id,
       date: new Date(item.created_at.slice(0, 10)),
       status: item.status,
-      total_score: item.result ? (item.result.total_score as number) : -1, //時間がないので型解決を諦めます。デフォルト値を-1にします。
+      formScore: item.result ? (item.result.total_score as number) : -1, //時間がないので型解決を諦めます。デフォルト値を-1にします。
       roundId: null,
     });
   });
-  moviesArray.sort((a, b) => {
+  tmpMovieDetailsList.sort((a, b) => {
     const dateA = new Date(a.date);
     const dateB = new Date(b.date);
     if (dateA > dateB) return -1;
@@ -229,41 +180,35 @@ const fetchMovies = async () => {
     else return 1;
   });
   //console.log(data);
-  //console.log(moviesArray);
+  //console.log(tmpMovieDetailsList);
 
-  const moviesData: movieList[] = [];
-  let tmpDate: Date = moviesArray[0].date;
-  let tmpDatas: {
-    id: number;
-    date: Date;
-    status: number;
-    total_score: number | null;
-    roundId: number | null;
-  }[] = [];
-  moviesArray.forEach((item) => {
+  const movieLogs: monthMovieLog[] = [];
+  let tmpDate: Date = tmpMovieDetailsList[0].date;
+  let tmpMonthMovieDetails: movieDetail[] = [];
+  tmpMovieDetailsList.forEach((item) => {
     const itemDate = item.date;
     if (
       itemDate.getFullYear() === tmpDate.getFullYear() &&
       itemDate.getMonth() === tmpDate.getMonth()
     ) {
-      tmpDatas.push(item);
+      tmpMonthMovieDetails.push(item);
     } else {
-      moviesData.push({
-        Y: tmpDate.getFullYear(),
-        M: tmpDate.getMonth() + 1,
-        monthDatas: tmpDatas,
+      movieLogs.push({
+        year: tmpDate.getFullYear(),
+        month: tmpDate.getMonth() + 1,
+        movieDetails: tmpMonthMovieDetails,
       });
-      tmpDatas = [item];
+      tmpMonthMovieDetails = [item];
       tmpDate = item.date;
     }
   });
-  moviesData.push({
-    Y: tmpDate.getFullYear(),
-    M: tmpDate.getMonth() + 1,
-    monthDatas: tmpDatas,
+  movieLogs.push({
+    year: tmpDate.getFullYear(),
+    month: tmpDate.getMonth() + 1,
+    movieDetails: tmpMonthMovieDetails,
   });
-  //console.log(moviesData);
-  return moviesData;
+  //console.log(movieLogs);
+  return movieLogs;
 };
 
 const fetchData = async () => {
@@ -274,38 +219,38 @@ const fetchData = async () => {
   if (error) throw error;
   //else console.log(relations);
 
-  const Logs = await fetchLog();
-  const Movies = await fetchMovies();
+  const scoreLogs = await fetchLog();
+  const movieLogs = await fetchMovies();
 
-  if (Logs) {
+  if (scoreLogs) {
     relations.forEach((relation) => {
-      Logs.forEach((log) => {
+      scoreLogs.forEach((log) => {
         // 該当する monthData を検索
-        const monthData = log.monthDatas.find(
+        const monthData = log.roundDetails.find(
           (data) => data.roundId === relation.round_id
         );
         if (!monthData) return;
 
         // 該当する holeDetail を検索
         const holeDetail = monthData.holeDetails.find(
-          (detail) => detail.holeNo === relation.hole_number
+          (detail) => detail.holeNumber === relation.hole_number
         );
         if (!holeDetail) return;
 
         // Movies が存在する場合
-        if (Movies) {
+        if (movieLogs) {
           // 該当する movie を検索
-          const movie = Movies.find((m1) =>
-            m1.monthDatas.some((m2) => m2.id === relation.movie_id)
+          const movie = movieLogs.find((m1) =>
+            m1.movieDetails.some((m2) => m2.id === relation.movie_id)
           );
 
           if (movie) {
-            const movieData = movie.monthDatas.find(
-              (m2) => m2.id === relation.movie_id
+            const movieData = movie.movieDetails.find(
+              (m) => m.id === relation.movie_id
             );
             if (movieData) {
-              holeDetail.form_Score = movieData.total_score
-                ? Math.round(movieData.total_score * 100)
+              holeDetail.formScore = movieData.formScore
+                ? Math.round(movieData.formScore * 100)
                 : null;
             }
           }
@@ -314,10 +259,10 @@ const fetchData = async () => {
     });
   }
 
-  if (Movies) {
+  if (movieLogs) {
     relations.forEach((relation) => {
-      Movies.forEach((item) => {
-        item.monthDatas.forEach((item1) => {
+      movieLogs.forEach((item) => {
+        item.movieDetails.forEach((item1) => {
           if (item1.id === relation.movie_id) {
             item1.roundId = relation.round_id;
           }
@@ -325,7 +270,10 @@ const fetchData = async () => {
       });
     });
   }
-  return { logs: Logs ? Logs : [], movies: Movies ? Movies : [] };
+  return {
+    scoreLogs: scoreLogs ? scoreLogs : [],
+    movieLogs: movieLogs ? movieLogs : [],
+  };
 };
 
 const { data } = useAsyncData(() => fetchData());

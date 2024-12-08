@@ -20,7 +20,7 @@
     <div class="tags">
       <div class="score_tag">
         <div class="score_text">合計スコア</div>
-        <div class="score_value">{{ calculateScore(props.holedetails) }}</div>
+        <div class="score_value">{{ calculateScore(props.holeDetails) }}</div>
       </div>
       <!-- <div class="place_tag">
         <div class="place_text">📍{{ props.golfPlaceName }}</div>
@@ -62,56 +62,41 @@
 import LogListTableRow from './logListTableRow.vue';
 import LogListArrow from './logListArrow.vue';
 import { useRouter } from 'vue-router';
+import type { roundDetail, holeDetail } from '~/types/scoreDisplay';
 
 const someHoleIsNull = ref<boolean>(false);
 const router = useRouter();
 
 const moveEditPage = (id: number) => {
-  router.push({path: `/scoreInput/${id}`, query: {param: 'scoreDisplay'}});
+  router.push({ path: `/scoreInput/${id}`, query: { param: 'scoreDisplay' } });
 };
 
-function getHoleDetails(i: number) {
-  const detail = props.holedetails.find((item) => item.holeNo === i);
-  if (detail?.result) {
+const getHoleDetails = (i: number): holeDetail => {
+  const detail = props.holeDetails.find((item) => item.holeNumber === i);
+  if (detail?.golfScore) {
     return detail;
   } else {
     someHoleIsNull.value = true;
     return {
-      holeNo: i,
-      par: null,
-      result: null,
-      putts: null,
-      form_Score: null,
+      holeNumber: i,
+      parNumber: null,
+      golfScore: null,
+      puttsNumber: null,
+      formScore: null,
     };
   }
-}
+};
 
 const isScoreTableVisible = ref(false);
 const toggleScoreTable = () => {
   isScoreTableVisible.value = !isScoreTableVisible.value;
 };
 
-interface holeDetail {
-  holeNo: number;
-  par: number;
-  result: number | null;
-  putts: number | null;
-  form_Score: number | null;
-  //form_Score: number;
-}
-
-interface scoreDetas {
-  date: Date;
-  golfPlaceName: string;
-  roundId: number;
-  holedetails: holeDetail[];
-}
-
 const calculateScore = (holedetails: holeDetail[]) => {
   //console.log(holedetails);
   let result = 0;
   holedetails.forEach((element) => {
-    if (element.result) result += element.result;
+    if (element.golfScore) result += element.golfScore;
   });
   //console.log(result);
   return result;
@@ -130,7 +115,7 @@ function calculateDays(date: Date) {
   return item[date.getDay()];
 }
 
-const props = defineProps<scoreDetas>();
+const props = defineProps<roundDetail>();
 </script>
 
 <style scoped>
