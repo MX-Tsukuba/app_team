@@ -40,13 +40,16 @@ const playData = reactive({
 const addPlayData = async () => {
   console.log('inputCard_currentHoleIndex', props.currentHoleIndex);
   console.log('playData', playData);
-  if (playData.scoreNumber != 0 && playData.puttsNumber != 0) {
-    const { error } = await supabase.from('t_holes').insert({
-      hole_number: playData.holeNumber,
-      round_id: props.roundId,
-      putts_number: playData.puttsNumber,
-      score_number: playData.scoreNumber,
-    });
+  if (playData.scoreNumber) {
+    const { error } = await supabase.from('t_holes').upsert(
+      {
+        hole_number: playData.holeNumber,
+        round_id: props.roundId,
+        putts_number: playData.puttsNumber,
+        score_number: playData.scoreNumber,
+      },
+      { onConflict: 'hole_number, round_id' }
+    );
     if (error) {
       alert(error.message);
     } else {
