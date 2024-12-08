@@ -33,8 +33,8 @@ const emit = defineEmits([
 ]);
 const playData = reactive({
   holeNumber: props.currentHoleIndex + 1,
-  puttsNumber: props.playDataArr[props.itemIndex]?.puttsNumber || -1,
-  scoreNumber: props.playDataArr[props.itemIndex]?.scoreNumber || -1,
+  puttsNumber: props.playDataArr[props.itemIndex]?.puttsNumber || 0,
+  scoreNumber: props.playDataArr[props.itemIndex]?.scoreNumber || 0,
 });
 //データ挿入
 const addPlayData = async () => {
