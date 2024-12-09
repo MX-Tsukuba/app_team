@@ -18,11 +18,15 @@ describe('test flow', {testIsolation: false},() => {
         cy.get('.inputBoxPW').clear().type('abc123');
         cy.get('.inputBoxPW').should('have.value','abc123');
         // ログインボタンを押下
+        cy.wait(1);
         cy.get('.mailLoginButton').click();
+        //ログインに成功したか？
+        cy.url().should('eq', baseUrl)
     });
 
     it('meal', () => {
         cy.get('[href="/mealInput"]').click();
+        cy.url().should('include','mealInput');
         cy.get('.input').clear().type('test1');
         cy.get('.inputkcal').clear().type(123);
         cy.get('.addBtn').click;
