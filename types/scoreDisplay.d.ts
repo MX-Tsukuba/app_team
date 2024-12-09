@@ -33,11 +33,4 @@ type monthMovieLog = {
   movieDetails: movieDetail[];
 };
 
-export {
-  holeDetail,
-  roundDetail,
-  monthScoreLog,
-  movieDetail,
-  monthMovieLog,
-  Logs,
-};
+export { holeDetail, roundDetail, monthScoreLog, movieDetail, monthMovieLog };
