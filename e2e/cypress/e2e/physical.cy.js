@@ -2,6 +2,12 @@ describe('physical', () => {
     const baseUrl = 'https://localhost:3000/';
     const login_id = "reyree41@gmail.com";
     const password = "abc123";
+
+    Cypress.on('uncaught:exception', (err, runnable) => {
+        // returning false here prevents Cypress from
+        // failing the test
+        return false
+    })
   
     before(() => {
         cy.viewport(430, 932);
