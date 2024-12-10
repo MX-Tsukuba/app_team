@@ -52,7 +52,7 @@ const handleSelectChange = async (event: Event) => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  /* width: 360px; */
+  width: 300px; 
   height: 310px;
   background-color: white;
   border-radius: 20px;

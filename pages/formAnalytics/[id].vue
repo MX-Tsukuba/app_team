@@ -1,6 +1,6 @@
 <template>
   <div id="card-container">
-    <topCard :score="topScore" :date="movieDate" :is-active="isActive" :-u-r-l="movieURL" :select-movie-data="selectMovieData" />
+    <topCard :score="topScore" :change-hole-arr="changeHoleArr" :date="movieDate" :is-active="isActive" :-u-r-l="movieURL" :select-movie-data="selectMovieData" />
     <bottomCard :play-data-arr="playDataArr" :movie-analyze-arr="movieAnalyzeArr" :isActive="isActive" />
   </div>
 </template>
@@ -25,9 +25,9 @@ let movieDate=ref<string|null>("");
 let topScore=ref<number>(100);
 let movieName=ref<string>('');
 let movieURL=ref<string>('');
-let playDataArr=ref<playData[]>([]);
-let changeHoleArr=ref([{}]);
-let movieAnalyzeArr=ref<movieAnalyze[]>([]);
+let playDataArr=ref<playData[]>(new Array(18).fill({}));
+let changeHoleArr=ref<{hole_number:number,movie_id:number}[]>([]);
+let movieAnalyzeArr=ref<movieAnalyze[]>(new Array(8).fill({}));
 
 import { useHeadVarStore } from '~/src/store/headVar.js';
 import { usePageStore } from '~/src/store/currentPage';
@@ -44,28 +44,51 @@ const selectRoundData =async(number:number)=> {
     console.error('roundの取得に失敗しました',roundError.message)
     return null;
   }else{
-    //取得したデータをJSの変数に代入していくt_relation(hole_number,movie_id),
-    // for(let i=0;i<data[0].t_relation.length;i++){
-    //   changeHoleArr.value.push(data[0].t_relation[i]);
-    // }
-
     golfPlaceName.value=data[0].m_golfplaces?.golf_place_name || 'ゴルフ場名がありません';//型定義のundifined許容を何とかする
+    console.log(playDataArr,"playDataArr");
+    console.log(data[0],"data");
     for(let i=0;i<18;i++){
-      // ParDataArr.value.push(new ParData(data[0].m_golfplaces?.m_holes[i].hole_number,data[0].m_golfplaces?.m_holes[i].par_number));
-      data[0].t_holes.forEach(item=>{
-      if(item.hole_number===i+1){//ホール数とindexで1の差があるので調整
-        playDataArr.value[i].holeNo=item.hole_number;
-        playDataArr.value[i].result=item.score_number;
-        playDataArr.value[i].putts=item.putts_number;
-        playDataArr.value[i].par=data[0].m_golfplaces?.m_holes[i].hole_number,data[0].m_golfplaces?.m_holes[i].par_number;
-        playDataArr.value[i].form_Score=null;
+      // playDataArrの初期化を修正
+      playDataArr.value[i] = new playData(0, undefined, null, null, null); // 初期値を設定
+      data[0].t_holes.forEach(item => {
+        if(item.hole_number === i + 1) { // ホール数とindexで1の差があるので調整
+          playDataArr.value[i].holeNo = item.hole_number || 0;
+          playDataArr.value[i].result = item.score_number || 0;
+          playDataArr.value[i].putts = item.putts_number || 0;
+          playDataArr.value[i].par = data[0].m_golfplaces?.m_holes[i].par_number; // 修正
+          playDataArr.value[i].form_Score = null;
+        }
+      });
+    }
+    // const { data: selectMovieData, error: subError } = await supabase
+    //   .from('t_movies')
+    //   .select('movie_id')
+    //   .filter('result', 'not.is', null)
+    //   .neq('result', '[]'); 
+    //   if(subError){console.error('suberror',subError);}
+    //   else{
+        const {data:relationData,error:relationError}= await supabase
+          .from('t_relations')
+          .select('hole_number,movie_id')
+          .eq('round_id',roundId.value)
+          // .in('movie_id',selectMovieData)
+          .order('hole_number',{ascending:true});
+          if(relationError){
+            console.error('relationの取得に失敗しました',relationError);
+          }
+          else{
+            console.log('relationの取得に成功しました',relationData);
+            for(let i=0;i<relationData.length;i++){
+              changeHoleArr.value.push(relationData[i]);
+            }
+          console.log('changeHoleArr',changeHoleArr.value);
+          }
+        // }
       }
-    });
-  }
-  console.log('playDataArr',playDataArr.value);
-  isLoading.value=false;
+    console.log('playDataArr',playDataArr.value);
+    isLoading.value=false;
 }
-}
+
 
 const selectMovieData=async(number:number)=>{
   const {data:movieData,error:movieError}=await supabase
@@ -80,19 +103,20 @@ const selectMovieData=async(number:number)=>{
     movieName.value=movieData[0].movie_name;
     const movieJson=movieData[0].result;
     topScore.value=Math.round(Number(movieJson.total_score)*100);
-    movieAnalyzeArr.value.push(new movieAnalyze(Math.round(Number(movieJson.right_elbow_shoulder_score)*100),'腕の上昇位置','#E45D5D'));
-    movieAnalyzeArr.value.push(new movieAnalyze(Math.round(Number(movieJson.sway_score)*100),'スウェー','#54B1CE' ));
-    movieAnalyzeArr.value.push(new movieAnalyze(Math.round(Number(movieJson.cog_score)*100),'重心移動','#509A58' ));
-    movieAnalyzeArr.value.push(new movieAnalyze(Math.round(Number(movieJson.forward_posture_score)*100),'前傾姿勢の維持','#509A58' ));
-    movieAnalyzeArr.value.push(new movieAnalyze(Math.round((Number(movieJson.address_parallel_score[0])+Number(movieJson.address_parallel_score[1]))*50),'アドレス時の平衡性','#82E3E3' ));
-    movieAnalyzeArr.value.push(new movieAnalyze(Math.round(Number(movieJson.head_stable_score)*100),'上半身の安定性','#F28822' ));
-    movieAnalyzeArr.value.push(new movieAnalyze(Math.round(Number(movieJson.axis_inclination_score)*100),'アッパー姿勢','#FECADB' ));
-    movieAnalyzeArr.value.push(new movieAnalyze(Math.round(Number(movieJson.twisting_score)*100),'捻転差','#7371BF' ));
+    movieAnalyzeArr.value[0]=new movieAnalyze(Math.round(Number(movieJson.right_elbow_shoulder_score)*100),'腕の上昇位置','#E45D5D');
+    movieAnalyzeArr.value[1]=new movieAnalyze(Math.round(Number(movieJson.sway_score)*100),'スウェー','#54B1CE' );
+    movieAnalyzeArr.value[2]=new movieAnalyze(Math.round(Number(movieJson.cog_score)*100),'重心移動','#509A58' );
+    movieAnalyzeArr.value[3]=new movieAnalyze(Math.round(Number(movieJson.forward_posture_score)*100),'前傾姿勢の維持','#509A58' );
+    movieAnalyzeArr.value[4]=new movieAnalyze(Math.round((Number(movieJson.address_parallel_score[0]||0)+Number(movieJson.address_parallel_score[1]||0))*50),'アドレス時の平衡性','#82E3E3' );
+    movieAnalyzeArr.value[5]=new movieAnalyze(Math.round(Number(movieJson.head_stable_score)*100),'上半身の安定性','#F28822' );
+    movieAnalyzeArr.value[6]=new movieAnalyze(Math.round(Number(movieJson.axis_inclination_score)*100),'アッパー姿勢','#FECADB' );
+    movieAnalyzeArr.value[7]=new movieAnalyze(Math.round(Number(movieJson.twisting_score)*100),'捻転差','#7371BF' );
 
 
 
 
     console.log('movieの取得に成功しました',movieData);
+    console.log(movieAnalyzeArr.value,"movieAnalyzeArr");
 
     const {data:URLdata} =await supabase
     .storage
@@ -115,7 +139,7 @@ function formatDate(dateString: string): string {
 
 
 class playData {
-  holeNo: number;
+  holeNo: number | undefined;
   par: number | undefined;
   result: number | null;
   putts: number | null;
@@ -167,6 +191,7 @@ onMounted(async () => {
 #card-container {
     display: flex;
     flex-direction: column;
+    /* align-items: center; */
     gap: 20px;
 }
 </style>
