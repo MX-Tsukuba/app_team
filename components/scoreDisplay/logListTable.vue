@@ -17,7 +17,7 @@ const props = defineProps<{ holeDetails: holeDetail[] }>();
         </tr>
       </thead>
       <tbody class="t_body">
-        <LogListTableRow v-for="i in 18" v-bind="holeDetails[i - 1]" />
+        <LogListTableRow v-for="i in 18" v-bind="props.holeDetails[i - 1]" />
       </tbody>
     </table>
   </div>
