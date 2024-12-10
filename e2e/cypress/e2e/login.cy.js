@@ -1,5 +1,8 @@
 describe('template spec', () => {
   const baseUrl = 'https://localhost:3000/';
+  const login_id = "reyree41@gmail.com";
+  const password = "abc123";
+
   before(() => {
     cy.viewport(430, 932);
     cy.visit(baseUrl);
