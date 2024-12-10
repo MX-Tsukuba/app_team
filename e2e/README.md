@@ -5,14 +5,11 @@ E2Eテスト用フォルダ
 1. 「~/app_team/」でテスト対象のアプリを立ち上げておく
 2. 「~/app_team/e2e/」にて
 ```
-Set-ExecutionPolicy  RemoteSigned  -Scope CurrentUser //PowerShellの実行ポリシー変更
-npm init -y
-npm install cypress
-npx tsc --init --types cypress --lib dom,es6
+npm ci
+npx cypress open
 ```
-を実行してNode.jsにcypressを追加(？)
-3. npx cypress openでCyress立ち上げ
-4. E2E Testing → 好きなブラウザを選択してStart E2E Testing in Chrome
-5. Specsより実行したいテストを選択
+を実行してnode_modulesフォルダを復帰し(git clone後の初回起動だけ)、Cypressを立ち上げる
+3. E2E Testing → Configuration filesはContinueボタンを押す → 好きなブラウザを選択してStart E2E Testing in xxx
+4. Specsより実行したいテストを選択
 
-参考: https://zenn.dev/takakiriy/articles/41531107d17455
+参考: https://qiita.com/Takakiri/items/b7011eb1949371f887e0
