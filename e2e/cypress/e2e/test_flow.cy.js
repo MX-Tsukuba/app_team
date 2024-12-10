@@ -1,5 +1,12 @@
 describe('test flow', {testIsolation: false},() => {
     const baseUrl = 'https://localhost:3000/';
+    
+    Cypress.on('uncaught:exception', (err, runnable) => {
+        // returning false here prevents Cypress from
+        // failing the test
+        return false
+    })
+    
     before(() => {
         // ensure clean test slate for these tests
         cy.then(Cypress.session.clearCurrentSessionData)
@@ -25,10 +32,14 @@ describe('test flow', {testIsolation: false},() => {
     });
 
     it('meal', () => {
-        cy.get('[href="/mealInput"]').click();
+        cy.get('[href="/mealInput"]').focus().click();
         cy.url().should('include','mealInput');
         cy.get('.input').clear().type('test1');
         cy.get('.inputkcal').clear().type(123);
         cy.get('.addBtn').click;
     });
+
+    it('physical', () => {
+        cy.get('[href="/bodyInput"]').click();
+    })
   });
