@@ -89,7 +89,7 @@ const props=defineProps<{
   /* width: 360px; */
   height: 350px;
   background-color: white;
-  /* border-radius: 20px; */
+  border-radius: 20px;
   gap: 20px;
 }
 
@@ -211,4 +211,30 @@ align-items: center;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }
+table {
+  font-family: Inter;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}
+
+tr {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  justify-items: stretch;
+  min-width: 300px;
+}
+
+th {
+  width: 100%;
+}
+
+thead {
+  background: #90b9dc;
+  color: #fff;
+  font-size: 12px;
+}
+
 </style>
