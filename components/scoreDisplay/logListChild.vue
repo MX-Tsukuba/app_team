@@ -22,44 +22,26 @@
         <div class="score_text">合計スコア</div>
         <div class="score_value">{{ calculateScore(props.holeDetails) }}</div>
       </div>
-      <!-- <div class="place_tag">
-        <div class="place_text">📍{{ props.golfPlaceName }}</div>
-      </div> -->
       <div class="no_Value_tag" v-show="someHoleIsNull">
         <div class="isNull_text">！未入力</div>
       </div>
     </div>
-    <div class="score_table" v-show="isScoreTableVisible">
-      <table>
-        <thead>
-          <tr>
-            <th>ホール</th>
-            <th>パー</th>
-            <th>スコア</th>
-            <th>パッド</th>
-            <th>フォーム</th>
-          </tr>
-        </thead>
-        <tbody class="t_body">
-          <LogListTableRow v-for="i in 18" v-bind="getHoleDetails(i)" />
-        </tbody>
-      </table>
-    </div>
+    <LogListTable
+      :holeDetails="props.holeDetails"
+      v-show="isScoreTableVisible"
+    />
     <div class="links">
       <div v-show="isScoreTableVisible">
         <button class="text_edit" @click="moveEditPage(props.roundId)">
           スコアを編集
         </button>
       </div>
-      <!-- <div v-show="isScoreTableVisible">
-        <div class="text_Analytics">フォームの分析を見る ></div>
-      </div> -->
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import LogListTableRow from './logListTableRow.vue';
+import LogListTable from './logListTable.vue';
 import LogListArrow from './logListArrow.vue';
 import { useRouter } from 'vue-router';
 import type { roundDetail, holeDetail } from '~/types/scoreDisplay';
@@ -71,34 +53,20 @@ const moveEditPage = (id: number) => {
   router.push({ path: `/scoreInput/${id}`, query: { param: 'scoreDisplay' } });
 };
 
-const getHoleDetails = (i: number): holeDetail => {
-  const detail = props.holeDetails.find((item) => item.holeNumber === i);
-  if (detail?.scoreNumber) {
-    return detail;
-  } else {
-    someHoleIsNull.value = true;
-    return {
-      holeNumber: i,
-      parNumber: null,
-      scoreNumber: null,
-      puttsNumber: null,
-      formScore: null,
-    };
-  }
-};
-
 const isScoreTableVisible = ref(false);
 const toggleScoreTable = () => {
   isScoreTableVisible.value = !isScoreTableVisible.value;
 };
 
-const calculateScore = (holedetails: holeDetail[]) => {
+const calculateScore = (holeDetails: holeDetail[]) => {
   //console.log(holedetails);
   let result = 0;
-  holedetails.forEach((element) => {
+  let nullFlag = 0;
+  holeDetails.forEach((element) => {
     if (element.scoreNumber) result += element.scoreNumber;
+    else nullFlag++;
   });
-  //console.log(result);
+  if (nullFlag > 0) someHoleIsNull.value = true;
   return result;
 };
 
@@ -268,44 +236,6 @@ const props = defineProps<roundDetail>();
   font-weight: 400;
   line-height: normal;
 }
-
-.score_table {
-  align-items: center;
-
-  margin: auto;
-  margin-bottom: 10px;
-  text-align: center;
-  max-width: 100%;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-table {
-  font-family: Inter;
-  font-size: 14px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: normal;
-}
-
-tr {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  justify-items: stretch;
-  min-width: 300px;
-}
-
-th {
-  width: 100%;
-}
-
-thead {
-  background: #90b9dc;
-  color: #fff;
-  font-size: 12px;
-}
-
 .dateAndPlaceTag{
   position: relative;
   display:flex;
