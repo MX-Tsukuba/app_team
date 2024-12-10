@@ -313,6 +313,7 @@ onUnmounted(() => {
           @updateCurrentHole="updateCurrentHole"
           @incrementCurrentHole="incrementCurrentHole"
           @updatePlayDataArr="updatePlayDataArr"
+          :isFetched="isLoading"
         />
       </swiper-slide>
     </swiper-container>
