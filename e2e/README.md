@@ -7,7 +7,7 @@ E2Eテスト用フォルダ
 ```
 Set-ExecutionPolicy  RemoteSigned  -Scope CurrentUser //PowerShellの実行ポリシー変更
 npm init -y
-npm install cypress typescript
+npm install cypress
 npx tsc --init --types cypress --lib dom,es6
 ```
 を実行してNode.jsにcypressを追加(？)
