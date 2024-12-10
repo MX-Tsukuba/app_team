@@ -2,7 +2,7 @@
   <tr :class="props.holeNumber % 2 === 0 ? 'even' : 'odd'">
     <td>{{ props.holeNumber }}</td>
     <td>{{ props.parNumber }}</td>
-    <td>{{ props.golfScore }}</td>
+    <td>{{ props.scoreNumber }}</td>
     <td>{{ props.puttsNumber }}</td>
     <td>{{ props.formScore }}</td>
   </tr>

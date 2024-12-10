@@ -73,14 +73,14 @@ const moveEditPage = (id: number) => {
 
 const getHoleDetails = (i: number): holeDetail => {
   const detail = props.holeDetails.find((item) => item.holeNumber === i);
-  if (detail?.golfScore) {
+  if (detail?.scoreNumber) {
     return detail;
   } else {
     someHoleIsNull.value = true;
     return {
       holeNumber: i,
       parNumber: null,
-      golfScore: null,
+      scoreNumber: null,
       puttsNumber: null,
       formScore: null,
     };
@@ -96,7 +96,7 @@ const calculateScore = (holedetails: holeDetail[]) => {
   //console.log(holedetails);
   let result = 0;
   holedetails.forEach((element) => {
-    if (element.golfScore) result += element.golfScore;
+    if (element.scoreNumber) result += element.scoreNumber;
   });
   //console.log(result);
   return result;

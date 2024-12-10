@@ -1,7 +1,7 @@
 type holeDetail = {
   holeNumber: number;
   parNumber: number | null;
-  golfScore: number | null;
+  scoreNumber: number | null;
   puttsNumber: number | null;
   formScore: number | null;
 };

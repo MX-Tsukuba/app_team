@@ -103,7 +103,7 @@ const fetchLog = async () => {
           tmpHoleDetails.push({
             holeNumber: a.hole_number,
             parNumber: a.par_number,
-            golfScore: b.score_number,
+            scoreNumber: b.score_number,
             puttsNumber: b.putts_number,
             formScore: null,
           });
@@ -111,7 +111,7 @@ const fetchLog = async () => {
           tmpHoleDetails.push({
             holeNumber: a.hole_number,
             parNumber: a.par_number,
-            golfScore: null,
+            scoreNumber: null,
             puttsNumber: null,
             formScore: null,
           });

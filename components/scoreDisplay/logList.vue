@@ -15,11 +15,7 @@
 
 <script setup lang="ts">
 import logListChild from './logListChild.vue';
-import type {
-  holeDetail,
-  roundDetail,
-  monthScoreLog,
-} from '@/types/scoreDisplay';
+import type { monthScoreLog } from '@/types/scoreDisplay';
 
 type data = {
   value: monthScoreLog[];
