@@ -6,8 +6,18 @@ describe('template spec', () => {
   });
   
   it('login', () => {
+    // usernameの入力・検証
+    cy.wait(1);
     cy.get('.inputBox').clear().type('reyree41@gmail.com');
+    cy.get('.inputBox').should('have.value','reyree41@gmail.com')
+    // passwordの入力・検証
+    cy.wait(1);
     cy.get('.inputBoxPW').clear().type('abc123');
-    cy.get('.mailLoginButton').focus().click();
-  });
+    cy.get('.inputBoxPW').should('have.value','abc123');
+    // ログインボタンを押下
+    cy.wait(1);
+    cy.get('.mailLoginButton').click();
+    //ログインに成功したか？
+    cy.url().should('eq', baseUrl)
+});
 });
