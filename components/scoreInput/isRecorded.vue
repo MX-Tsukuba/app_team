@@ -8,7 +8,7 @@ const scoreStore = useScoreStore();
 //piniaから取得
 const currentHoleIndex = computed(() => scoreStore.currentHoleIndex);
 const videoUrlArray = computed(() => scoreStore.videoUrlArray);
-console.log(`[In IsRecorded.vue] videoUrlArray:${videoUrlArray.value}, currentHoleIndex:${currentHoleIndex.value}`);
+//console.log(`[In IsRecorded.vue] videoUrlArray:${videoUrlArray.value}, currentHoleIndex:${currentHoleIndex.value}`);
 
 const isCurrentHoleRecorded = computed(() => scoreStore.isCurrentHoleRecorded());
 </script>

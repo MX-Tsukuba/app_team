@@ -16,7 +16,6 @@ const router = useRouter()
 const route = useRoute()
 
 const param = route.query.param || 'null'
-console.log(`[In camera.vue] param:${param}`)
 const roundId = route.query.id || 'null'
 const movieId = ref<number>(0)
 const modalStore = useModalStore();

@@ -97,7 +97,7 @@ const insertRounds = async() => {
 
 const ToNewScoreInput = async () => {
   await insertRounds();
-  console.log(`[In enterGolfCourseName.vue] ページ遷移先のround_id:${round_id.value}`);
+  // console.log(`[In enterGolfCourseName.vue] ページ遷移先のround_id:${round_id.value}`);
 
   if(golf_place_Index.value===-1){
     console.log('return null')
@@ -117,7 +117,6 @@ const ToRestartScoreInput = async () => {
     console.log(`[In enterGolfCourseName.vue] ToRestartScoreInput スコア入力の中断に失敗しています`);
   } else if (inputStateStore.roundId) {
     round_id.value = inputStateStore.roundId;
-    console.log(round_id.value);
     router.push({
       path: `/scoreInput/${round_id.value}`,
       query:{

@@ -113,6 +113,7 @@ const selectData = async () => {
     });
   }
   isLoading.value = false;
+  console.log(scoreStore.videoUrlArray);
 };
 
 const setting = () => {
