@@ -136,7 +136,10 @@ const upLoadSupabaseStorage = async (video: Blob | File) => {
             }
           ])
         router.push({
-          path: `/scoreInput/${roundId}`
+          path: `/scoreInput/${roundId}`,
+          query:{
+            param: 'scoreInput'
+          }
         })
         scoreStore.setVideoUrl(publicUrl);
         scoreStore.updateVideoUrlArray(currentHoleIndex.value, publicUrl);

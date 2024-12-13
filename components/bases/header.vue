@@ -1,16 +1,28 @@
 <script setup lang="ts">
 import Menu from './Menu.vue';
 import { useHeadVarStore } from '~/src/store';
+import { useRouter } from 'vue-router';
 const headVarStore = useHeadVarStore();
 const isOpen = ref(false);
+const router = useRouter();
 const handleMenubar = () => {
   isOpen.value = !isOpen.value;
+};
+
+const customRedirect = () => {
+  if (headVarStore.backButtonText === '一時保存') {
+    router.push('/top');
+  } else if (headVarStore.backButtonText === '編集終了') {
+    router.push('/scoreDisplay');
+  } else {
+    router.go(-1);
+  }
 };
 </script>
 
 <template>
   <header>
-    <div class="backButton" @click="$router.go(-1)">
+    <div class="backButton" @click="customRedirect()">
       <img
         src="~/assets/img/back.png"
         alt="Back"
