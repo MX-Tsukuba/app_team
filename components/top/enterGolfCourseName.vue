@@ -137,6 +137,9 @@ onMounted(() => {
   selectData();
 }
 );
+onUnmounted(() => {
+  toggleModal();
+});
 
 </script>
 
