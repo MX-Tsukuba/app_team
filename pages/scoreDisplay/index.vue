@@ -116,6 +116,14 @@ const fetchLog = async () => {
             formScore: null,
           });
         }
+      } else {
+        tmpHoleDetails.push({
+          holeNumber: i,
+          parNumber: null,
+          scoreNumber: null,
+          puttsNumber: null,
+          formScore: null,
+        });
       }
     }
     tmpRoundDetailsList.push({

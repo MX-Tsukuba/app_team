@@ -5,7 +5,7 @@
         :class="['tab', { active: selectedTab === 'score' }]"
         @click="selectedTab = 'score'"
       >
-      解析スコア
+        解析スコア
       </div>
       <div
         :class="['tab', { active: selectedTab === 'detail' }]"
@@ -18,8 +18,12 @@
     <div class="content">
       <div v-if="selectedTab === 'score'">
         <div class="scoreItemContainer">
-          <div class="progress" v-for="(v,i) in props.movieAnalyzeArr" :key="i">
-            <p class="name">{{v.name}}</p>
+          <div
+            class="progress"
+            v-for="(v, i) in props.movieAnalyzeArr"
+            :key="i"
+          >
+            <p class="name">{{ v.name }}</p>
             <div class="progressContainer">
               <el-progress
                 :percentage="v.score"
@@ -31,27 +35,12 @@
               />
               <p class="scoreleft">/100</p>
             </div>
-          </div> 
+          </div>
         </div>
       </div>
       <div v-if="selectedTab === 'detail'">
         <div class="detailContainer">
-          <div class="score_table" v-show="isActive===true">
-            <table>
-              <thead>
-                <tr>
-                  <th>ホール</th>
-                  <th>パー</th>
-                  <th>スコア</th>
-                  <th>パッド</th>
-                  <th>フォーム</th>
-                </tr>
-              </thead>
-              <tbody class="t_body">
-                <logListTableRow v-for="i in 18" v-bind="playDataArr[i]" />
-              </tbody>
-            </table>
-          </div>
+          <logListTable :holeDetails="playDataArr" v-show="isActive" />
         </div>
       </div>
     </div>
@@ -59,26 +48,15 @@
 </template>
 
 <script setup lang="ts">
-import logListTableRow from '../scoreDisplay/logListTableRow.vue';
+import type { holeDetail } from '~/types/scoreDisplay';
+import logListTable from '../scoreDisplay/logListTable.vue';
 const selectedTab = ref<string>('score');
 
-const props=defineProps<{
-  playDataArr:{
-  holeNo: number;
-  par: number | null;
-  result: number | null;
-  putts: number | null;
-  form_Score: number | null;
-}[]
-  movieAnalyzeArr:{score:number,name:string,color:string}[]
-  isActive:boolean
-}>()
-
-
-
-
-
-
+const props = defineProps<{
+  playDataArr: holeDetail[];
+  movieAnalyzeArr: { score: number; name: string; color: string }[];
+  isActive: boolean;
+}>();
 </script>
 
 <style scoped>
@@ -199,42 +177,4 @@ align-items: center;
 ::v-deep(.el-progress__text) {
   color: var(--custom-color) !important; /* 動的なテキスト色 */
 }
-
-
-.score_table {
-  align-items: center;
-
-  margin: auto;
-  margin-bottom: 10px;
-  text-align: center;
-  max-width: 100%;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
-table {
-  font-family: Inter;
-  font-size: 14px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: normal;
-}
-
-tr {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  justify-items: stretch;
-  min-width: 300px;
-}
-
-th {
-  width: 100%;
-}
-
-thead {
-  background: #90b9dc;
-  color: #fff;
-  font-size: 12px;
-}
-
 </style>
