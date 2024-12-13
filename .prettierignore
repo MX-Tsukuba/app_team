@@ -4,4 +4,4 @@
 # Markdownファイルを除外
 *.md
 
-.nuxt\**
+.nuxt/**
