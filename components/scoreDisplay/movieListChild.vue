@@ -1,15 +1,8 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
+import type { movieDetail } from '~/types/scoreDisplay';
 const value = ref<boolean>(true);
 const router = useRouter();
-
-interface movie {
-  id: number;
-  date: Date;
-  status: number;
-  total_score: number | null;
-  roundId: number | null;
-}
 
 function calculateDays(date: Date) {
   const item = [
@@ -36,7 +29,7 @@ const toAnalytics = (movieId: number, roundId: number | null) => {
   });
 };
 
-const props = defineProps<movie>();
+const props = defineProps<movieDetail>();
 </script>
 
 <template>
@@ -51,7 +44,7 @@ const props = defineProps<movie>();
         <div class="score_tag">
           <div class="score_text">スコア</div>
           <div class="score_value">
-            {{ props.total_score ? Math.round(props.total_score * 100) : null }}
+            {{ props.formScore ? Math.round(props.formScore * 100) : null }}
           </div>
         </div>
       </div>

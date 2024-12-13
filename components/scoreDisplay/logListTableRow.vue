@@ -1,22 +1,16 @@
 <template>
-  <tr :class="props.holeNo % 2 === 0 ? 'even' : 'odd'">
-    <td>{{ props.holeNo }}</td>
-    <td>{{ props.par }}</td>
-    <td>{{ props.result }}</td>
-    <td>{{ props.putts }}</td>
-    <td>{{ props.form_Score }}</td>
+  <tr :class="props.holeNumber % 2 === 0 ? 'even' : 'odd'">
+    <td>{{ props.holeNumber }}</td>
+    <td>{{ props.parNumber }}</td>
+    <td>{{ props.scoreNumber }}</td>
+    <td>{{ props.puttsNumber }}</td>
+    <td>{{ props.formScore }}</td>
   </tr>
 </template>
 
 <script setup lang="ts">
-interface holeDetails {
-  holeNo: number;
-  par: number | null;
-  result: number | null;
-  putts: number | null;
-  form_Score: number | null;
-}
-const props = defineProps<holeDetails>();
+import type { holeDetail } from '~/types/scoreDisplay';
+const props = defineProps<holeDetail>();
 </script>
 
 <style scoped>
