@@ -50,13 +50,14 @@ describe('meal', () => {
         // 入力内容の確認
         cy.get('.resultTable').contains('teeeeeeeeeeeeeeeeeeeeeest2').should('exist');
         cy.get('.resultTable').contains(test2_kcal).should('exist');
+        
         // スクリーンショットの保存
-        cy.scrollTo('bottom' ,{ duration: 2000 })
-        cy.wait(3000)
+        cy.scrollTo('bottom' ,{ duration: 200 })
+        cy.wait(300)
         cy.get('header').invoke('css','position','absolute')
-        cy.get('.footer').invoke('css','position','absolute')
+        //cy.get('.footer').invoke('css','position','absolute')
         cy.screenshot('朝ごはん入力', {overwrite: true})
         cy.get('header').invoke('css','position',null)
-        cy.get('.footer').invoke('css','position',null)
+        //cy.get('.footer').invoke('css','position',null)
     });
   });
