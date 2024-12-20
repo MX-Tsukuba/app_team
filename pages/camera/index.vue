@@ -88,13 +88,14 @@ const upLoadSupabaseStorage = async (video: Blob | File) => {
       ? videoSrc.value.split('/').pop()?.split('.')[0] ?? 'test/test.mp4'
       : 'test/test.mp4';
     const { data, error } = await supabase
-      
       .storage
       .from('Movie')
       
       .upload(fileName, video);
     if (error) {
       console.log('ファイルのアップロードに失敗しました:',error);
+      alert('動画のアップロードに失敗しました、もう一度お試しください');
+      return;
     } else {
       const currentDate = new Date().toISOString().split('T')[0];
       const {data:dbData, error : dbError } = await supabase
@@ -147,7 +148,7 @@ const upLoadSupabaseStorage = async (video: Blob | File) => {
       }
     }
   } catch (err) {
-    console.error('エラーが発生しました:', err);
+    console.error('予期せぬエラーが発生しました:', err);
   }
 };
 const confirmVideo = async () => {
@@ -201,6 +202,14 @@ onBeforeUnmount(() => {
         <div class="buttons">
           <button @click="toggleModal('confirmModal')" class="cancelButton">キャンセル</button>
           <button @click="confirmVideo" class="confirmButton">確認</button>
+        </div>
+      </div>
+    </div>
+    <div v-if="isShowModal && modalName === 'uploadFailedModal'" class="modal">
+      <div class="card">
+        <p class="title">動画のアップロードに失敗しました。もう一度お試しください</p>
+        <div class="buttons">
+          <button @click="toggleModal('uploadFailedModal')" class="confirmButton">確認</button>
         </div>
       </div>
     </div>
