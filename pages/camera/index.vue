@@ -205,14 +205,6 @@ onBeforeUnmount(() => {
         </div>
       </div>
     </div>
-    <div v-if="isShowModal && modalName === 'uploadFailedModal'" class="modal">
-      <div class="card">
-        <p class="title">動画のアップロードに失敗しました。もう一度お試しください</p>
-        <div class="buttons">
-          <button @click="toggleModal('uploadFailedModal')" class="confirmButton">確認</button>
-        </div>
-      </div>
-    </div>
 
     <img
       src="~/assets/img/backWhite.png"

@@ -1,16 +1,15 @@
 <script setup lang="ts">
 import type { Database } from '~/types/database.types';
 import { Information } from '~/components/scoreInput';
-import { useInputStateStore, useScoreStore } from '~/src/store';
+import { useInputStateStore } from '~/src/store';
 const inputStateStore = useInputStateStore();
-const scoreStore = useScoreStore();
 const supabase = useSupabaseClient<Database>();
-const currentHoleVideoUrl = computed(() => scoreStore.getCurrentHoleVideoUrl());
 
 type dbPlayData = {
   holeNumber?: number;
   scoreNumber?: number;
   puttsNumber?: number;
+  videoUrl?: string | null;
 };
 interface Props {
   itemIndex: number;
@@ -36,6 +35,7 @@ const playData = reactive({
   holeNumber: props.currentHoleIndex + 1,
   puttsNumber: props.playDataArr[props.itemIndex]?.puttsNumber || 0,
   scoreNumber: props.playDataArr[props.itemIndex]?.scoreNumber || 0,
+  videoUrl: props.playDataArr[props.itemIndex]?.videoUrl || null,
 });
 //データ挿入
 const addPlayData = async () => {
@@ -72,6 +72,7 @@ watch(
     playData.holeNumber = newHole + 1;
     playData.puttsNumber = props.playDataArr[props.itemIndex]?.puttsNumber || 0;
     playData.scoreNumber = props.playDataArr[props.itemIndex]?.scoreNumber || 0;
+    playData.videoUrl = props.playDataArr[props.itemIndex]?.videoUrl || null;
   }
 );
 
@@ -84,6 +85,8 @@ watch(
         props.playDataArr[props.itemIndex]?.puttsNumber || 0;
       playData.scoreNumber =
         props.playDataArr[props.itemIndex]?.scoreNumber || 0;
+      playData.videoUrl = 
+        props.playDataArr[props.itemIndex]?.videoUrl || null;
     }
   }
 );
@@ -123,8 +126,8 @@ watch(
       </div>
     </div>
     <video
-      v-if="currentHoleVideoUrl"
-      :src="currentHoleVideoUrl"
+      v-if="playData.videoUrl"
+      :src="playData.videoUrl"
       controls
       class="videoArea"
     ></video>

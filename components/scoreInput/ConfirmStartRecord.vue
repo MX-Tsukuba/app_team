@@ -10,14 +10,12 @@
 </template>
 
 <script setup lang="ts">
-import { useModalStore, useScoreStore } from '~/src/store';
+import { useModalStore } from '~/src/store';
 const modalStore = useModalStore();
-const scoreStore = useScoreStore();
 const toggleModal = () => modalStore.toggleModal('');
 const router = useRouter();
 const route = useRoute();
 let roundId =ref<number>(Number(route.params.id));
-const currentHoleIndex = computed(() => scoreStore.currentHoleIndex);
 
 onMounted(() => {
   setTimeout(() => {
