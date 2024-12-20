@@ -141,7 +141,6 @@ const upLoadSupabaseStorage = async (video: Blob | File) => {
           }
         })
         scoreStore.setVideoUrl(publicUrl);
-        scoreStore.updateVideoUrlArray(currentHoleIndex.value, publicUrl);
       } else {
         console.error("リダイレクト先が見つかりません");
         return;

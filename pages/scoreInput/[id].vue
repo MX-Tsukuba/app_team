@@ -44,11 +44,13 @@ class playData {
   holeNumber?: number;
   scoreNumber?: number;
   puttsNumber?: number;
+  videoUrl?: string;
 
-  constructor(holeNumber?: number, scoreNumber?: number, puttsNumber?: number) {
+  constructor(holeNumber?: number, scoreNumber?: number, puttsNumber?: number, videoUrl?: string) {
     this.holeNumber = holeNumber;
     this.scoreNumber = scoreNumber;
     this.puttsNumber = puttsNumber;
+    this.videoUrl = videoUrl;
   }
 }
 
@@ -107,13 +109,13 @@ const selectData = async () => {
             .from('Movie')
             .getPublicUrl(fileName);
           const publicUrl = publicUrlData.publicUrl;
-          scoreStore.updateVideoUrlArray(i, publicUrl);
+          playDataArr.value[i].videoUrl = publicUrl;
         }
       }
     });
   }
   isLoading.value = false;
-  console.log(scoreStore.videoUrlArray);
+  console.log(playDataArr);
 };
 
 const setting = () => {
@@ -121,9 +123,8 @@ const setting = () => {
   ParDataArr.value = [];
   playDataArr.value = new Array(18).fill({});
   for (let i = 0; i < 18; i++) {
-    playDataArr.value[i] = new playData(0, 0, 0);
-    scoreStore.updateVideoUrlArray(i, null);
-  }
+    playDataArr.value[i] = new playData(0, 0, 0, "");
+    }
 };
 
 // const {data}  = await useAsyncData(()=>fetchPar(currentHole.value), {watch: [currentHole]});
@@ -147,6 +148,7 @@ const updatePlayDataArr = (playData: {
   playDataArr.value[playData.holeNumber - 1].puttsNumber = playData.puttsNumber;
   console.log(playDataArr);
 };
+
 
 //ホール選択（スライド）
 interface holeObj {
@@ -227,10 +229,18 @@ watch(currentHoleIndex, () =>
   })
 );
 const videoInsert = async () => {
-  videoUrl.value = scoreStore.getCurrentHoleVideoUrl();
+  const currentVideoUrl = playDataArr.value[currentHoleIndex.value].videoUrl;
+
+  // currentVideoUrlがstringであることを確認
+  if (currentVideoUrl) {
+    videoUrl.value = currentVideoUrl; // videoUrlに代入
+  } else {
+    videoUrl.value = null; // currentVideoUrlがundefinedの場合はnullを代入
+  }
+
   await nextTick();
   if (videoPlayer.value && videoUrl.value) {
-    videoPlayer.value.src = videoUrl.value;
+    videoPlayer.value.src = videoUrl.value; // videoUrlがnullでないことを確認
   }
 };
 
@@ -319,16 +329,16 @@ onUnmounted(() => {
       </swiper-slide>
     </swiper-container>
 
-    <IsRecorded
-      v-if="!scoreStore.isCurrentHoleRecorded()"
+    <IsRecorded :playDataArr="playDataArr"
+      v-if="!playDataArr[currentHoleIndex.value].videoUrl"
       @click="toggleModal('confirm')"
     />
-    <IsRecorded v-else />
+    <IsRecorded :playDataArr="playDataArr" v-else />
     <StartRecord
       v-if="
         isShowModal &&
         modalName === 'confirm' &&
-        !scoreStore.getCurrentHoleVideoUrl()
+        !playDataArr[currentHoleIndex.value].videoUrl
       "
     />
   </section>
