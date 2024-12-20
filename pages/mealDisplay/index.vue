@@ -127,6 +127,8 @@ let kindImages=reactive( [
 ])
 // 定義
 const supabase = useSupabaseClient<Database>();
+const route = useRoute();
+const initialDate = route.query.date as string | undefined;
 const daySum=ref<number[]>([0,0,0,0,0,0,0]);
 const kindSum=ref<number[][]>([[],[],[],[]]);
 let today=new Date();
@@ -134,6 +136,10 @@ let kindNowIndex=ref<number>(0);
 const kindNow=["朝食","昼食","夕食","間食"];
 
 let dateNowIndex =ref<number>(today.getDay())
+if(initialDate){
+    const insertedDate = new Date(initialDate);
+    dateNowIndex.value = insertedDate.getDay();
+}
 const isLoading = ref<boolean>(true);
 const week_view_tables=ref<any[]>([]);
 
@@ -175,10 +181,10 @@ const changeWeeks=(i:number)=>{
 
 function getCurrentWeekDates(startDay:number=1):string[]{
     const dayOfWeek =today.getDay(); // 日曜日=0,土曜日=6
-    const diff=(dayOfWeek +7-startDay) % 7;
+    // const diff=(dayOfWeek +7-startDay) % 7;
 
     const startOfWeek = new Date(today);
-    startOfWeek.setDate(today.getDate()-diff);
+    startOfWeek.setDate(today.getDate()-dayOfWeek);
 
     const weekDates=ref<string[]>([]);
     for(let i=0;i<7;i++){
@@ -271,7 +277,7 @@ console.log('chartData:', chartData.value);
 
     border-radius: 20px;
     background: #FFF;
-    box-shadow: 0px 0px 8px 2px rgba(0, 0, 0, 0.40);
+    box-shadow: 0px 0px 8px 2px rgba(0, 0, 0, 0.25);
 }
 .graghChart{
     width: 330px;
