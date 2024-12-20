@@ -137,7 +137,7 @@ onMounted(() => {
 }
 );
 onUnmounted(() => {
-  toggleModal();
+  modalStore.isShowModal = false;
 });
 
 </script>
