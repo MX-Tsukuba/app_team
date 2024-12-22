@@ -330,7 +330,7 @@ onUnmounted(() => {
     </swiper-container>
 
     <IsRecorded :playDataArr="playDataArr"
-      v-if="!playDataArr[currentHoleIndex].videoUrl"
+      v-if="!playDataArr[currentHoleIndex].videoUrl || playDataArr[currentHoleIndex].videoUrl == undefined"
       @click="toggleModal('confirm')"
     />
     <IsRecorded :playDataArr="playDataArr" v-else />

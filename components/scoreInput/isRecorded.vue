@@ -2,7 +2,7 @@
 import { defineProps } from 'vue';
 import CameraImg from '~/assets/img/camera.svg';
 import CameraTransparentImg from '~/assets/img/cameraTransparent.svg';
-import { useScoreStore } from '~/src/store/scoreInput';
+
 type dbPlayData = {
   holeNumber?: number;
   scoreNumber?: number;
@@ -12,9 +12,9 @@ type dbPlayData = {
 interface Props {
   playDataArr: dbPlayData[];
 }
-const scoreStore = useScoreStore();
+
 const props = defineProps<Props>();
-const currentHoleIndex = computed(() => props.playDataArr[scoreStore.currentHoleIndex]);
+const currentHoleIndex = computed(() => props.);
 const isCurrentHoleRecorded = computed(() => currentHoleIndex.value?.videoUrl !== undefined); // videoUrlが存在するか確認
 </script>
 
