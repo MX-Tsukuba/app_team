@@ -35,7 +35,7 @@ const insertToDatabase = async()=>{
     if(error){
         console.error('Error inserting data:',error);
     }else{
-        router.push('./mealDisplay');//insert実行後にページ遷移をしたい
+        router.push({path: './mealDisplay', query: {date: myArr[0].date}});//insert実行後にページ遷移をしたい.今は同一日程で登録されるのでとりあえず0番目の日付を渡す
     }
 };
 
