@@ -67,6 +67,7 @@ const calculateScore = (holeDetails: holeDetail[]) => {
     else nullFlag++;
   });
   if (nullFlag > 0) someHoleIsNull.value = true;
+  else someHoleIsNull.value = false;
   return result;
 };
 
