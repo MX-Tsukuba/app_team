@@ -117,13 +117,23 @@ const fetchLog = async () => {
           });
         }
       } else {
-        tmpHoleDetails.push({
-          holeNumber: i,
-          parNumber: null,
-          scoreNumber: null,
-          puttsNumber: null,
-          formScore: null,
-        });
+        if (b) {
+          tmpHoleDetails.push({
+            holeNumber: i,
+            parNumber: null,
+            scoreNumber: b.score_number,
+            puttsNumber: b.putts_number,
+            formScore: null,
+          });
+        } else {
+          tmpHoleDetails.push({
+            holeNumber: i,
+            parNumber: null,
+            scoreNumber: null,
+            puttsNumber: null,
+            formScore: null,
+          });
+        }
       }
     }
     tmpRoundDetailsList.push({

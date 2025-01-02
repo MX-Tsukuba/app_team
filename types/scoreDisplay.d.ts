@@ -1,10 +1,10 @@
-type holeDetail = {
+interface holeDetail {
   holeNumber: number;
   parNumber: number | null;
   scoreNumber: number | null;
   puttsNumber: number | null;
   formScore: number | null;
-};
+}
 
 type roundDetail = {
   date: Date;
