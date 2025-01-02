@@ -108,6 +108,37 @@ const selectRoundData = async (number: number) => {
         changeHoleArr.value.push(relationData[i]);
       }
       console.log('changeHoleArr', changeHoleArr.value);
+
+      //以下フォームのスコアを表に入れるための処理
+      const movieIds = relationData.map((value) => {
+        return value.movie_id;
+      });
+
+      const { data: movieData, error } = await supabase
+        .from('t_movies')
+        .select('*')
+        .in('id', movieIds);
+      if (error) throw error;
+      console.log(movieData);
+
+      relationData.forEach((value) => {
+        const index = playDataArr.value.findIndex((item) => {
+          return item.holeNumber === value.hole_number;
+        });
+        // console.log(index);
+
+        const movieDetail = movieData.find((item) => {
+          return item.id === value.movie_id;
+        });
+
+        if (index !== -1) {
+          if (movieDetail) {
+            playDataArr.value[index].formScore = movieDetail.result?.total_score
+              ? Math.round((movieDetail.result.total_score as number) * 100)
+              : null;
+          }
+        }
+      });
     }
     // }
   }
