@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import changeDate from '~/components/meal/changeDate.vue';
-import { onMounted } from 'vue'
-import { useHeadVarStore } from '~/src/store/headVar.js'
-import  FlexibilityModal  from '~/components/bodyDisplay/FlexibilityModal.vue'
+import { onMounted } from 'vue';
+import { useHeadVarStore } from '~/src/store/headVar.js';
+import FlexibilityModal from '~/components/bodyDisplay/FlexibilityModal.vue';
 import { usePageStore } from '~/src/store/currentPage';
 
-const headVarStore = useHeadVarStore()
-headVarStore.title = '身体情報入力'
+const headVarStore = useHeadVarStore();
+headVarStore.title = '身体情報入力';
 const pageStore = usePageStore();
 onMounted(() => {
   pageStore.setCurrentPage('body');
@@ -21,35 +21,41 @@ const selectedDate = ref<Date>(new Date());
 
 // 日付を指定のフォーマットに変換する関数
 const formatDateToString = (date: Date): string => {
-  const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const day = String(date.getDate()).padStart(2, '0')
-  return `${year}-${month}-${day}`
-}
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
 
 // フォーマットされた日付を計算するcomputed
-const formattedDate = computed<string>(() => formatDateToString(selectedDate.value))
+const formattedDate = computed<string>(() =>
+  formatDateToString(selectedDate.value)
+);
 
 // 日付を指定した日数分移動する関数
 const moveDate = (days: number): void => {
-  const newDate = new Date(selectedDate.value)
-  newDate.setDate(newDate.getDate() + days)
-  if(newDate.getDate()>new Date().getDate() && newDate.getMonth()===new Date().getMonth() && newDate.getFullYear()===new Date().getFullYear()){
+  const newDate = new Date(selectedDate.value);
+  newDate.setDate(newDate.getDate() + days);
+  if (
+    newDate.getDate() > new Date().getDate() &&
+    newDate.getMonth() === new Date().getMonth() &&
+    newDate.getFullYear() === new Date().getFullYear()
+  ) {
     return;
   }
-  selectedDate.value = newDate
-}
-
+  selectedDate.value = newDate;
+};
 
 const insertBody = async () => {
-  const { error } = await supabase
-    .from('body_inputs')
-    .upsert({
+  const { error } = await supabase.from('body_inputs').upsert(
+    {
       date: formattedDate.value,
       weight: bodyWeight.value,
       flexibility: flexibility.value,
       height: bodyHeight.value,
-    }, { onConflict: 'date' });
+    },
+    { onConflict: 'date' }
+  );
 
   if (error) {
     console.error('Error inserting or updating data:', error);
@@ -57,62 +63,82 @@ const insertBody = async () => {
     console.log('Data inserted or updated successfully');
     await navigateTo('./bodyDisplay');
   }
-}
+};
 
-let bodyWeight=ref(0);
-let bodyHeight=ref(0);
-let flexibility=ref(0);
+let bodyWeight = ref(0);
+let bodyHeight = ref(0);
+let flexibility = ref(0);
 
 const isModalOpen = ref(false);
 
 const showModal = () => {
   isModalOpen.value = true;
 };
-
 </script>
 
 <template>
-<div class="bodyLayout">
-  <div class="BchangeDate">
-    <changeDate :formatted-date="formattedDate" @firstclick="moveDate(-1)" @secondclick="moveDate(1)" ></changeDate>
-  </div>
+  <div class="bodyLayout">
+    <div class="BchangeDate">
+      <changeDate
+        :formatted-date="formattedDate"
+        @firstclick="moveDate(-1)"
+        @secondclick="moveDate(1)"
+      ></changeDate>
+    </div>
 
-  <div class="mainInputBody">
-    <div class="BinputLayout">
-      <div class="BinputDetails">
-        <div class="BinputCard">
-          <div class="inputName"><p class="inputText">体重(必須)</p></div>
-          <div class="inputBody">
-            <input class="Binput"placeholder="数値を入力" v-model="bodyWeight"></input>
-            <p>kg</p>
+    <div class="mainInputBody">
+      <div class="BinputLayout">
+        <div class="BinputDetails">
+          <div class="BinputCard">
+            <div class="inputName"><p class="inputText">体重(必須)</p></div>
+            <div class="inputBody">
+              <input
+                class="Binput"
+                placeholder="数値を入力"
+                v-model="bodyWeight"
+              />
+              <p>kg</p>
+            </div>
           </div>
+          <div class="inputCard">
+            <div class="inputName"><p class="inputText">身長</p></div>
+            <div class="inputBody">
+              <input
+                class="Binput"
+                placeholder="数値を入力(任意)"
+                v-model="bodyHeight"
+              />
+              <p>cm</p>
+            </div>
+          </div>
+          <div class="inputCard">
+            <div class="inputName">
+              <p class="inputText">柔軟性</p>
+              <!-- <span class="help-icon" @click="showModal">?</span> -->
+              <img
+                src="~assets/img/information.png"
+                alt="information"
+                class="help-icon"
+                @click="showModal"
+              />
+            </div>
+            <div class="inputBody">
+              <input
+                class="Binput"
+                placeholder="数値を入力(任意)"
+                v-model="flexibility"
+              />
+              <p>cm</p>
+            </div>
+          </div>
+          <FlexibilityModal v-model:isOpen="isModalOpen" />
         </div>
-        <div class="inputCard">
-          <div class="inputName"><p class="inputText">身長</p></div>
-          <div class="inputBody">
-            <input class="Binput"placeholder="数値を入力(任意)" v-model="bodyHeight"></input>
-            <p>cm</p>
-          </div>
-        </div>
-        <div class="inputCard">
-          <div class="inputName">
-            <p class="inputText">柔軟性</p>
-            <!-- <span class="help-icon" @click="showModal">?</span> -->
-            <img src="~assets/img/information.png" alt="information" class="help-icon" @click="showModal" >
-          </div>
-          <div class="inputBody">
-            <input class="Binput" placeholder="数値を入力(任意)" v-model="flexibility"></input>
-            <p>cm</p>
-          </div>
-        </div>
-        <FlexibilityModal v-model:isOpen="isModalOpen" />
+        <button class="BaddBtn" @click="insertBody">
+          <div class="addName">追加</div>
+        </button>
       </div>
-      <button class="BaddBtn" @click="insertBody">
-        <div class="addName">追加</div>
-      </button>
     </div>
   </div>
-</div>
 </template>
 
 <style lang="css">

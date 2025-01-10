@@ -1,0 +1,7 @@
+# JSONファイルを除外
+*.json
+
+# Markdownファイルを除外
+*.md
+
+.nuxt/**

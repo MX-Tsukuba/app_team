@@ -1,19 +1,19 @@
 <template  >
     <button v-if="title=='朝食'" :class="ifClick ? 'true-class' : 'false-class'" @click="changeKind()">
-        <img v-if="ifClick" src="@/assets/img/icon_morning_click.png" :alt="title"></img>
-        <img v-else  src="@/assets/img/icon_morning_default.png" :alt="title"></img>
+        <img v-if="ifClick" src="@/assets/img/icon_morning_click.png" :alt="title">
+        <img v-else  src="@/assets/img/icon_morning_default.png" :alt="title">
     </button>
     <button v-if="title=='昼食'" :class="ifClick ? 'true-class' : 'false-class'" @click="changeKind()">
-        <img v-if="ifClick" src="@/assets/img/icon_afternoon_click.png" :alt="title"></img>
-        <img v-else  src="@/assets/img/icon_afternoon_default.png" :alt="title"></img>
+        <img v-if="ifClick" src="@/assets/img/icon_afternoon_click.png" :alt="title">
+        <img v-else  src="@/assets/img/icon_afternoon_default.png" :alt="title">
     </button>
     <button v-if="title=='夕食'" :class="ifClick ? 'true-class' : 'false-class'" @click="changeKind()">
-        <img v-if="ifClick" src="@/assets/img/icon_night_click.png" :alt="title"></img>
-        <img v-else  src="@/assets/img/icon_night_default.png" :alt="title"></img>
+        <img v-if="ifClick" src="@/assets/img/icon_night_click.png" :alt="title">
+        <img v-else  src="@/assets/img/icon_night_default.png" :alt="title">
     </button>
     <button v-if="title=='間食'" :class="ifClick ? 'true-class' : 'false-class'" @click="changeKind()">
-        <img v-if="ifClick" src="@/assets/img/icon_snack_click.png" :alt="title"></img>
-        <img v-else  src="@/assets/img/icon_snack_default.png" :alt="title"></img>
+        <img v-if="ifClick" src="@/assets/img/icon_snack_click.png" :alt="title">
+        <img v-else  src="@/assets/img/icon_snack_default.png" :alt="title">
     </button>
 </template>
 
