@@ -17,14 +17,14 @@ const route = useRoute()
 
 const param = route.query.param || 'null'
 const roundId = route.query.id || 'null'
+const currentHoleIndex = Number(route.query.hole) || 0;
 const movieId = ref<number>(0)
 const modalStore = useModalStore();
 const scoreStore = useScoreStore();
 const isShowModal = computed(() => modalStore.isShowModal);
 const modalName = computed(() => modalStore.modalName);
 const toggleModal = (name:string) => modalStore.toggleModal(name);
-const currentHoleIndex = computed(() => scoreStore.currentHoleIndex);
-
+// const currentHoleIndex = computed(() => scoreStore.currentHoleIndex);
 
 const recordedBlob = ref<Blob | null>(null);
 const selectedFile = ref<File | null>(null);
@@ -131,7 +131,7 @@ const upLoadSupabaseStorage = async (video: Blob | File) => {
           .insert([
             {
               round_id: Number(roundId),
-              hole_number: currentHoleIndex.value + 1,
+              hole_number: currentHoleIndex + 1,
               movie_id: movieId.value
             }
           ])
@@ -141,7 +141,7 @@ const upLoadSupabaseStorage = async (video: Blob | File) => {
             param: 'scoreInput'
           }
         })
-        scoreStore.setVideoUrl(publicUrl);
+        // scoreStore.setVideoUrl(publicUrl);
       } else {
         console.error("リダイレクト先が見つかりません");
         return;

@@ -3,19 +3,27 @@ import { defineProps } from 'vue';
 import CameraImg from '~/assets/img/camera.svg';
 import CameraTransparentImg from '~/assets/img/cameraTransparent.svg';
 
+const props = defineProps<{
+  currentHoleIndex: number;
+  playDataArr: dbPlayData[]
+}>();
+
 type dbPlayData = {
   holeNumber?: number;
   scoreNumber?: number;
   puttsNumber?: number;
   videoUrl?: string | null;
 };
-interface Props {
-  playDataArr: dbPlayData[];
-}
 
-const props = defineProps<Props>();
-const currentHoleIndex = computed(() => props.);
-const isCurrentHoleRecorded = computed(() => currentHoleIndex.value?.videoUrl !== undefined); // videoUrlが存在するか確認
+// isCurrentHoleRecordedがtrueの場合、カメラアイコンを透明にする
+const isCurrentHoleRecorded = computed(() => {
+  const currentHoleData = props.playDataArr?.[props.currentHoleIndex];
+  if (!currentHoleData) return false;
+  
+  console.log(currentHoleData.videoUrl !== undefined && currentHoleData.videoUrl !== null);
+  return currentHoleData.videoUrl !== undefined && 
+         currentHoleData.videoUrl !== null;
+});
 </script>
 
 <template>

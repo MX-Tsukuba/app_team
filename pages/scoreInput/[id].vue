@@ -44,7 +44,7 @@ class playData {
   holeNumber?: number;
   scoreNumber?: number;
   puttsNumber?: number;
-  videoUrl?: string;
+  videoUrl?: string
 
   constructor(holeNumber?: number, scoreNumber?: number, puttsNumber?: number, videoUrl?: string) {
     this.holeNumber = holeNumber;
@@ -57,7 +57,6 @@ class playData {
 class ParData {
   hole_number?: number;
   par_number?: number;
-
   constructor(hole_number?: number, par_number?: number) {
     this.hole_number = hole_number;
     this.par_number = par_number;
@@ -69,6 +68,7 @@ const ParDataArr = ref<ParData[]>([]);
 
 //データの取得@辻
 const selectData = async () => {
+  console.log('debug: selectData');
   const { data: data, error: roundError } = await supabase
     .from('t_rounds')
     .select(
@@ -119,19 +119,21 @@ const selectData = async () => {
 };
 
 const setting = () => {
+  console.log('debug: setting');
   roundId.value = Number(route.params.id);
   ParDataArr.value = [];
   playDataArr.value = new Array(18).fill({});
   for (let i = 0; i < 18; i++) {
-    playDataArr.value[i] = new playData(0, 0, 0, "");
-    }
+    playDataArr.value[i] = new playData(0, 0, 0, null);
+  }
+  console.log(playDataArr)
 };
 
 // const {data}  = await useAsyncData(()=>fetchPar(currentHole.value), {watch: [currentHole]});
 
 const updateCurrentHole = (holeId: number) => {
   currentHoleIndex.value = holeId;
-  scoreStore.setCurrentHoleIndex(holeId);
+  // scoreStore.setCurrentHoleIndex(holeId);
   if (swiperCards.value) {
     swiperCards.value.swiper.slideTo(holeId);
   }
@@ -141,14 +143,15 @@ const updatePlayDataArr = (playData: {
   holeNumber: number;
   puttsNumber: number;
   scoreNumber: number;
+  videoUrl: string;
 }) => {
   console.log('updated playDataArr');
   playDataArr.value[playData.holeNumber - 1].holeNumber = playData.holeNumber;
   playDataArr.value[playData.holeNumber - 1].scoreNumber = playData.scoreNumber;
   playDataArr.value[playData.holeNumber - 1].puttsNumber = playData.puttsNumber;
+  playDataArr.value[playData.holeNumber - 1].videoUrl = playData.videoUrl;
   console.log(playDataArr);
 };
-
 
 //ホール選択（スライド）
 interface holeObj {
@@ -229,6 +232,8 @@ watch(currentHoleIndex, () =>
   })
 );
 const videoInsert = async () => {
+  console.log('debug: videoInsert');
+  if (!playDataArr.value?.[currentHoleIndex.value]) return;
   const currentVideoUrl = playDataArr.value[currentHoleIndex.value].videoUrl;
 
   // currentVideoUrlがstringであることを確認
@@ -248,6 +253,7 @@ onMounted(() => {
   pageStore.setCurrentPage('score');
   videoInsert();
   if (swiperCards.value) {
+    console.log('debug: swiperCards.value', swiperCards.value);
     swiperCards.value.swiper.on('slideChange', onSlideChange);
   }
   setting();
@@ -328,17 +334,23 @@ onUnmounted(() => {
         />
       </swiper-slide>
     </swiper-container>
-
-    <IsRecorded :playDataArr="playDataArr"
-      v-if="!playDataArr[currentHoleIndex].videoUrl || playDataArr[currentHoleIndex].videoUrl == undefined"
+<!--動画が撮影されていたらカメラを押してもカメラに飛ばされない-->
+    <IsRecorded 
+      :playDataArr="playDataArr" 
+      :currentHoleIndex
+      v-if="playDataArr?.[currentHoleIndex]?.videoUrl === undefined || playDataArr?.[currentHoleIndex]?.videoUrl === null"
       @click="toggleModal('confirm')"
     />
-    <IsRecorded :playDataArr="playDataArr" v-else />
+    <IsRecorded
+      :playDataArr="playDataArr"
+      :currentHoleIndex
+      v-else 
+    />
     <StartRecord
       v-if="
         isShowModal &&
         modalName === 'confirm' &&
-        !playDataArr[currentHoleIndex].videoUrl
+        !playDataArr.value?.[currentHoleIndex.value]?.videoUrl
       "
     />
   </section>
@@ -356,19 +368,19 @@ element.style{
 }
 .displayBox{
   display: flex;
-flex-direction: column;
-justify-content: center;
-align-items: flex-end;
-gap: 2px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 2px;
 }
 .displayHolePar{
   font-size: 36px;
   color: #007BE5;
-align-self: stretch;
-position: relative;
-top: 0;
-left: 0;
-text-align: center;
+  align-self: stretch;
+  position: relative;
+  top: 0;
+  left: 0;
+  text-align: center;
 }
 .displayPar{
   font-size: 20px;
@@ -379,11 +391,11 @@ text-align: center;
 }
 .displayLine{
   width: 300px;
-height: 2px;
-margin: 0;
-border-radius: 8px;
-background: #007BE5;
-box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, .5);
+  height: 2px;
+  margin: 0;
+  border-radius: 8px;
+  background: #007BE5;
+  box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, .5);
 }
 .selectHole{
   width: 100vw;
@@ -392,7 +404,6 @@ box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, .5);
   align-items: end;
   gap: 10px;
 }
-
 .eachHole{
   margin: 5px;
   display: flex;
