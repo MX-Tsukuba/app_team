@@ -3,11 +3,20 @@ describe('meal', () => {
     const login_id = "reyree41@gmail.com";
     const password = "abc123";
 
-    const today = new Date()
-    const DateOFToday = [today.getFullYear(), today.getMonth()+1, today.getDate()]
-    const yesterday = new Date()
-    yesterday.setDate(yesterday.getDate()-1)
-    const DateOFYesterday = [yesterday.getFullYear(), yesterday.getMonth(), yesterday.getDate()]
+    // 日付の計算
+    const today = new Date();
+    const DateOFToday = [
+        today.getFullYear(),
+        today.getMonth() + 1, // 月を1加算
+        today.getDate(),
+    ];
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const DateOFYesterday = [
+        yesterday.getFullYear(),
+        yesterday.getMonth() + 1, // 月を1加算
+        yesterday.getDate(),
+    ];
 
     Cypress.on('uncaught:exception', (err, runnable) => {
         // returning false here prevents Cypress from
@@ -71,17 +80,18 @@ describe('meal', () => {
         
 
         // 結果表示の確認
-        cy.url().should('include','mealInput');
-        cy.get('.insertBtn').click();                                   // 結果挿入ボタンを押下
-        cy.url().should('include','mealDisplay');     // URLの検証
-        cy.get(':nth-child(1) > .dateBtn').click();                     // 日付を今日のに
-        cy.get('.dayfont').contains(DateOFToday[2]).should('exist');               // 日付が今日のか確認(仕様変わってたら修正)
-        cy.get('.true-class > img').click();                            // 朝ごはんボタンを押下
-        cy.get('.table').contains('test'+test_num).should('exist');     // 2つ目の朝ごはんが正しい名前で保存されてるか
-        cy.get('.backButton').click();                                  // 入力画面へ戻る
+        cy.url().should('include', 'mealInput');
+        cy.get('.insertBtn').click(); // 結果挿入ボタンを押下
+        cy.url().should('include', 'mealDisplay'); // URLの検証
+
+        // 日付の検証 (文字列化して検証)
+        cy.get('.dayfont').should('be.visible').and('contain', String(DateOFToday[2])); // 今日の日付の検証
+        cy.get('.true-class > img').click(); // 朝ごはんボタンを押下
+        cy.get('.table').contains('test' + test_num).should('exist'); // 2つ目の朝ごはんが正しい名前で保存されてるか
+        cy.get('.backButton').click(); // 入力画面へ戻る
 
         // 過去の食事を記録する
-        cy.url().should('include','mealInput');
-        cy.get('.changeDate > :nth-child(1)').click();
+        cy.url().should('include', 'mealInput');
+        cy.get('.changeDate > :nth-child(1)').click(); // 過去の日付に変更
     });
-  });
+});
