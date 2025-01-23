@@ -59,13 +59,13 @@ describe('meal', () => {
         cy.get('.resultTable').contains(test1_kcal).should('exist');
 
         // 今日の朝ごはん2を入力
-        const test_num = Math.floor(Math.random()*100000);
+        const test2_num = Math.floor(Math.random()*100000); // 長い文字の入力に対する挙動を検証
         const test2_kcal = Math.floor(Math.random()*100);   // (0,100)の整数をランダムに生成
-        cy.get('.input').clear().type('test'+String(test_num));             // 「食事名」に'test1'を入力
-        cy.get('.inputkcal').clear().type(test2_kcal);      // 「カロリー」にtest1_kcalを入力
+        cy.get('.input').clear().type('test'+String(test2_num));             // 「食事名」に'test1'を入力
+        cy.get('.inputkcal').clear().type(test2_kcal);      // 「カロリー」にtest2_kcalを入力
         cy.get('.addBtn').click();                          // 「追加」ボタンを押下
         // 入力内容の確認
-        cy.get('.resultTable').contains('test'+String(test_num)).should('exist');
+        cy.get('.resultTable').contains('test'+String(test2_num)).should('exist');
         cy.get('.resultTable').contains(test2_kcal).should('exist');
 
         // 食事入力画面におけるスクリーンショットの保存
@@ -87,11 +87,18 @@ describe('meal', () => {
         // 日付の検証 (文字列化して検証)
         cy.get('.dayfont').should('be.visible').and('contain', String(DateOFToday[2])); // 今日の日付の検証
         cy.get('.true-class > img').click(); // 朝ごはんボタンを押下
-        cy.get('.table').contains('test' + test_num).should('exist'); // 2つ目の朝ごはんが正しい名前で保存されてるか
+        cy.get('.table').contains('test' + test2_num).should('exist'); // 2つ目の朝ごはんが正しい名前で保存されてるか
         cy.get('.backButton').click(); // 入力画面へ戻る
 
         // 過去の食事を記録する
         cy.url().should('include', 'mealInput');
-        cy.get('.changeDate > :nth-child(1)').click(); // 過去の日付に変更
+        cy.get('.changeDate > :nth-child(1)').click();      // 過去の日付に変更
+        const test3_kcal = Math.floor(Math.random()*100);   // (0,100)の整数をランダムに生成
+        cy.get('.input').clear().type('test3');             // 「食事名」に'test3'を入力
+        cy.get('.inputkcal').clear().type(test3_kcal);      // 「カロリー」にtest3_kcalを入力
+        cy.get('.addBtn').click();                          // 「追加」ボタンを押下
+        // 入力内容の確認
+        cy.get('.resultTable').contains('test3').should('exist');
+        cy.get('.resultTable').contains(test3_kcal).should('exist');
     });
 });
