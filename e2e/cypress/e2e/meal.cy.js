@@ -60,15 +60,15 @@ describe('meal', () => {
         cy.get('.resultTable').contains(test2_kcal).should('exist');
 
         // 食事入力画面におけるスクリーンショットの保存
-        /*
+        
         cy.scrollTo('bottom' ,{ duration: 200 });
         cy.wait(300);
-        cy.get('header').invoke('css','position','absolute');
-        cy.get('.footer').invoke('css','position','absolute');
+        cy.get('header').invoke('css','position','relative');
+        cy.get('.footer').invoke('css','position','relative');
         cy.screenshot('朝ごはん入力', {overwrite: true});
         cy.get('header').invoke('css','position',null);
         cy.get('.footer').invoke('css','position',null);
-        */
+        
 
         // 結果表示の確認
         cy.url().should('include','mealInput');
